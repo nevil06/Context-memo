@@ -1,0 +1,215 @@
+project:
+  name: context-memo
+  purpose: Provides a persistent memory layer for AI agents, enabling seamless context switching between different AI coding assistants. This solves the problem of AI agents losing project context when sessions are interrupted or agents are swapped, saving developers time and effort.
+  type: CLI
+  stack: Node.js, commander, js-yaml, clipboardy, chalk, inquirer
+  entry_points:
+    - bin/memo.js
+  environment_vars: []
+  constraints: Free tier Gemini API (no credit card required)
+knowledge_graph:
+  god_nodes:
+    - name: scan.js
+      why_critical: This is the core command that orchestrates the scanning process, interacts with the Gemini API, and generates the memory file, making it central to the project's functionality.
+      file: src/commands/scan.js
+  components:
+    - name: initCommand
+      file: src/commands/init.js
+      role: Initializes the .recall/ directory and template files for memory storage.
+      exports: [default]
+      depends_on:
+        - fileUtils
+      status: complete
+    - name: scanCommand
+      file: src/commands/scan.js
+      role: Scans the project files, builds a prompt, calls the Gemini API, and saves the generated memory.
+      exports: [default]
+      depends_on:
+        - fileUtils
+        - scanner
+        - prompt
+        - gemini
+        - config
+        - inquirer
+      status: complete
+    - name: updateCommand
+      file: src/commands/update.js
+      role: Allows users to interactively update the project's progress and task state.
+      exports: [default]
+      depends_on:
+        - fileUtils
+        - inquirer
+      status: complete
+    - name: loadCommand
+      file: src/commands/load.js
+      role: Reads the memory file and builds an agent briefing, copying it to the clipboard.
+      exports: [default]
+      depends_on:
+        - fileUtils
+        - assembler
+        - clipboard
+      status: complete
+    - name: statusCommand
+      file: src/commands/status.js
+      role: Displays a terminal dashboard showing the project's current status and progress.
+      exports: [default]
+      depends_on:
+        - fileUtils
+      status: complete
+    - name: installCommand
+      file: src/commands/install.js
+      role: Creates integration files for various AI agents to read the memory file.
+      exports: [default]
+      depends_on: [fs, path, chalk]
+      status: complete
+    - name: configCommand
+      file: src/commands/config.js
+      role: Manages the configuration, primarily storing the Gemini API key.
+      exports: [default]
+      depends_on: [fs, path, os, chalk]
+      status: complete
+    - name: scanner
+      file: src/utils/scanner.js
+      role: Recursively scans the project directory, categorizing files and extracting git information.
+      exports: [scanProject]
+      depends_on: [fs, path]
+      status: complete
+    - name: prompt
+      file: src/utils/prompt.js
+      role: Constructs the detailed prompt for the Gemini API, including project structure and instructions.
+      exports: [buildGeminiPrompt]
+      depends_on: [scanner]
+      status: complete
+    - name: gemini
+      file: src/utils/gemini.js
+      role: Handles the communication with the Gemini API, sending prompts and receiving responses.
+      exports: [callGemini, estimateTokens]
+      depends_on: []
+      status: complete
+    - name: assembler
+      file: src/utils/assembler.js
+      role: Builds the agent briefing from the memory data in different modes (quick, full, onboard).
+      exports: [buildBriefing]
+      depends_on: []
+      status: complete
+    - name: fileUtils
+      file: src/utils/fileUtils.js
+      role: Provides utility functions for file system operations, including reading and writing YAML files.
+      exports: [ensureRecallDir, createRecallDir, writeYaml, readYaml, fileExists, writeFile, readFile, getRecallPath, appendToFile]
+      depends_on: [fs, path, yaml]
+      status: complete
+    - name: clipboard
+      file: src/utils/clipboard.js
+      role: Handles copying text to the system clipboard.
+      exports: [copyToClipboard]
+      depends_on: [clipboardy]
+      status: complete
+  data_flow: The `scan` command reads project files and git history, constructs a prompt, sends it to the Gemini API, and receives a YAML response which is saved as `memory.yaml`. The `load` command reads `memory.yaml` and `task_state.yaml` to build an agent briefing that is copied to the clipboard. The `update` command modifies `task_state.yaml` and `memory.yaml`.
+  api_endpoints: []
+  data_models:
+    - project:
+        name: string
+        purpose: string
+        type: string
+        stack: string
+        entry_points: string
+        environment_vars: string[]
+        constraints: string
+        non_goals: string
+    - knowledge_graph:
+        god_nodes:
+          - name: string
+            why_critical: string
+            file: string
+        components:
+          - name: string
+            file: string
+            role: string
+            exports: string[]
+            depends_on: string[]
+            status: 'complete' | 'in_progress' | 'broken' | 'stub' | 'not_started'
+        data_flow: string
+        api_endpoints: string[]
+        data_models: string[]
+        external_services: string[]
+    - progress:
+        percent_done: integer
+        phase: string
+        what_works: string[]
+        what_is_broken: string[]
+        what_is_missing: string[]
+        technical_debt: string[]
+    - task_state:
+        last_task: string
+        current_problem: string
+        continue_here:
+          file: string
+          location: string
+          instruction: string
+        next_steps: string[]
+        blocked_on: string
+        completed_recently: string[]
+    - _meta:
+        scan_count: integer
+        last_scan_timestamp: string
+        file_count: integer
+  external_services:
+    - name: Gemini API
+      type: AI Model API
+      url: https://generativelanguage.googleapis.com/
+progress:
+  percent_done: 100
+  phase: complete
+  what_works:
+    - CLI commands (init, scan, load, status, update, install, config) are fully implemented and functional.
+    - Project scanning logic correctly categorizes and prioritizes files.
+    - Gemini API integration is established and handles responses.
+    - Knowledge graph and task state generation are complete.
+    - Agent briefing generation with multiple modes is functional.
+    - Clipboard integration works for pasting briefings.
+    - Agent integration scripts for 7 agents are created.
+    - Terminal UI with colored output and progress bars is implemented.
+    - Documentation is comprehensive and covers all aspects of the project.
+  what_is_broken: []
+  what_is_missing: []
+  technical_debt: []
+task_state:
+  last_task: Project completion and documentation.
+  current_problem: None. The project is marked as complete.
+  continue_here:
+    file: ''
+    location: ''
+    instruction: ''
+  next_steps: []
+  blocked_on: nothing
+  completed_recently:
+    - Finalized documentation files (README.md, QUICKSTART.md, etc.).
+    - Completed the FINAL_SUMMARY.md and PROJECT_SUMMARY.md.
+    - Ensured all commands and utilities are fully implemented as per checklists.
+    - Verified the structure and content of generated YAML files.
+decisions:
+  - decision: Use Gemini 1.5 Flash API for its free tier and capabilities.
+    why: To provide a cost-effective solution for AI agent memory generation without requiring user credit card information.
+    impact: The project relies on an external API for its core functionality.
+  - decision: Structure the memory file in YAML format with a predefined schema.
+    why: YAML is human-readable and easily parsable by both humans and machines, making it ideal for configuration and data exchange. The strict schema ensures consistency across different scans and agents.
+    impact: All generated memory files adhere to this structure, simplifying parsing for AI agents.
+  - decision: Implement a CLI interface using the 'commander' library.
+    why: A CLI provides a convenient and scriptable way for developers to interact with the memory generation tool directly from their terminal.
+    impact: The primary user interaction is through command-line arguments.
+  - decision: Store user-specific configuration (like API keys) in a hidden directory in the user's home folder (~/.recall/config.json).
+    why: This keeps sensitive information out of the project directory and ensures it's accessible across different projects.
+    impact: Users need to configure the API key once per machine.
+  - decision: Use a recursive directory scanner with skip patterns for efficiency.
+    why: To avoid processing unnecessary files (like node_modules) and to limit the scope of the scan to relevant project files.
+    impact: The scanning process is faster and more focused.
+handoff_message: |
+  This project, context-memo, is a CLI tool designed to create a persistent memory layer for AI agents. Its primary function is to scan a software project, analyze its code, configuration, documentation, and git history, and then generate a comprehensive YAML memory file. This memory file allows AI agents to instantly understand the project's context, structure, progress, and where to continue working, eliminating the need for repetitive explanations when switching agents or resuming sessions. The tool uses the free Gemini 1.5 Flash API for its core analysis.
+
+  The project is now complete and production-ready. All 7 commands (init, scan, load, status, update, install, config) and 6 utility modules are fully implemented. The core `scan` command successfully integrates with the Gemini API to produce the structured `memory.yaml` file. Agent integrations for 7 popular AI assistants have also been created.
+
+  There are currently no known bugs or missing features. The project is in a stable, complete state.
+
+  To continue development or maintenance, please refer to the `DEVELOPMENT.md` and `GET_STARTED.md` files for detailed instructions on setting up the development environment, running tests, and understanding the project structure. The `bin/memo.js` file is the main entry point for the CLI, and `src/commands/scan.js` contains the core logic for project analysis and Gemini API interaction.
+
+  Please do not make significant changes to the core scanning logic in `src/utils/scanner.js` or the Gemini API prompt construction in `src/utils/prompt.js` without thorough review, as these are critical to the accuracy and structure of the generated memory files. Focus on maintaining existing functionality and addressing any minor documentation updates or potential edge cases identified in future usage.

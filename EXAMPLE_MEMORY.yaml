@@ -1,0 +1,174 @@
+# Example of generated .recall/memory.yaml
+# This shows what Gemini generates after scanning a project
+
+project:
+  name: TaskFlow API
+  purpose: A REST API for team task management that allows creating, assigning, and tracking tasks across projects. Built for small teams who need simple task coordination without enterprise complexity.
+  type: REST API
+  stack: Node.js, Express, PostgreSQL, Prisma ORM, JWT auth, Jest
+  entry_points: src/server.js, src/app.js
+  environment_vars:
+    - DATABASE_URL
+    - JWT_SECRET
+    - PORT
+    - NODE_ENV
+  constraints: Free tier PostgreSQL (max 10k rows), no paid APIs, must work offline
+  non_goals: Real-time collaboration, file attachments, time tracking
+
+knowledge_graph:
+  god_nodes:
+    - name: TaskService
+      why_critical: Central business logic for all task operations. Every endpoint depends on this. Contains validation, authorization, and database access patterns used throughout.
+      file: src/services/taskService.js
+    - name: AuthMiddleware
+      why_critical: Guards all protected routes. Used by every authenticated endpoint. Handles JWT validation and user context injection.
+      file: src/middleware/auth.js
+
+  components:
+    - name: TaskController
+      file: src/controllers/taskController.js
+      role: HTTP request handlers for task endpoints
+      exports: [createTask, getTasks, updateTask, deleteTask, assignTask]
+      depends_on: [TaskService, AuthMiddleware]
+      status: complete
+
+    - name: TaskService
+      file: src/services/taskService.js
+      role: Business logic for task operations and validation
+      exports: [create, findAll, findById, update, delete, assign]
+      depends_on: [TaskRepository, UserRepository]
+      status: complete
+
+    - name: TaskRepository
+      file: src/repositories/taskRepository.js
+      role: Database access layer using Prisma
+      exports: [create, findMany, findUnique, update, delete]
+      depends_on: [PrismaClient]
+      status: complete
+
+    - name: AuthService
+      file: src/services/authService.js
+      role: User authentication and JWT token management
+      exports: [login, register, verifyToken, hashPassword]
+      depends_on: [UserRepository, bcrypt, jsonwebtoken]
+      status: in_progress
+
+    - name: UserRepository
+      file: src/repositories/userRepository.js
+      role: User data access
+      exports: [create, findByEmail, findById]
+      depends_on: [PrismaClient]
+      status: complete
+
+    - name: ValidationMiddleware
+      file: src/middleware/validation.js
+      role: Request body validation using Joi schemas
+      exports: [validateTask, validateUser, validateQuery]
+      depends_on: [joi]
+      status: broken
+
+  data_flow: Client sends JWT in Authorization header → AuthMiddleware validates → Controller receives request → Service validates business rules → Repository queries database via Prisma → Response flows back up
+
+  api_endpoints:
+    - POST /api/auth/register — Create new user account
+    - POST /api/auth/login — Authenticate and get JWT token
+    - GET /api/tasks — List all tasks (with filters)
+    - POST /api/tasks — Create new task
+    - GET /api/tasks/:id — Get single task details
+    - PUT /api/tasks/:id — Update task
+    - DELETE /api/tasks/:id — Delete task
+    - POST /api/tasks/:id/assign — Assign task to user
+    - GET /api/users/me — Get current user profile
+
+  data_models:
+    - User (id, email, password_hash, name, created_at)
+    - Task (id, title, description, status, priority, assignee_id, project_id, due_date, created_at, updated_at)
+    - Project (id, name, description, owner_id, created_at)
+
+  external_services:
+    - PostgreSQL database (local development, Supabase free tier for production)
+
+progress:
+  percent_done: 65
+  phase: mid
+
+  what_works:
+    - User registration and login with JWT auth
+    - Task CRUD operations (create, read, update, delete)
+    - Task listing with pagination
+    - Database schema and migrations
+    - Basic error handling middleware
+    - Unit tests for TaskService (12 tests passing)
+
+  what_is_broken:
+    - ValidationMiddleware throws 500 errors instead of 400 (src/middleware/validation.js line 23)
+    - Task assignment endpoint returns 404 even when task exists (src/controllers/taskController.js assignTask function)
+    - JWT tokens expire too quickly (1 hour, should be 24 hours) in src/services/authService.js
+
+  what_is_missing:
+    - Project management endpoints (referenced in schema but no routes)
+    - Task filtering by status and priority (query params ignored)
+    - User profile update endpoint
+    - Password reset flow
+    - API documentation (Swagger/OpenAPI)
+    - Integration tests
+    - Docker setup for deployment
+
+  technical_debt:
+    - Hardcoded database connection in multiple files (should use config)
+    - No logging system (console.log everywhere)
+    - Error messages expose internal details
+    - TODO in taskService.js line 45: "Add transaction support"
+    - Prisma client instantiated in every repository (should be singleton)
+
+task_state:
+  last_task: Fixing task assignment endpoint 404 error
+  
+  current_problem: Task assignment endpoint (POST /api/tasks/:id/assign) returns 404 even when task exists. The issue is in src/controllers/taskController.js assignTask function - it's looking for req.params.taskId but the route parameter is named 'id'. Need to change line 87 from `const taskId = req.params.taskId` to `const taskId = req.params.id`.
+
+  continue_here:
+    file: src/controllers/taskController.js
+    location: assignTask function, line 87
+    instruction: Change `req.params.taskId` to `req.params.id` to match the route parameter name. Then test with POST /api/tasks/123/assign with body {"userId": 456}.
+
+  next_steps:
+    - Fix the task assignment parameter bug (line 87)
+    - Add validation for userId in request body
+    - Test assignment endpoint with curl or Postman
+    - Fix ValidationMiddleware error handling (return 400 not 500)
+    - Update JWT expiration to 24 hours in authService.js
+    - Add integration tests for assignment flow
+
+  blocked_on: nothing
+
+  completed_recently:
+    - Implemented task pagination with limit/offset query params
+    - Added priority field to Task model and migration
+    - Fixed user registration duplicate email check
+    - Set up Jest test environment with test database
+
+decisions:
+  - decision: Use Prisma ORM instead of raw SQL
+    why: Type safety, automatic migrations, easier to maintain. Team has Prisma experience.
+    impact: All database access goes through Prisma client. Adds ~50ms query overhead but worth it for DX.
+
+  - decision: JWT stored in Authorization header, not cookies
+    why: Simpler for mobile clients and API-first design. Frontend handles storage.
+    impact: Frontend must implement token refresh logic. No automatic CSRF protection.
+
+  - decision: Soft deletes not implemented
+    why: Free tier database has 10k row limit. Hard deletes save space.
+    impact: Deleted tasks cannot be recovered. Must be explicit in API docs.
+
+  - decision: No real-time updates (WebSockets)
+    why: Adds complexity, not in MVP scope. Polling is acceptable for small teams.
+    impact: Clients must poll for updates. Max 10 second staleness acceptable.
+
+handoff_message: |
+  This is a task management REST API built with Node.js, Express, and PostgreSQL. It's about 65% complete and currently in active development. The core CRUD operations for tasks work well, and user authentication with JWT is functional. However, there are three critical bugs that need fixing: (1) the task assignment endpoint returns 404 due to a parameter name mismatch on line 87 of taskController.js, (2) the ValidationMiddleware throws 500 errors instead of 400s, and (3) JWT tokens expire too quickly. Start by fixing the assignment bug in src/controllers/taskController.js line 87 - change req.params.taskId to req.params.id. The codebase follows a clean layered architecture (Controller → Service → Repository) with Prisma as the ORM. Don't touch the working authentication flow or the TaskService core logic. Focus on the three bugs listed above, then move on to implementing the missing project management endpoints.
+
+_meta:
+  generated_at: 2024-01-15T10:30:00.000Z
+  files_scanned: 47
+  model: gemini-1.5-flash
+  scan_count: 3

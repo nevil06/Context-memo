@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+*.log
+.env
+dist/
+build/
+coverage/
+.cache/
+
+# Don't commit API keys or local config
+.recall/config.json
+~/.recall/config.json

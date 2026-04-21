@@ -1,0 +1,32 @@
+{
+  "name": "context-memo",
+  "version": "1.0.0",
+  "description": "Persistent AI memory layer — switch agents without losing context",
+  "bin": {
+    "memo": "./bin/memo.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "commander": "^11.0.0",
+    "js-yaml": "^4.1.0",
+    "clipboardy": "^4.0.0",
+    "chalk": "^5.3.0",
+    "inquirer": "^9.2.0"
+  },
+  "keywords": [
+    "ai",
+    "memory",
+    "context",
+    "cli",
+    "claude",
+    "cursor",
+    "windsurf",
+    "copilot",
+    "agent-switching",
+    "knowledge-graph"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
