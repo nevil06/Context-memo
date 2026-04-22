@@ -1,12 +1,18 @@
-last_task: Project completion and documentation finalization.
-current_problem: None. The project is marked as complete.
+last_task: Refined Gemini prompt structure and error handling for scan command.
+current_problem: The `buildGeminiPrompt` function in `src/utils/prompt.js` needs to be thoroughly reviewed to ensure all sections of the YAML structure are correctly populated and that Gemini's output is consistently valid YAML.
 continue_here:
-  file: ''
-  location: ''
-  instruction: ''
-next_steps: []
+  file: src\utils\prompt.js
+  location: buildGeminiPrompt
+  instruction: Ensure all sections of the YAML structure are correctly populated and that Gemini's output is consistently valid YAML. Add specific error handling for cases where Gemini returns an empty candidate list or malformed JSON.
+next_steps:
+  - Review and refine `src/utils/prompt.js` to guarantee valid YAML output from Gemini.
+  - Implement more granular error handling for Gemini API responses.
+  - Add a visualizer for the knowledge graph.
+  - Consider adding conflict resolution for `memo update`.
 blocked_on: nothing
 completed_recently:
-  - Finalized all documentation files.
-  - Verified all commands and features against checklists.
-  - Ensured project adheres to the specified YAML structure.
+  - Implemented incremental scanning logic using file hashes.
+  - Added `--local` flag for privacy-focused scanning.
+  - Enhanced `watch` command to use incremental scans.
+  - Improved error handling in `gemini.js`.
+  - Added `test-incremental.js` to test incremental scan functionality.

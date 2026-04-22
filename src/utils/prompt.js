@@ -1,6 +1,6 @@
 import { buildFileTree } from './scanner.js';
 
-export function buildGeminiPrompt(files, gitInfo) {
+export function buildGeminiPrompt(files, gitInfo, graphSummary) {
   const sections = [];
 
   sections.push(`You are analyzing a software project to build a comprehensive memory file for AI agent handoffs.
@@ -25,6 +25,7 @@ knowledge_graph:
     - name: [most connected/critical module]
       why_critical: [why everything depends on this]
       file: [file path]
+      connections: [number]
   components:
     - name: [component name]
       file: [exact file path]
@@ -78,6 +79,13 @@ handoff_message: |
 `);
 
   sections.push('\n--- PROJECT CONTEXT ---\n');
+
+  // Knowledge graph summary (if provided)
+  if (graphSummary) {
+    sections.push('KNOWLEDGE GRAPH ANALYSIS:');
+    sections.push(JSON.stringify(graphSummary, null, 2));
+    sections.push('');
+  }
 
   // File tree
   sections.push('FILE TREE (top 3 levels):');

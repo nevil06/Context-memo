@@ -1,86 +1,145 @@
 project:
   name: context-memo
-  purpose: |
-    Provides a persistent memory layer for AI agents, enabling seamless context switching between different AI coding assistants. It solves the problem of AI agents losing project context when sessions end or agents are swapped, saving developers time and computational resources.
+  purpose: Provides a persistent memory layer for AI coding agents, enabling seamless context switching and preventing information loss. It solves the problem of AI agents forgetting project context when sessions end or agents are switched, benefiting developers by saving time and improving AI productivity.
   type: CLI
   stack:
     - Node.js
-    - JavaScript
     - commander
     - js-yaml
     - clipboardy
     - chalk
     - inquirer
+    - https
+    - fs
+    - path
+    - os
+    - crypto
   entry_points:
     - bin/memo.js
   environment_vars: []
   constraints:
-    - Free Gemini API key required
-    - No paid APIs
+    - Free Gemini API (no credit card required)
+    - Local-only scan mode for privacy
+    - Incremental scans to minimize token usage
 knowledge_graph:
   god_nodes:
-    - name: scan.js
-      why_critical: This is the core command that orchestrates the scanning process, calls the Gemini API, and generates the memory file. It depends on most utility functions and is central to the project's functionality.
-      file: src/commands/scan.js
+    - name: scan
+      why_critical: Imports 11 dependencies and contains 9 functions, acting as the core logic for project analysis and AI interaction.
+      file: src\commands\scan.js
+      connections: 11
+    - name: memo
+      why_critical: The main CLI entry point, importing all command modules and orchestrating their execution.
+      file: bin\memo.js
+      connections: 9
+    - name: config
+      why_critical: Handles API key configuration and retrieval, a critical dependency for AI interaction.
+      file: src\commands\config.js
+      connections: 4
+    - name: load
+      why_critical: Responsible for building and presenting agent briefings, a key output of the memory system.
+      file: src\commands\load.js
+      connections: 4
+    - name: watch
+      why_critical: Implements an auto-scan feature that triggers memory updates based on file changes.
+      file: src\commands\watch.js
+      connections: 4
   components:
     - name: initCommand
-      file: src/commands/init.js
-      role: Initializes the .recall/ directory and template files for memory storage.
+      file: src\commands\init.js
+      role: Initializes the .recall/ directory and its template files.
       exports:
         - default
       depends_on:
-        - fileUtils
+        - chalk
+        - inquirer
+        - ensureRecallDir
+        - createRecallDir
+        - writeYaml
+        - writeFile
+        - getRecallPath
       status: complete
     - name: scanCommand
-      file: src/commands/scan.js
-      role: Scans the project, builds a prompt, calls the Gemini API, and saves the memory.
+      file: src\commands\scan.js
+      role: Orchestrates the project scanning process, including file analysis, Git info gathering, knowledge graph building, and Gemini API calls.
       exports:
         - default
       depends_on:
-        - scanner
-        - prompt
-        - gemini
-        - config
-        - fileUtils
+        - chalk
+        - inquirer
+        - yaml
+        - scanProject
+        - getGitInfo
+        - buildGeminiPrompt
+        - callGemini
+        - estimateTokens
+        - getApiKey
+        - ensureRecallDir
+        - writeYaml
+        - writeFile
+        - getRecallPath
+        - readYaml
+        - fileExists
+        - buildKnowledgeGraph
+        - detectChangedFiles
+        - buildGraphSummary
+        - loadPreviousHashes
+        - saveCurrentHashes
+        - isFirstScan
       status: complete
     - name: updateCommand
-      file: src/commands/update.js
-      role: Allows users to interactively update the project's progress and task state.
+      file: src\commands\update.js
+      role: Interactively updates the task state, progress, and decision logs.
       exports:
         - default
       depends_on:
-        - fileUtils
+        - chalk
         - inquirer
+        - ensureRecallDir
+        - readYaml
+        - writeYaml
+        - getRecallPath
+        - fileExists
+        - appendToFile
       status: complete
     - name: loadCommand
-      file: src/commands/load.js
-      role: Reads the memory file and builds an agent briefing, copying it to the clipboard.
+      file: src\commands\load.js
+      role: Reads the project memory and task state to build and display an agent briefing.
       exports:
         - default
       depends_on:
-        - fileUtils
-        - assembler
-        - clipboard
+        - chalk
+        - ensureRecallDir
+        - readYaml
+        - getRecallPath
+        - fileExists
+        - buildBriefing
+        - estimateTokens
+        - copyToClipboard
       status: complete
     - name: statusCommand
-      file: src/commands/status.js
-      role: Displays a terminal dashboard showing the project's current status and progress.
+      file: src\commands\status.js
+      role: Displays a dashboard summarizing the project's status, progress, and key components.
       exports:
         - default
       depends_on:
-        - fileUtils
+        - chalk
+        - ensureRecallDir
+        - readYaml
+        - getRecallPath
+        - fileExists
       status: complete
     - name: installCommand
-      file: src/commands/install.js
-      role: Creates integration files for various AI agents to read the memory file.
+      file: src\commands\install.js
+      role: Creates integration files for various AI agents to automatically load context.
       exports:
         - default
       depends_on:
         - fs
         - path
+        - chalk
       status: complete
     - name: configCommand
-      file: src/commands/config.js
+      file: src\commands\config.js
       role: Manages the Gemini API key configuration.
       exports:
         - default
@@ -88,41 +147,56 @@ knowledge_graph:
         - fs
         - path
         - os
+        - chalk
+      status: complete
+    - name: watchCommand
+      file: src\commands\watch.js
+      role: Monitors project files for changes and triggers scans automatically.
+      exports:
+        - default
+      depends_on:
+        - fs
+        - path
+        - chalk
+        - execSync
       status: complete
     - name: scanner
-      file: src/utils/scanner.js
-      role: Recursively scans project files, categorizes them, and extracts git information.
+      file: src\utils\scanner.js
+      role: Scans the project directory, categorizes files, and extracts Git information.
       exports:
         - scanProject
         - getGitInfo
-      depends_on: []
+      depends_on:
+        - fs
+        - path
       status: complete
-    - name: prompt
-      file: src/utils/prompt.js
-      role: Constructs the detailed prompt for the Gemini API based on scanned files and git info.
+    - name: promptBuilder
+      file: src\utils\prompt.js
+      role: Constructs the detailed prompt for the Gemini API based on project analysis.
       exports:
         - buildGeminiPrompt
       depends_on:
-        - scanner
+        - buildFileTree
       status: complete
-    - name: gemini
-      file: src/utils/gemini.js
-      role: Handles the communication with the Gemini API.
+    - name: geminiApi
+      file: src\utils\gemini.js
+      role: Handles communication with the Gemini API.
       exports:
         - callGemini
         - estimateTokens
       depends_on: []
       status: complete
     - name: assembler
-      file: src/utils/assembler.js
-      role: Builds agent briefings from the memory data in different modes.
+      file: src\utils\assembler.js
+      role: Builds agent briefings from memory data in different modes.
       exports:
         - buildBriefing
+        - estimateTokens
       depends_on: []
       status: complete
     - name: fileUtils
-      file: src/utils/fileUtils.js
-      role: Provides utility functions for file system operations, including reading/writing YAML.
+      file: src\utils\fileUtils.js
+      role: Provides utility functions for file system operations, including reading and writing YAML and JSON.
       exports:
         - ensureRecallDir
         - createRecallDir
@@ -139,15 +213,45 @@ knowledge_graph:
         - yaml
       status: complete
     - name: clipboard
-      file: src/utils/clipboard.js
+      file: src\utils\clipboard.js
       role: Handles copying text to the system clipboard.
       exports:
         - copyToClipboard
       depends_on:
         - clipboardy
       status: complete
-  data_flow: |
-    The `scan` command takes project files and git information as input, processes them through the Gemini API via `gemini.js` and `prompt.js`, and outputs a comprehensive `memory.yaml` file. The `load` command then reads this file to generate an agent briefing.
+    - name: graphBuilder
+      file: src\utils\graphBuilder.js
+      role: Builds the knowledge graph from scanned files, extracting code structure and dependencies.
+      exports:
+        - buildKnowledgeGraph
+        - detectChangedFiles
+        - buildGraphSummary
+      depends_on:
+        - fs
+        - path
+        - crypto
+      status: complete
+    - name: hashStore
+      file: src\utils\hashStore.js
+      role: Manages the storage and retrieval of file hashes for incremental scanning.
+      exports:
+        - loadPreviousHashes
+        - saveCurrentHashes
+        - isFirstScan
+      depends_on:
+        - fs
+        - getRecallPath
+        - fileExists
+      status: complete
+    - name: testIncremental
+      file: test-incremental.js
+      role: Test file to trigger incremental scan.
+      exports:
+        - testFunction
+      depends_on: []
+      status: complete
+  data_flow: Project files are scanned, analyzed for code structure and Git history, and then used to construct a prompt for the Gemini API. The API response, containing project memory, is parsed into YAML and saved, enabling agents to load comprehensive briefings for seamless context switching.
   api_endpoints: []
   data_models:
     - project:
@@ -155,28 +259,32 @@ knowledge_graph:
         purpose: string
         type: string
         stack: string
-        entry_points: string
+        entry_points: string[]
         environment_vars: string[]
         constraints: string
-        non_goals: string
+        non_goals: string[]
     - knowledge_graph:
         god_nodes:
           - name: string
             why_critical: string
             file: string
+            connections: number
         components:
           - name: string
             file: string
             role: string
             exports: string[]
             depends_on: string[]
-            status: string
+            status: complete
         data_flow: string
-        api_endpoints: string[]
+        api_endpoints:
+          - METHOD: string
+            path: string
+            description: string
         data_models: string[]
         external_services: string[]
     - progress:
-        percent_done: integer
+        percent_done: number
         phase: string
         what_works: string[]
         what_is_broken: string[]
@@ -192,66 +300,92 @@ knowledge_graph:
         next_steps: string[]
         blocked_on: string
         completed_recently: string[]
+    - decisions:
+        - decision: string
+          why: string
+          impact: string
     - _meta:
-        scan_count: integer
-        last_scan_time: string
-        file_count: integer
+        scan_count: number
+        last_scan_timestamp: string
+        file_hashes:
+          '[object Object]': string
   external_services:
-    - name: Gemini API
-      type: AI/LLM
-      purpose: Generates the project memory file based on scanned code and context.
-      auth: API Key
+    - Gemini API (generativelanguage.googleapis.com)
+  graph_stats:
+    totalFiles: 18
+    totalConnections: 56
+    avgConnections: 3.111111111111111
 progress:
-  percent_done: 100
-  phase: complete
+  percent_done: 95
+  phase: nearly_complete
   what_works:
-    - All 7 commands (init, scan, load, status, update, install, config) are fully implemented and functional.
-    - Core scanning logic in `scan.js` correctly processes files and calls the Gemini API.
-    - Agent briefing generation in `loadCommand` works with multiple modes.
-    - Terminal UI elements like status dashboard and colored output are functional.
-    - Gemini API integration is stable and handles responses.
-    - File utilities for managing `.recall/` directory and YAML files are complete.
-    - Clipboard integration for briefing is working.
-    - Agent installation scripts create correct integration files.
-  what_is_broken: []
-  what_is_missing: []
-  technical_debt: []
+    - Initialization of .recall/ directory and template files.
+    - Project scanning with file categorization and Git integration.
+    - Gemini API integration for memory generation.
+    - Knowledge graph construction with god node identification.
+    - Task state tracking and continuation point definition.
+    - Agent briefing generation in multiple modes (quick, full, onboard).
+    - Clipboard integration for easy briefing transfer.
+    - Status dashboard with progress visualization.
+    - Configuration management for API keys.
+    - Watch mode for automatic scanning on file changes.
+    - Incremental scanning for token efficiency.
+    - Agent integration file generation for popular AI tools.
+    - Added a test file for incremental scan functionality.
+  what_is_broken:
+    - src\commands\scan.js: The `buildGeminiPrompt` function might not correctly format all sections of the prompt, potentially leading to incomplete or malformed YAML responses from Gemini.
+  what_is_missing:
+    - A more robust error handling mechanism for Gemini API responses, specifically for cases where the API returns unexpected structures or empty candidates.
+    - Advanced conflict resolution for `memo update` if multiple agents are modifying the task state concurrently.
+    - A dedicated command to view the generated knowledge graph visually.
+  technical_debt:
+    - Some utility functions in `fileUtils.js` could be consolidated or refactored for better readability.
+    - The `scanProject` function in `scanner.js` has a large number of hardcoded file extensions and directory names that could be externalized.
+    - The `buildGeminiPrompt` function is quite long and could be broken down into smaller, more manageable helper functions.
 task_state:
-  last_task: Project completion and documentation finalization.
-  current_problem: None. The project is marked as complete.
+  last_task: Refined Gemini prompt structure and error handling for scan command.
+  current_problem: The `buildGeminiPrompt` function in `src/utils/prompt.js` needs to be thoroughly reviewed to ensure all sections of the YAML structure are correctly populated and that Gemini's output is consistently valid YAML.
   continue_here:
-    file: ''
-    location: ''
-    instruction: ''
-  next_steps: []
+    file: src\utils\prompt.js
+    location: buildGeminiPrompt
+    instruction: Ensure all sections of the YAML structure are correctly populated and that Gemini's output is consistently valid YAML. Add specific error handling for cases where Gemini returns an empty candidate list or malformed JSON.
+  next_steps:
+    - Review and refine `src/utils/prompt.js` to guarantee valid YAML output from Gemini.
+    - Implement more granular error handling for Gemini API responses.
+    - Add a visualizer for the knowledge graph.
+    - Consider adding conflict resolution for `memo update`.
   blocked_on: nothing
   completed_recently:
-    - Finalized all documentation files.
-    - Verified all commands and features against checklists.
-    - Ensured project adheres to the specified YAML structure.
+    - Implemented incremental scanning logic using file hashes.
+    - Added `--local` flag for privacy-focused scanning.
+    - Enhanced `watch` command to use incremental scans.
+    - Improved error handling in `gemini.js`.
+    - Added `test-incremental.js` to test incremental scan functionality.
 decisions:
-  - decision: Use Gemini 1.5 Flash API for its balance of performance and cost (free).
-    why: The project aims to be accessible and free to use, making a free API a primary constraint. Gemini 1.5 Flash offers good capabilities for code analysis.
-    impact: Limits the project to using Gemini and requires users to obtain an API key.
-  - decision: Structure the memory file using a specific YAML format with defined sections for project, knowledge graph, and task state.
-    why: This structured format is crucial for AI agents to reliably parse and understand the project context. It ensures consistency across different AI tools.
-    impact: Requires strict adherence to the YAML schema by the Gemini API and the `scan.js` command.
-  - decision: Implement a CLI tool for ease of use and integration into developer workflows.
-    why: A CLI tool is the most direct way for developers to interact with the memory generation process without complex setup.
-    impact: The primary interface is command-line based.
-  - decision: Prioritize file scanning and Gemini API interaction in the `scan.js` command.
-    why: This command is the core of the project, responsible for generating the memory file. Its efficiency and accuracy are paramount.
-    impact: Significant development effort focused on `scan.js` and its dependencies.
+  - decision: Use Gemini 2.5 Flash Lite API for memory generation.
+    why: It's a powerful, free-tier model suitable for generating structured YAML output and understanding code context, aligning with the project's goal of being cost-effective and accessible.
+    impact: Enables the core functionality of the tool without requiring users to provide their own API keys or incur costs.
+  - decision: Implement incremental scanning based on file hashes.
+    why: To significantly reduce token usage and API call frequency on subsequent scans, making the tool more efficient and cost-effective for users over time.
+    impact: Reduces the cost and time associated with using the tool for projects with frequent changes.
+  - decision: Store API keys in `~/.recall/config.json`.
+    why: Provides a centralized and secure location for user API keys, separate from project files, and avoids hardcoding sensitive information.
+    impact: Simplifies API key management for users and enhances security.
+  - decision: Use `commander` for CLI argument parsing.
+    why: It's a robust and widely-used library for building command-line interfaces in Node.js, providing a structured way to define commands, options, and arguments.
+    impact: Ensures a consistent and user-friendly CLI experience.
 handoff_message: |
-  This project, `context-memo`, is a CLI tool designed to create a persistent memory layer for AI agents. Its primary goal is to solve the problem of AI agents losing project context when switching or when sessions end. It achieves this by scanning your project's codebase, configuration files, and documentation, then using the Gemini API to generate a comprehensive YAML memory file. This file includes a knowledge graph, project status, and exact continuation points, allowing any new AI agent to instantly understand the project's state.
+  This project, context-memo, is a CLI tool designed to provide persistent memory for AI coding agents. It scans your project, builds a knowledge graph, and uses the Gemini API to generate comprehensive briefings that agents can use to understand project context instantly. The goal is to eliminate context-switching overhead and save developers time and AI tokens.
 
-  The project is now complete and production-ready. All 7 commands (`init`, `scan`, `load`, `status`, `update`, `install`, `config`) are fully implemented and functional. The core `scan` command correctly integrates with the Gemini API to produce the `memory.yaml` file, and the `load` command effectively generates agent briefings.
+  The project is nearly complete, with core features like scanning, memory generation, task state tracking, and agent integrations fully implemented. The main area needing attention is the `scanCommand` within `src/commands/scan.js`, specifically the `buildGeminiPrompt` function. There's a risk that the prompt construction might not always guarantee valid YAML output from Gemini, or that error handling for Gemini's responses could be more robust.
 
-  There are currently no known bugs or missing features. The project is stable and ready for use.
-
-  To continue development or maintenance, please refer to the `src/commands/scan.js` file for the core scanning logic and Gemini API interaction. The `src/utils/prompt.js` and `src/utils/assembler.js` files are also critical for understanding how the Gemini prompt is constructed and how agent briefings are generated, respectively. Please do not modify the core YAML structure defined in `src/utils/prompt.js` without careful consideration, as it is fundamental to agent compatibility.
+  Your immediate task is to focus on refining the `buildGeminiPrompt` function in `src/utils/prompt.js`. Ensure that all sections of the expected YAML structure are correctly populated and that the output from Gemini is consistently valid YAML. Pay close attention to error handling, especially for cases where Gemini might return an empty candidate list or malformed JSON. Do not make significant changes to other parts of the codebase unless directly related to improving the prompt generation or error handling for the Gemini API interaction.
 _meta:
-  generated_at: '2026-04-21T18:07:43.147Z'
-  files_scanned: 28
-  model: gemini-1.5-flash
-  scan_count: 1
+  generated_at: '2026-04-22T15:04:14.816Z'
+  files_scanned: 36
+  model: gemini-2.5-flash-lite
+  scan_count: 3
+  scan_type: incremental
+  confidence: high
+  tokens_used: 4299
+  tokens_saved: 14567

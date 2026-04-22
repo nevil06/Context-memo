@@ -1,11 +1,27 @@
 {
   "name": "context-memo",
-  "version": "1.0.0",
-  "description": "Persistent AI memory layer — switch agents without losing context",
+  "version": "2.0.0",
+  "description": "Hybrid AI memory layer: Local knowledge graph + AI-powered reasoning for persistent context",
   "bin": {
     "memo": "./bin/memo.js"
   },
   "type": "module",
+  "main": "./bin/memo.js",
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nevil06/Context-memo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nevil06/Context-memo/issues"
+  },
+  "homepage": "https://github.com/nevil06/Context-memo#readme",
+  "author": "Nevil",
   "dependencies": {
     "commander": "^11.0.0",
     "js-yaml": "^4.1.0",
@@ -23,7 +39,12 @@
     "windsurf",
     "copilot",
     "agent-switching",
-    "knowledge-graph"
+    "knowledge-graph",
+    "gemini",
+    "ai-agent",
+    "context-switching",
+    "persistent-memory",
+    "developer-tools"
   ],
   "license": "MIT",
   "engines": {

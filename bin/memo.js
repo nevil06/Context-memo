@@ -8,6 +8,7 @@ import loadCommand from '../src/commands/load.js';
 import statusCommand from '../src/commands/status.js';
 import installCommand from '../src/commands/install.js';
 import configCommand from '../src/commands/config.js';
+import watchCommand from '../src/commands/watch.js';
 
 const program = new Command();
 
@@ -25,6 +26,7 @@ program
   .command('scan')
   .description('Scan project and generate memory with Gemini')
   .option('--quick', 'Quick scan with fewer files')
+  .option('--local', 'Local-only scan without API (privacy mode)')
   .action(scanCommand);
 
 program
@@ -54,5 +56,10 @@ program
   .option('--key <key>', 'Set Gemini API key')
   .option('--show', 'Show current configuration')
   .action(configCommand);
+
+program
+  .command('watch')
+  .description('Watch project and auto-scan on file changes')
+  .action(watchCommand);
 
 program.parse();

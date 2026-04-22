@@ -1,8 +1,8 @@
 # context-memo 🧠
 
-**Persistent AI memory layer for developers**
+**Hybrid AI Memory Layer: Local Knowledge Graph + AI-Powered Reasoning**
 
-Switch AI coding agents without losing context. One command scans your project and generates a master memory file that any new agent can read to instantly understand your codebase.
+Never lose context when switching AI coding agents. context-memo combines local code analysis (Graphify-style) with AI-powered task reasoning to create persistent memory that survives agent switches.
 
 ## The Problem
 
@@ -10,22 +10,38 @@ When working with AI coding agents (Claude, Cursor, Windsurf, Copilot, etc.) and
 
 ## The Solution
 
-`context-memo` combines two approaches:
+`context-memo` uses a **hybrid approach**:
 
-1. **Knowledge graph** (like Graphify) — deep code understanding, component mapping, dependency graph, critical nodes
-2. **Task continuation layer** — progress %, what works, what's broken, exact file+line to continue from, decision log, handoff message
+1. **Local Knowledge Graph** (Graphify-style) — Zero-cost code understanding
+   - Analyzes imports, exports, functions, classes
+   - Maps dependencies and relationships
+   - Identifies "god nodes" (critical components)
+   - 100% private, runs locally
 
-One command generates `.recall/memory.yaml` that any AI agent can read to get instant context.
+2. **AI-Powered Reasoning** (Gemini API) — Smart task continuation
+   - Understands project purpose and progress
+   - Tracks what works, what's broken, what's missing
+   - Provides exact continuation points
+   - Generates handoff messages
+
+3. **Incremental Updates** — Minimal token usage
+   - Detects changed files using hashes
+   - Only sends changes to API (not full codebase)
+   - Saves 60-90% tokens on subsequent scans
+   - Local-only mode available (--local flag)
 
 ## Features
 
-- 🔍 **Smart project scanning** — analyzes code, configs, docs, git history
-- 🧠 **Knowledge graph** — maps components, dependencies, critical nodes
-- 📊 **Progress tracking** — what works, what's broken, what's missing
-- 🎯 **Exact continuation** — tells next agent exactly where to continue
-- 📝 **Decision log** — tracks key architectural decisions
-- 🤖 **Agent integration** — works with Claude, Cursor, Windsurf, Copilot, Aider, etc.
-- 🆓 **100% free** — uses Gemini 1.5 Flash API (no credit card needed)
+- 🔍 **Local Knowledge Graph** — Analyzes code structure without API calls
+- 🧠 **AI-Powered Reasoning** — Uses Gemini for deep insights
+- 📊 **Incremental Updates** — Only scans changed files (saves 60-90% tokens)
+- � **Privacy Mode** — Local-only scanning (--local flag)
+- 🎯 **Exact Continuation** — Tells next agent exactly where to continue
+- 📝 **Decision Log** — Tracks key architectural decisions
+- 🤖 **Agent Integration** — Works with Claude, Cursor, Windsurf, Copilot, Aider, etc.
+- 👀 **Auto-Scan** — Watch mode for active development
+- 🆓 **100% free** — Uses Gemini 2.5 Flash Lite API (no credit card needed)
+- 💰 **Token Efficient** — Incremental scans save massive amounts of tokens
 
 ## Installation
 
@@ -63,11 +79,34 @@ Paste the briefing into your AI agent and it instantly understands your entire p
 ### `memo init`
 Initialize `.recall/` folder in your project with blank templates.
 
-### `memo scan [--quick]`
-Scan entire project and generate memory using Gemini AI.
-- Analyzes code, configs, docs, git history
-- Builds knowledge graph and task state
-- `--quick` flag for faster scan with fewer files
+### `memo scan [--quick] [--local]`
+Scan entire project and generate memory.
+
+**Modes:**
+- **First scan**: Full analysis with AI
+- **Subsequent scans**: Incremental (only changed files) — saves 60-90% tokens
+- **--quick**: Faster scan with fewer files
+- **--local**: Privacy mode (no API calls, local analysis only)
+
+**What it does:**
+1. Builds local knowledge graph (imports, exports, dependencies)
+2. Detects changed files (incremental updates)
+3. Identifies "god nodes" (most critical components)
+4. Calls Gemini API (only for changes, or skip with --local)
+5. Generates comprehensive memory.yaml
+
+**Token optimization:**
+- First scan: ~15,000 tokens
+- Incremental scan: ~2,000-5,000 tokens (60-90% savings!)
+- Local mode: 0 tokens
+
+### `memo watch` 🆕
+Watch project and auto-scan on file changes.
+- Monitors code files for changes
+- Auto-scans 10 seconds after changes stop
+- Uses incremental scanning (saves tokens)
+- Perfect for active development
+- Press Ctrl+C to stop
 
 ### `memo load [--mode=quick|full|onboard]`
 Load and display agent briefing (copies to clipboard).
@@ -95,11 +134,43 @@ Configure settings (API key stored at `~/.recall/config.json`).
 
 ## How It Works
 
-1. **Scan**: `memo scan` walks your project, reads code/configs/docs, analyzes git history
-2. **Analyze**: Sends context to Gemini 1.5 Flash to build knowledge graph + task state
-3. **Generate**: Creates `.recall/memory.yaml` with complete project understanding
-4. **Load**: `memo load` generates agent briefing and copies to clipboard
-5. **Handoff**: Paste into any AI agent — they instantly understand your project
+context-memo uses a **3-layer hybrid architecture**:
+
+### Layer 1: Local Knowledge Graph (Free, Private)
+```bash
+memo scan --local  # No API calls
+```
+- Parses all JS/TS files locally
+- Extracts imports, exports, functions, classes
+- Builds dependency graph
+- Identifies "god nodes" (most connected files)
+- Saves to `.recall/graph.json`
+- **Cost: $0 | Privacy: 100% local**
+
+### Layer 2: Incremental Change Detection (Smart)
+```bash
+memo scan  # Automatic after first scan
+```
+- Hashes all files (MD5)
+- Detects changed/added/removed files
+- Only sends changes to API (not full codebase)
+- Reuses previous memory for unchanged parts
+- **Saves 60-90% tokens on subsequent scans**
+
+### Layer 3: AI-Powered Reasoning (When Needed)
+```bash
+memo scan  # First time or when changes detected
+```
+- Sends: changed files + graph summary + previous memory
+- Gemini analyzes: purpose, progress, issues, next steps
+- Generates: comprehensive memory.yaml
+- **Smart token usage: only what's needed**
+
+### The Result:
+1. **First scan**: `memo scan` → ~15,000 tokens → Full analysis
+2. **Edit 3 files**: `memo scan` → ~2,000 tokens → Incremental update (87% savings!)
+3. **No changes**: `memo scan` → 0 tokens → Reuses cached memory
+4. **Privacy mode**: `memo scan --local` → 0 tokens → Local-only analysis
 
 ## Memory Structure
 
@@ -155,9 +226,32 @@ your-project/
 
 - Run `memo scan` after major changes
 - Run `memo update` before switching agents
+- Use `memo watch` during active development for auto-updates
 - Commit `.recall/` folder to git for team sharing
 - Use `memo status` for quick project overview
 - Use `--quick` flag for faster scans during development
+
+## Auto-Scan Options
+
+### Option 1: Watch Mode (Recommended for Development)
+```bash
+memo watch
+```
+Automatically scans when you save files. Perfect for active development!
+
+### Option 2: Git Hook (Recommended for Teams)
+```bash
+# Run setup script
+bash setup-auto-scan.sh    # Unix/Mac/Linux
+setup-auto-scan.bat         # Windows
+```
+Automatically scans before every git commit. Great for keeping team memory in sync!
+
+### Option 3: Manual
+```bash
+memo scan
+```
+Run manually when you want to update the memory.
 
 ## Tech Stack
 

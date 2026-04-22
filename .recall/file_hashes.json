@@ -1,0 +1,20 @@
+{
+  "src\\commands\\init.js": "abfdff0cae30f27c2d591b8e92e5830c",
+  "bin\\memo.js": "ea5aa055d6ed623afbd74d56610057ff",
+  "src\\commands\\config.js": "0baa1d41ad0cc503072a0eb11c968597",
+  "src\\commands\\install.js": "8d79090a79bbe17b93804b30dbf803e0",
+  "src\\commands\\load.js": "e2ebd155b44b5f040718ac047fac6b0c",
+  "src\\commands\\scan.js": "e73a1e031a656de1b4a24cdb892b9ec4",
+  "src\\commands\\status.js": "40a834fc78b74cf1a0c59f46a5dbf4dc",
+  "src\\commands\\update.js": "e1b23fd9682c27deccc14363ce21a0e8",
+  "src\\commands\\watch.js": "f3f463f925edec1aa8b74a9ebce9c022",
+  "src\\utils\\assembler.js": "5c0c38bc94b002fcb119d877805553f9",
+  "src\\utils\\clipboard.js": "5f0607007891a486f5d09189f5fbcfb5",
+  "src\\utils\\fileUtils.js": "8961f17cc17879e30523c8322e363b98",
+  "src\\utils\\gemini.js": "3eff93abd978b1c36be0c3c68991c8fd",
+  "src\\utils\\graphBuilder.js": "f78c5188d2e0e1c28c2a98050bf2ef3a",
+  "src\\utils\\hashStore.js": "2402cc054fb2e53b05bfb8c6aa4a9954",
+  "src\\utils\\prompt.js": "7f7c4a91911f24e713917bc0b27f4365",
+  "src\\utils\\scanner.js": "c28ca110e466b6135a4b373b6e59d586",
+  "test-incremental.js": "af959457fc711decb99f7dc5bd3e20d8"
+}

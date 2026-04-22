@@ -1,0 +1,1273 @@
+{
+  "nodes": [
+    {
+      "id": "src\\commands\\init.js",
+      "file": "src\\commands\\init.js",
+      "type": "module",
+      "hash": "abfdff0cae30f27c2d591b8e92e5830c",
+      "exports": [
+        "initCommand"
+      ],
+      "functions": [
+        "initCommand"
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "chalk",
+          "items": [
+            "chalk"
+          ]
+        },
+        {
+          "source": "inquirer",
+          "items": [
+            "inquirer"
+          ]
+        },
+        {
+          "source": "src/utils/fileUtils.js",
+          "items": [
+            "ensureRecallDir",
+            "createRecallDir",
+            "writeYaml",
+            "writeFile",
+            "getRecallPath"
+          ]
+        }
+      ],
+      "loc": 112
+    },
+    {
+      "id": "bin\\memo.js",
+      "file": "bin\\memo.js",
+      "type": "module",
+      "hash": "ea5aa055d6ed623afbd74d56610057ff",
+      "exports": [],
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "commander",
+          "items": [
+            "Command"
+          ]
+        },
+        {
+          "source": "src/commands/init.js",
+          "items": [
+            "initCommand"
+          ]
+        },
+        {
+          "source": "src/commands/scan.js",
+          "items": [
+            "scanCommand"
+          ]
+        },
+        {
+          "source": "src/commands/update.js",
+          "items": [
+            "updateCommand"
+          ]
+        },
+        {
+          "source": "src/commands/load.js",
+          "items": [
+            "loadCommand"
+          ]
+        },
+        {
+          "source": "src/commands/status.js",
+          "items": [
+            "statusCommand"
+          ]
+        },
+        {
+          "source": "src/commands/install.js",
+          "items": [
+            "installCommand"
+          ]
+        },
+        {
+          "source": "src/commands/config.js",
+          "items": [
+            "configCommand"
+          ]
+        },
+        {
+          "source": "src/commands/watch.js",
+          "items": [
+            "watchCommand"
+          ]
+        }
+      ],
+      "loc": 66
+    },
+    {
+      "id": "src\\commands\\config.js",
+      "file": "src\\commands\\config.js",
+      "type": "module",
+      "hash": "0baa1d41ad0cc503072a0eb11c968597",
+      "exports": [
+        "configCommand",
+        "getApiKey"
+      ],
+      "functions": [
+        "ensureConfigDir",
+        "readConfig",
+        "writeConfig",
+        "configCommand",
+        "getApiKey"
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "fs/promises",
+          "items": [
+            "fs"
+          ]
+        },
+        {
+          "source": "path",
+          "items": [
+            "path"
+          ]
+        },
+        {
+          "source": "os",
+          "items": [
+            "os"
+          ]
+        },
+        {
+          "source": "chalk",
+          "items": [
+            "chalk"
+          ]
+        }
+      ],
+      "loc": 62
+    },
+    {
+      "id": "src\\commands\\install.js",
+      "file": "src\\commands\\install.js",
+      "type": "module",
+      "hash": "8d79090a79bbe17b93804b30dbf803e0",
+      "exports": [
+        "installCommand"
+      ],
+      "functions": [
+        "installCommand"
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "fs/promises",
+          "items": [
+            "fs"
+          ]
+        },
+        {
+          "source": "path",
+          "items": [
+            "path"
+          ]
+        },
+        {
+          "source": "chalk",
+          "items": [
+            "chalk"
+          ]
+        }
+      ],
+      "loc": 130
+    },
+    {
+      "id": "src\\commands\\load.js",
+      "file": "src\\commands\\load.js",
+      "type": "module",
+      "hash": "e2ebd155b44b5f040718ac047fac6b0c",
+      "exports": [
+        "loadCommand"
+      ],
+      "functions": [
+        "loadCommand"
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "chalk",
+          "items": [
+            "chalk"
+          ]
+        },
+        {
+          "source": "src/utils/fileUtils.js",
+          "items": [
+            "ensureRecallDir",
+            "readYaml",
+            "getRecallPath",
+            "fileExists"
+          ]
+        },
+        {
+          "source": "src/utils/assembler.js",
+          "items": [
+            "buildBriefing",
+            "estimateTokens"
+          ]
+        },
+        {
+          "source": "src/utils/clipboard.js",
+          "items": [
+            "copyToClipboard"
+          ]
+        }
+      ],
+      "loc": 54
+    },
+    {
+      "id": "src\\commands\\scan.js",
+      "file": "src\\commands\\scan.js",
+      "type": "module",
+      "hash": "e73a1e031a656de1b4a24cdb892b9ec4",
+      "exports": [
+        "scanCommand"
+      ],
+      "functions": [
+        "scanCommand",
+        "buildLocalMemory",
+        "buildFullPrompt",
+        "buildIncrementalPrompt",
+        "parseGeminiResponse",
+        "enrichMemoryWithGraph",
+        "printSummary",
+        "detectStack",
+        "detectEntryPoints"
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "chalk",
+          "items": [
+            "chalk"
+          ]
+        },
+        {
+          "source": "inquirer",
+          "items": [
+            "inquirer"
+          ]
+        },
+        {
+          "source": "js-yaml",
+          "items": [
+            "yaml"
+          ]
+        },
+        {
+          "source": "src/utils/scanner.js",
+          "items": [
+            "scanProject",
+            "getGitInfo"
+          ]
+        },
+        {
+          "source": "src/utils/prompt.js",
+          "items": [
+            "buildGeminiPrompt"
+          ]
+        },
+        {
+          "source": "src/utils/gemini.js",
+          "items": [
+            "callGemini",
+            "estimateTokens"
+          ]
+        },
+        {
+          "source": "src/commands/config.js",
+          "items": [
+            "getApiKey"
+          ]
+        },
+        {
+          "source": "src/utils/fileUtils.js",
+          "items": [
+            "ensureRecallDir",
+            "writeYaml",
+            "writeFile",
+            "getRecallPath",
+            "readYaml",
+            "fileExists"
+          ]
+        },
+        {
+          "source": "src/utils/graphBuilder.js",
+          "items": [
+            "buildKnowledgeGraph",
+            "detectChangedFiles",
+            "buildGraphSummary"
+          ]
+        },
+        {
+          "source": "src/utils/hashStore.js",
+          "items": [
+            "loadPreviousHashes",
+            "saveCurrentHashes",
+            "isFirstScan"
+          ]
+        },
+        {
+          "source": "path",
+          "items": [
+            "path"
+          ]
+        }
+      ],
+      "loc": 478
+    },
+    {
+      "id": "src\\commands\\status.js",
+      "file": "src\\commands\\status.js",
+      "type": "module",
+      "hash": "40a834fc78b74cf1a0c59f46a5dbf4dc",
+      "exports": [
+        "statusCommand"
+      ],
+      "functions": [
+        "statusCommand",
+        "getStatusIcon"
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "chalk",
+          "items": [
+            "chalk"
+          ]
+        },
+        {
+          "source": "src/utils/fileUtils.js",
+          "items": [
+            "ensureRecallDir",
+            "readYaml",
+            "getRecallPath",
+            "fileExists"
+          ]
+        }
+      ],
+      "loc": 138
+    },
+    {
+      "id": "src\\commands\\update.js",
+      "file": "src\\commands\\update.js",
+      "type": "module",
+      "hash": "e1b23fd9682c27deccc14363ce21a0e8",
+      "exports": [
+        "updateCommand"
+      ],
+      "functions": [
+        "updateCommand",
+        "name"
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "chalk",
+          "items": [
+            "chalk"
+          ]
+        },
+        {
+          "source": "inquirer",
+          "items": [
+            "inquirer"
+          ]
+        },
+        {
+          "source": "src/utils/fileUtils.js",
+          "items": [
+            "ensureRecallDir",
+            "readYaml",
+            "writeYaml",
+            "getRecallPath",
+            "fileExists",
+            "appendToFile"
+          ]
+        }
+      ],
+      "loc": 170
+    },
+    {
+      "id": "src\\commands\\watch.js",
+      "file": "src\\commands\\watch.js",
+      "type": "module",
+      "hash": "f3f463f925edec1aa8b74a9ebce9c022",
+      "exports": [
+        "watchCommand"
+      ],
+      "functions": [
+        "watchCommand"
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "fs",
+          "items": [
+            "fs"
+          ]
+        },
+        {
+          "source": "path",
+          "items": [
+            "path"
+          ]
+        },
+        {
+          "source": "chalk",
+          "items": [
+            "chalk"
+          ]
+        },
+        {
+          "source": "child_process",
+          "items": [
+            "execSync"
+          ]
+        }
+      ],
+      "loc": 71
+    },
+    {
+      "id": "src\\utils\\assembler.js",
+      "file": "src\\utils\\assembler.js",
+      "type": "module",
+      "hash": "5c0c38bc94b002fcb119d877805553f9",
+      "exports": [
+        "buildBriefing",
+        "estimateTokens"
+      ],
+      "functions": [
+        "buildBriefing",
+        "buildQuickBriefing",
+        "buildFullBriefing",
+        "buildOnboardPrompt",
+        "getStatusIcon",
+        "estimateTokens"
+      ],
+      "classes": [],
+      "imports": [],
+      "loc": 199
+    },
+    {
+      "id": "src\\utils\\clipboard.js",
+      "file": "src\\utils\\clipboard.js",
+      "type": "module",
+      "hash": "5f0607007891a486f5d09189f5fbcfb5",
+      "exports": [
+        "copyToClipboard"
+      ],
+      "functions": [
+        "copyToClipboard"
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "clipboardy",
+          "items": [
+            "clipboardy"
+          ]
+        }
+      ],
+      "loc": 11
+    },
+    {
+      "id": "src\\utils\\fileUtils.js",
+      "file": "src\\utils\\fileUtils.js",
+      "type": "module",
+      "hash": "8961f17cc17879e30523c8322e363b98",
+      "exports": [
+        "ensureRecallDir",
+        "createRecallDir",
+        "writeYaml",
+        "readYaml",
+        "fileExists",
+        "writeFile",
+        "readFile",
+        "getRecallPath",
+        "appendToFile"
+      ],
+      "functions": [
+        "ensureRecallDir",
+        "createRecallDir",
+        "writeYaml",
+        "readYaml",
+        "fileExists",
+        "writeFile",
+        "readFile",
+        "getRecallPath",
+        "appendToFile"
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "fs/promises",
+          "items": [
+            "fs"
+          ]
+        },
+        {
+          "source": "path",
+          "items": [
+            "path"
+          ]
+        },
+        {
+          "source": "js-yaml",
+          "items": [
+            "yaml"
+          ]
+        }
+      ],
+      "loc": 55
+    },
+    {
+      "id": "src\\utils\\gemini.js",
+      "file": "src\\utils\\gemini.js",
+      "type": "module",
+      "hash": "3eff93abd978b1c36be0c3c68991c8fd",
+      "exports": [
+        "callGemini",
+        "estimateTokens"
+      ],
+      "functions": [
+        "callGemini",
+        "estimateTokens"
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "https",
+          "items": [
+            "https"
+          ]
+        }
+      ],
+      "loc": 74
+    },
+    {
+      "id": "src\\utils\\graphBuilder.js",
+      "file": "src\\utils\\graphBuilder.js",
+      "type": "module",
+      "hash": "f78c5188d2e0e1c28c2a98050bf2ef3a",
+      "exports": [
+        "buildKnowledgeGraph",
+        "detectChangedFiles",
+        "buildGraphSummary"
+      ],
+      "functions": [
+        "buildKnowledgeGraph",
+        "analyzeFile",
+        "declarations",
+        "resolveImportPath",
+        "calculateConnections",
+        "identifyGodNodes",
+        "generateCriticalityReason",
+        "detectChangedFiles",
+        "buildGraphSummary",
+        "getTopExports",
+        "describeArchitecture"
+      ],
+      "classes": [
+        "declarations"
+      ],
+      "imports": [
+        {
+          "source": "fs/promises",
+          "items": [
+            "fs"
+          ]
+        },
+        {
+          "source": "path",
+          "items": [
+            "path"
+          ]
+        },
+        {
+          "source": "crypto",
+          "items": [
+            "crypto"
+          ]
+        }
+      ],
+      "loc": 387
+    },
+    {
+      "id": "src\\utils\\hashStore.js",
+      "file": "src\\utils\\hashStore.js",
+      "type": "module",
+      "hash": "2402cc054fb2e53b05bfb8c6aa4a9954",
+      "exports": [
+        "loadPreviousHashes",
+        "saveCurrentHashes",
+        "isFirstScan"
+      ],
+      "functions": [
+        "loadPreviousHashes",
+        "saveCurrentHashes",
+        "isFirstScan"
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "fs/promises",
+          "items": [
+            "fs"
+          ]
+        },
+        {
+          "source": "src/utils/fileUtils.js",
+          "items": [
+            "getRecallPath",
+            "fileExists"
+          ]
+        }
+      ],
+      "loc": 39
+    },
+    {
+      "id": "src\\utils\\prompt.js",
+      "file": "src\\utils\\prompt.js",
+      "type": "module",
+      "hash": "7f7c4a91911f24e713917bc0b27f4365",
+      "exports": [
+        "buildGeminiPrompt"
+      ],
+      "functions": [
+        "buildGeminiPrompt",
+        "name"
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "src/utils/scanner.js",
+          "items": [
+            "buildFileTree"
+          ]
+        }
+      ],
+      "loc": 139
+    },
+    {
+      "id": "src\\utils\\scanner.js",
+      "file": "src\\utils\\scanner.js",
+      "type": "module",
+      "hash": "c28ca110e466b6135a4b373b6e59d586",
+      "exports": [
+        "scanProject",
+        "buildFileTree",
+        "getGitInfo"
+      ],
+      "functions": [
+        "scanProject",
+        "walkDirectory",
+        "readFileContents",
+        "buildFileTree",
+        "getGitInfo"
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "fs/promises",
+          "items": [
+            "fs"
+          ]
+        },
+        {
+          "source": "path",
+          "items": [
+            "path"
+          ]
+        }
+      ],
+      "loc": 140
+    },
+    {
+      "id": "test-incremental.js",
+      "file": "test-incremental.js",
+      "type": "module",
+      "hash": "af959457fc711decb99f7dc5bd3e20d8",
+      "exports": [
+        "testFunction"
+      ],
+      "functions": [
+        "testFunction"
+      ],
+      "classes": [],
+      "imports": [],
+      "loc": 7
+    }
+  ],
+  "edges": [
+    {
+      "from": "src\\commands\\init.js",
+      "to": "chalk",
+      "type": "imports",
+      "items": [
+        "chalk"
+      ]
+    },
+    {
+      "from": "src\\commands\\init.js",
+      "to": "inquirer",
+      "type": "imports",
+      "items": [
+        "inquirer"
+      ]
+    },
+    {
+      "from": "src\\commands\\init.js",
+      "to": "src/utils/fileUtils.js",
+      "type": "imports",
+      "items": [
+        "ensureRecallDir",
+        "createRecallDir",
+        "writeYaml",
+        "writeFile",
+        "getRecallPath"
+      ]
+    },
+    {
+      "from": "bin\\memo.js",
+      "to": "commander",
+      "type": "imports",
+      "items": [
+        "Command"
+      ]
+    },
+    {
+      "from": "bin\\memo.js",
+      "to": "src/commands/init.js",
+      "type": "imports",
+      "items": [
+        "initCommand"
+      ]
+    },
+    {
+      "from": "bin\\memo.js",
+      "to": "src/commands/scan.js",
+      "type": "imports",
+      "items": [
+        "scanCommand"
+      ]
+    },
+    {
+      "from": "bin\\memo.js",
+      "to": "src/commands/update.js",
+      "type": "imports",
+      "items": [
+        "updateCommand"
+      ]
+    },
+    {
+      "from": "bin\\memo.js",
+      "to": "src/commands/load.js",
+      "type": "imports",
+      "items": [
+        "loadCommand"
+      ]
+    },
+    {
+      "from": "bin\\memo.js",
+      "to": "src/commands/status.js",
+      "type": "imports",
+      "items": [
+        "statusCommand"
+      ]
+    },
+    {
+      "from": "bin\\memo.js",
+      "to": "src/commands/install.js",
+      "type": "imports",
+      "items": [
+        "installCommand"
+      ]
+    },
+    {
+      "from": "bin\\memo.js",
+      "to": "src/commands/config.js",
+      "type": "imports",
+      "items": [
+        "configCommand"
+      ]
+    },
+    {
+      "from": "bin\\memo.js",
+      "to": "src/commands/watch.js",
+      "type": "imports",
+      "items": [
+        "watchCommand"
+      ]
+    },
+    {
+      "from": "src\\commands\\config.js",
+      "to": "fs/promises",
+      "type": "imports",
+      "items": [
+        "fs"
+      ]
+    },
+    {
+      "from": "src\\commands\\config.js",
+      "to": "path",
+      "type": "imports",
+      "items": [
+        "path"
+      ]
+    },
+    {
+      "from": "src\\commands\\config.js",
+      "to": "os",
+      "type": "imports",
+      "items": [
+        "os"
+      ]
+    },
+    {
+      "from": "src\\commands\\config.js",
+      "to": "chalk",
+      "type": "imports",
+      "items": [
+        "chalk"
+      ]
+    },
+    {
+      "from": "src\\commands\\install.js",
+      "to": "fs/promises",
+      "type": "imports",
+      "items": [
+        "fs"
+      ]
+    },
+    {
+      "from": "src\\commands\\install.js",
+      "to": "path",
+      "type": "imports",
+      "items": [
+        "path"
+      ]
+    },
+    {
+      "from": "src\\commands\\install.js",
+      "to": "chalk",
+      "type": "imports",
+      "items": [
+        "chalk"
+      ]
+    },
+    {
+      "from": "src\\commands\\load.js",
+      "to": "chalk",
+      "type": "imports",
+      "items": [
+        "chalk"
+      ]
+    },
+    {
+      "from": "src\\commands\\load.js",
+      "to": "src/utils/fileUtils.js",
+      "type": "imports",
+      "items": [
+        "ensureRecallDir",
+        "readYaml",
+        "getRecallPath",
+        "fileExists"
+      ]
+    },
+    {
+      "from": "src\\commands\\load.js",
+      "to": "src/utils/assembler.js",
+      "type": "imports",
+      "items": [
+        "buildBriefing",
+        "estimateTokens"
+      ]
+    },
+    {
+      "from": "src\\commands\\load.js",
+      "to": "src/utils/clipboard.js",
+      "type": "imports",
+      "items": [
+        "copyToClipboard"
+      ]
+    },
+    {
+      "from": "src\\commands\\scan.js",
+      "to": "chalk",
+      "type": "imports",
+      "items": [
+        "chalk"
+      ]
+    },
+    {
+      "from": "src\\commands\\scan.js",
+      "to": "inquirer",
+      "type": "imports",
+      "items": [
+        "inquirer"
+      ]
+    },
+    {
+      "from": "src\\commands\\scan.js",
+      "to": "js-yaml",
+      "type": "imports",
+      "items": [
+        "yaml"
+      ]
+    },
+    {
+      "from": "src\\commands\\scan.js",
+      "to": "src/utils/scanner.js",
+      "type": "imports",
+      "items": [
+        "scanProject",
+        "getGitInfo"
+      ]
+    },
+    {
+      "from": "src\\commands\\scan.js",
+      "to": "src/utils/prompt.js",
+      "type": "imports",
+      "items": [
+        "buildGeminiPrompt"
+      ]
+    },
+    {
+      "from": "src\\commands\\scan.js",
+      "to": "src/utils/gemini.js",
+      "type": "imports",
+      "items": [
+        "callGemini",
+        "estimateTokens"
+      ]
+    },
+    {
+      "from": "src\\commands\\scan.js",
+      "to": "src/commands/config.js",
+      "type": "imports",
+      "items": [
+        "getApiKey"
+      ]
+    },
+    {
+      "from": "src\\commands\\scan.js",
+      "to": "src/utils/fileUtils.js",
+      "type": "imports",
+      "items": [
+        "ensureRecallDir",
+        "writeYaml",
+        "writeFile",
+        "getRecallPath",
+        "readYaml",
+        "fileExists"
+      ]
+    },
+    {
+      "from": "src\\commands\\scan.js",
+      "to": "src/utils/graphBuilder.js",
+      "type": "imports",
+      "items": [
+        "buildKnowledgeGraph",
+        "detectChangedFiles",
+        "buildGraphSummary"
+      ]
+    },
+    {
+      "from": "src\\commands\\scan.js",
+      "to": "src/utils/hashStore.js",
+      "type": "imports",
+      "items": [
+        "loadPreviousHashes",
+        "saveCurrentHashes",
+        "isFirstScan"
+      ]
+    },
+    {
+      "from": "src\\commands\\scan.js",
+      "to": "path",
+      "type": "imports",
+      "items": [
+        "path"
+      ]
+    },
+    {
+      "from": "src\\commands\\status.js",
+      "to": "chalk",
+      "type": "imports",
+      "items": [
+        "chalk"
+      ]
+    },
+    {
+      "from": "src\\commands\\status.js",
+      "to": "src/utils/fileUtils.js",
+      "type": "imports",
+      "items": [
+        "ensureRecallDir",
+        "readYaml",
+        "getRecallPath",
+        "fileExists"
+      ]
+    },
+    {
+      "from": "src\\commands\\update.js",
+      "to": "chalk",
+      "type": "imports",
+      "items": [
+        "chalk"
+      ]
+    },
+    {
+      "from": "src\\commands\\update.js",
+      "to": "inquirer",
+      "type": "imports",
+      "items": [
+        "inquirer"
+      ]
+    },
+    {
+      "from": "src\\commands\\update.js",
+      "to": "src/utils/fileUtils.js",
+      "type": "imports",
+      "items": [
+        "ensureRecallDir",
+        "readYaml",
+        "writeYaml",
+        "getRecallPath",
+        "fileExists",
+        "appendToFile"
+      ]
+    },
+    {
+      "from": "src\\commands\\watch.js",
+      "to": "fs",
+      "type": "imports",
+      "items": [
+        "fs"
+      ]
+    },
+    {
+      "from": "src\\commands\\watch.js",
+      "to": "path",
+      "type": "imports",
+      "items": [
+        "path"
+      ]
+    },
+    {
+      "from": "src\\commands\\watch.js",
+      "to": "chalk",
+      "type": "imports",
+      "items": [
+        "chalk"
+      ]
+    },
+    {
+      "from": "src\\commands\\watch.js",
+      "to": "child_process",
+      "type": "imports",
+      "items": [
+        "execSync"
+      ]
+    },
+    {
+      "from": "src\\utils\\clipboard.js",
+      "to": "clipboardy",
+      "type": "imports",
+      "items": [
+        "clipboardy"
+      ]
+    },
+    {
+      "from": "src\\utils\\fileUtils.js",
+      "to": "fs/promises",
+      "type": "imports",
+      "items": [
+        "fs"
+      ]
+    },
+    {
+      "from": "src\\utils\\fileUtils.js",
+      "to": "path",
+      "type": "imports",
+      "items": [
+        "path"
+      ]
+    },
+    {
+      "from": "src\\utils\\fileUtils.js",
+      "to": "js-yaml",
+      "type": "imports",
+      "items": [
+        "yaml"
+      ]
+    },
+    {
+      "from": "src\\utils\\gemini.js",
+      "to": "https",
+      "type": "imports",
+      "items": [
+        "https"
+      ]
+    },
+    {
+      "from": "src\\utils\\graphBuilder.js",
+      "to": "fs/promises",
+      "type": "imports",
+      "items": [
+        "fs"
+      ]
+    },
+    {
+      "from": "src\\utils\\graphBuilder.js",
+      "to": "path",
+      "type": "imports",
+      "items": [
+        "path"
+      ]
+    },
+    {
+      "from": "src\\utils\\graphBuilder.js",
+      "to": "crypto",
+      "type": "imports",
+      "items": [
+        "crypto"
+      ]
+    },
+    {
+      "from": "src\\utils\\hashStore.js",
+      "to": "fs/promises",
+      "type": "imports",
+      "items": [
+        "fs"
+      ]
+    },
+    {
+      "from": "src\\utils\\hashStore.js",
+      "to": "src/utils/fileUtils.js",
+      "type": "imports",
+      "items": [
+        "getRecallPath",
+        "fileExists"
+      ]
+    },
+    {
+      "from": "src\\utils\\prompt.js",
+      "to": "src/utils/scanner.js",
+      "type": "imports",
+      "items": [
+        "buildFileTree"
+      ]
+    },
+    {
+      "from": "src\\utils\\scanner.js",
+      "to": "fs/promises",
+      "type": "imports",
+      "items": [
+        "fs"
+      ]
+    },
+    {
+      "from": "src\\utils\\scanner.js",
+      "to": "path",
+      "type": "imports",
+      "items": [
+        "path"
+      ]
+    }
+  ],
+  "godNodes": [
+    {
+      "name": "scan",
+      "file": "src\\commands\\scan.js",
+      "connections": 11,
+      "incoming": 0,
+      "outgoing": 11,
+      "exports": [
+        "scanCommand"
+      ],
+      "why_critical": "imports 11 dependencies, contains 9 functions"
+    },
+    {
+      "name": "memo",
+      "file": "bin\\memo.js",
+      "connections": 9,
+      "incoming": 0,
+      "outgoing": 9,
+      "exports": [],
+      "why_critical": "imports 9 dependencies"
+    },
+    {
+      "name": "config",
+      "file": "src\\commands\\config.js",
+      "connections": 4,
+      "incoming": 0,
+      "outgoing": 4,
+      "exports": [
+        "configCommand",
+        "getApiKey"
+      ],
+      "why_critical": "Central hub with 4 connections"
+    },
+    {
+      "name": "load",
+      "file": "src\\commands\\load.js",
+      "connections": 4,
+      "incoming": 0,
+      "outgoing": 4,
+      "exports": [
+        "loadCommand"
+      ],
+      "why_critical": "Central hub with 4 connections"
+    },
+    {
+      "name": "watch",
+      "file": "src\\commands\\watch.js",
+      "connections": 4,
+      "incoming": 0,
+      "outgoing": 4,
+      "exports": [
+        "watchCommand"
+      ],
+      "why_critical": "Central hub with 4 connections"
+    }
+  ],
+  "fileHashes": {
+    "src\\commands\\init.js": "abfdff0cae30f27c2d591b8e92e5830c",
+    "bin\\memo.js": "ea5aa055d6ed623afbd74d56610057ff",
+    "src\\commands\\config.js": "0baa1d41ad0cc503072a0eb11c968597",
+    "src\\commands\\install.js": "8d79090a79bbe17b93804b30dbf803e0",
+    "src\\commands\\load.js": "e2ebd155b44b5f040718ac047fac6b0c",
+    "src\\commands\\scan.js": "e73a1e031a656de1b4a24cdb892b9ec4",
+    "src\\commands\\status.js": "40a834fc78b74cf1a0c59f46a5dbf4dc",
+    "src\\commands\\update.js": "e1b23fd9682c27deccc14363ce21a0e8",
+    "src\\commands\\watch.js": "f3f463f925edec1aa8b74a9ebce9c022",
+    "src\\utils\\assembler.js": "5c0c38bc94b002fcb119d877805553f9",
+    "src\\utils\\clipboard.js": "5f0607007891a486f5d09189f5fbcfb5",
+    "src\\utils\\fileUtils.js": "8961f17cc17879e30523c8322e363b98",
+    "src\\utils\\gemini.js": "3eff93abd978b1c36be0c3c68991c8fd",
+    "src\\utils\\graphBuilder.js": "f78c5188d2e0e1c28c2a98050bf2ef3a",
+    "src\\utils\\hashStore.js": "2402cc054fb2e53b05bfb8c6aa4a9954",
+    "src\\utils\\prompt.js": "7f7c4a91911f24e713917bc0b27f4365",
+    "src\\utils\\scanner.js": "c28ca110e466b6135a4b373b6e59d586",
+    "test-incremental.js": "af959457fc711decb99f7dc5bd3e20d8"
+  },
+  "stats": {
+    "totalFiles": 18,
+    "totalConnections": 56,
+    "avgConnections": 3.111111111111111
+  }
+}
