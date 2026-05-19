@@ -9,6 +9,7 @@ import statusCommand from '../src/commands/status.js';
 import installCommand from '../src/commands/install.js';
 import configCommand from '../src/commands/config.js';
 import watchCommand from '../src/commands/watch.js';
+import validateCommand from '../src/commands/validate.js';
 
 const program = new Command();
 
@@ -61,5 +62,12 @@ program
   .command('watch')
   .description('Watch project and auto-scan on file changes')
   .action(watchCommand);
+
+program
+  .command('validate')
+  .description('Validate repository code for errors')
+  .option('-v, --verbose', 'Show detailed validation output')
+  .option('-s, --save', 'Save validation report to file')
+  .action(validateCommand);
 
 program.parse();
