@@ -8,6 +8,10 @@ memo scan                    # Build AST registry + graph
 memo scan --local            # Local-only (no API)
 memo scan --quick            # Faster scan
 memo validate                # Validate repository code
+memo health                  # Repository health dashboard
+memo trust                   # AI trust meter
+memo timeline                # Edit replay timeline
+memo local init              # Initialize local runtime
 memo load                    # Load memory to clipboard
 memo status                  # Show project status
 memo watch                   # Auto-scan on changes
@@ -242,6 +246,100 @@ const health = scorer.getRepositoryHealth();
 const stats = scorer.getStats();
 ```
 
+### Health Dashboard (Phase 3)
+```javascript
+import { HealthDashboard } from './src/dashboard/healthDashboard.js';
+
+const dashboard = new HealthDashboard(context);
+
+// Generate report
+const report = await dashboard.generateReport();
+
+// Get overall health
+const health = await dashboard.getOverallHealth();
+// { score: 88, grade: 'B', status: 'good' }
+
+// Identify issues
+const godFiles = await dashboard.identifyGodFiles();
+const cycles = await dashboard.findCircularDependencies();
+const bottlenecks = await dashboard.identifyBottlenecks();
+```
+
+### Trust Meter (Phase 3)
+```javascript
+import { TrustMeter } from './src/trust/trustMeter.js';
+
+const trustMeter = new TrustMeter(context);
+
+// Generate report
+const report = await trustMeter.generateReport();
+
+// Get overall trust
+const trust = await trustMeter.getOverallTrust();
+// { score: 88.6, grade: 'B+', level: 'high' }
+
+// Get metrics
+const symbolMetrics = await trustMeter.getSymbolVerificationMetrics();
+const importMetrics = await trustMeter.getImportValidationMetrics();
+const risk = await trustMeter.getHallucinationRisk();
+```
+
+### Edit Timeline (Phase 3)
+```javascript
+import { EditTimeline } from './src/timeline/editTimeline.js';
+
+const timeline = new EditTimeline(context);
+
+// Record change
+await timeline.recordChange({
+  type: 'file_modified',
+  file: 'src/utils/helper.js',
+  reasoning: 'Added validation',
+  confidence: 95
+});
+
+// Get timeline
+const events = await timeline.getTimeline({ limit: 10 });
+
+// Get file timeline
+const fileEvents = await timeline.getFileTimeline('src/utils/helper.js');
+
+// Compare changes
+const comparison = await timeline.compareChanges('change_1', 'change_2');
+
+// Statistics
+const stats = await timeline.getStats();
+```
+
+### Local Runtime (Phase 3)
+```javascript
+import { LocalRuntime } from './src/local/localRuntime.js';
+
+const runtime = new LocalRuntime(context);
+
+// Initialize
+await runtime.initialize({
+  provider: 'ollama',
+  model: 'llama2',
+  embeddingModel: 'nomic-embed-text'
+});
+
+// Generate embeddings
+const embedding = await runtime.generateEmbedding('test text');
+
+// Semantic search
+const results = await runtime.semanticSearch('query', documents, {
+  topK: 10,
+  threshold: 0.5
+});
+
+// Analyze code
+const analysis = await runtime.analyzeCode(code, { task: 'explain' });
+
+// Get status
+const status = await runtime.getStatus();
+```
+
 ## 12 Repository Tools
 
 1. **read_file** — Read file content
@@ -268,12 +366,16 @@ const stats = scorer.getStats();
 ├── symbol_registry.json  # AST symbols
 ├── checksums.json        # File checksums
 ├── working_memory.json   # Active context
-└── file_hashes.json      # Change detection
+├── file_hashes.json      # Change detection
+├── edit_timeline.json    # Change history (Phase 3)
+├── local_config.json     # Local runtime config (Phase 3)
+└── local_embeddings.json # Local embeddings cache (Phase 3)
 ```
 
 ## Test Files
 
 ```bash
+# Phase 1 & 2 Tests
 node test-ast-parser.js          # AST parsing
 node test-graph-engine.js         # Graph operations
 node test-validator.js            # Validation pipeline
@@ -283,6 +385,12 @@ node test-confidence.js           # Confidence scoring
 node test-orchestrator.js         # Multi-agent pipeline
 node test-tools.js                # Tool execution
 node test-hybrid-retrieval.js     # Retrieval strategies
+
+# Phase 3 Tests
+node test-health-dashboard.js     # Repository health
+node test-trust-meter.js          # AI trust metrics
+node test-edit-timeline.js        # Change tracking
+node test-local-runtime.js        # Local-first runtime
 ```
 
 ## Performance

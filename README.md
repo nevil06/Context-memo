@@ -132,6 +132,63 @@ Install context-memo integration for AI agents:
 ### `memo config [--key KEY] [--show]`
 Configure settings (API key stored at `~/.recall/config.json`).
 
+### `memo validate`
+Validate repository code for hallucinations and errors.
+
+**What it does:**
+1. Syntax validation (AST parsing)
+2. Import validation (verify all imports exist)
+3. Symbol validation (verify all symbols exist)
+4. Path validation (verify all paths are valid)
+5. Generates confidence score
+
+### `memo health [--format full|summary] [--save]`
+Display repository health dashboard with metrics and recommendations.
+
+**What it shows:**
+- Overall health score (0-100) with grade
+- God files (highly connected files)
+- Circular dependencies
+- Architecture drift
+- Bottlenecks and unstable modules
+- Orphaned files
+- Complexity hotspots
+- Actionable recommendations
+
+### `memo trust [--format full|summary] [--save]`
+Display AI trust meter with confidence metrics.
+
+**What it shows:**
+- Overall trust score (0-100) with grade
+- Symbol verification rate
+- Import validation rate
+- Hallucination risk assessment
+- Validation history and trends
+- Verified/unverified symbols
+- Recommendations
+
+### `memo timeline [--file <path>] [--compare id1,id2] [--save]`
+Display edit replay timeline with change history.
+
+**What it shows:**
+- Recent changes with timestamps
+- Impact analysis (blast radius, risk score)
+- Most changed files
+- High risk changes
+- Change comparison
+- 7-day activity visualization
+
+### `memo local <action> [options]`
+Manage local-first runtime for offline operation.
+
+**Actions:**
+- `init` — Initialize local runtime (Ollama integration)
+- `status` — Check runtime status
+- `test` — Test models
+- `search` — Semantic search with local embeddings
+- `analyze` — Analyze code locally
+- `embeddings` — Manage embedding cache
+
 ## How It Works
 
 context-memo uses a **3-layer hybrid architecture**:

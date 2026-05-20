@@ -20,7 +20,7 @@ const program = new Command();
 program
   .name('memo')
   .description('Persistent AI memory layer — switch agents without losing context')
-  .version('2.0.0');
+  .version('2.1.0');
 
 program
   .command('init')
