@@ -11,6 +11,7 @@ import configCommand from '../src/commands/config.js';
 import watchCommand from '../src/commands/watch.js';
 import validateCommand from '../src/commands/validate.js';
 import { executeHealthCommand } from '../src/commands/health.js';
+import { executeTrustCommand } from '../src/commands/trust.js';
 
 const program = new Command();
 
@@ -77,5 +78,12 @@ program
   .option('--format <format>', 'Output format: full|summary', 'full')
   .option('-s, --save', 'Save health report to file')
   .action((options) => executeHealthCommand(options));
+
+program
+  .command('trust')
+  .description('Display AI trust meter and confidence metrics')
+  .option('--format <format>', 'Output format: full|summary', 'full')
+  .option('-s, --save', 'Save trust report to file')
+  .action((options) => executeTrustCommand(options));
 
 program.parse();
