@@ -13,6 +13,7 @@ import validateCommand from '../src/commands/validate.js';
 import { executeHealthCommand } from '../src/commands/health.js';
 import { executeTrustCommand } from '../src/commands/trust.js';
 import { executeTimelineCommand } from '../src/commands/timeline.js';
+import { executeLocalCommand } from '../src/commands/local.js';
 
 const program = new Command();
 
@@ -95,5 +96,20 @@ program
   .option('--limit <number>', 'Limit number of events', '10')
   .option('-s, --save', 'Save timeline report to file')
   .action((options) => executeTimelineCommand(options));
+
+program
+  .command('local <action>')
+  .description('Manage local-first runtime (actions: init, status, test, search, analyze, embeddings)')
+  .option('--provider <provider>', 'Model provider (ollama)', 'ollama')
+  .option('--model <model>', 'Model name', 'llama2')
+  .option('--embedding-model <model>', 'Embedding model', 'nomic-embed-text')
+  .option('--api-url <url>', 'API URL', 'http://localhost:11434')
+  .option('--type <type>', 'Test type (model, embedding, both)', 'both')
+  .option('--query <query>', 'Search query')
+  .option('--documents <docs>', 'Documents to search (JSON array)')
+  .option('--code <code>', 'Code to analyze')
+  .option('--task <task>', 'Analysis task (explain, review, optimize, document)', 'explain')
+  .option('--action <action>', 'Embeddings action (stats, clear, export)', 'stats')
+  .action((action, options) => executeLocalCommand(action, options));
 
 program.parse();
