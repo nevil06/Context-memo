@@ -10,13 +10,14 @@ import installCommand from '../src/commands/install.js';
 import configCommand from '../src/commands/config.js';
 import watchCommand from '../src/commands/watch.js';
 import validateCommand from '../src/commands/validate.js';
+import { executeHealthCommand } from '../src/commands/health.js';
 
 const program = new Command();
 
 program
   .name('memo')
   .description('Persistent AI memory layer — switch agents without losing context')
-  .version('1.0.0');
+  .version('2.0.0');
 
 program
   .command('init')
@@ -69,5 +70,12 @@ program
   .option('-v, --verbose', 'Show detailed validation output')
   .option('-s, --save', 'Save validation report to file')
   .action(validateCommand);
+
+program
+  .command('health')
+  .description('Display repository health dashboard')
+  .option('--format <format>', 'Output format: full|summary', 'full')
+  .option('-s, --save', 'Save health report to file')
+  .action((options) => executeHealthCommand(options));
 
 program.parse();
