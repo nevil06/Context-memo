@@ -1,0 +1,93 @@
+{
+  "timeline": [
+    {
+      "id": "change_1779298404958_h995kd0ej",
+      "timestamp": "2026-05-20T17:33:24.958Z",
+      "type": "file_modified",
+      "file": "src/utils/helper.js",
+      "changes": [
+        "Added new function validateInput"
+      ],
+      "impact": {
+        "affectedFiles": [
+          "src/services/userService.js"
+        ],
+        "affectedSymbols": [
+          {
+            "type": "function",
+            "name": "formatData"
+          },
+          {
+            "type": "export",
+            "name": "formatData"
+          }
+        ],
+        "dependencies": [],
+        "dependents": [
+          "src/services/userService.js"
+        ],
+        "riskScore": 0,
+        "blastRadius": 2
+      },
+      "reasoning": "Added input validation for security",
+      "confidence": 95,
+      "metadata": {}
+    },
+    {
+      "id": "change_1779298404963_60ochp14k",
+      "timestamp": "2026-05-20T17:33:24.963Z",
+      "type": "file_modified",
+      "file": "src/models/User.js",
+      "changes": [
+        "Modified User class",
+        "Added delete method"
+      ],
+      "impact": {
+        "affectedFiles": [
+          "src/services/userService.js"
+        ],
+        "affectedSymbols": [
+          {
+            "type": "class",
+            "name": "User"
+          },
+          {
+            "type": "export",
+            "name": "User"
+          }
+        ],
+        "dependencies": [],
+        "dependents": [
+          "src/services/userService.js"
+        ],
+        "riskScore": 0,
+        "blastRadius": 2
+      },
+      "reasoning": "Added user deletion functionality",
+      "confidence": 98,
+      "metadata": {}
+    },
+    {
+      "id": "change_1779298404964_xhhm1odjq",
+      "timestamp": "2026-05-20T17:33:24.964Z",
+      "type": "file_created",
+      "file": "src/api/newRoutes.js",
+      "changes": [
+        "Created new API routes file"
+      ],
+      "impact": {
+        "affectedFiles": [],
+        "affectedSymbols": [],
+        "dependencies": [],
+        "dependents": [],
+        "riskScore": 0,
+        "blastRadius": 0
+      },
+      "reasoning": "Separated routes for better organization",
+      "confidence": 100,
+      "metadata": {}
+    }
+  ],
+  "version": "1.0.0",
+  "lastUpdated": "2026-05-20T17:33:24.964Z"
+}

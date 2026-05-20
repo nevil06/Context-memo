@@ -12,6 +12,7 @@ import watchCommand from '../src/commands/watch.js';
 import validateCommand from '../src/commands/validate.js';
 import { executeHealthCommand } from '../src/commands/health.js';
 import { executeTrustCommand } from '../src/commands/trust.js';
+import { executeTimelineCommand } from '../src/commands/timeline.js';
 
 const program = new Command();
 
@@ -85,5 +86,14 @@ program
   .option('--format <format>', 'Output format: full|summary', 'full')
   .option('-s, --save', 'Save trust report to file')
   .action((options) => executeTrustCommand(options));
+
+program
+  .command('timeline')
+  .description('Display edit replay timeline')
+  .option('--file <file>', 'Show timeline for specific file')
+  .option('--compare <ids>', 'Compare two changes (comma-separated IDs)')
+  .option('--limit <number>', 'Limit number of events', '10')
+  .option('-s, --save', 'Save timeline report to file')
+  .action((options) => executeTimelineCommand(options));
 
 program.parse();
