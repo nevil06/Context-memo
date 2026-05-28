@@ -143,9 +143,11 @@ export class GraphRetriever {
         const symbols = this.registry.getFile(importer.file);
         if (symbols) {
           for (const imp of symbols.imports || []) {
-            if (imp.items.some(item => 
+            const matchesItems = imp.items && imp.items.some(item => 
               item.name === symbolName || item.imported === symbolName
-            )) {
+            );
+            const matchesDirect = imp.imported === symbolName || imp.local === symbolName;
+            if (matchesItems || matchesDirect) {
               usages.push({
                 file: importer.file,
                 symbol: symbolName,
@@ -293,6 +295,57 @@ export class GraphRetriever {
     results.metadata.totalEdges = results.edges.length;
 
     return results;
+  }
+
+  /**
+   * Find files related by shared dependencies
+   */
+  async findRelatedFiles(filePath, options = {}) {
+    const { minSharedDeps = 1, maxFiles = 5 } = options;
+    const results = { files: [] };
+
+    const targetDeps = new Set(
+      this.graph.getDirectDependencies(filePath).map(d => d.file)
+    );
+
+    if (targetDeps.size === 0) return results;
+
+    for (const node of this.graph.getAllNodes()) {
+      if (node.id === filePath) continue;
+
+      const nodeDeps = this.graph.getDirectDependencies(node.id).map(d => d.file);
+      let sharedCount = 0;
+      for (const dep of nodeDeps) {
+        if (targetDeps.has(dep)) {
+          sharedCount++;
+        }
+      }
+
+      if (sharedCount >= minSharedDeps) {
+        results.files.push({
+          path: node.file,
+          sharedDeps: sharedCount
+        });
+      }
+    }
+
+    results.files.sort((a, b) => b.sharedDeps - a.sharedDeps);
+    results.files = results.files.slice(0, maxFiles);
+    return results;
+  }
+
+  /**
+   * Get critical path between two files in dependency graph
+   */
+  async getCriticalPath(fromFile, toFile) {
+    const path = this.graph.findPath(fromFile, toFile);
+    return {
+      from: fromFile,
+      to: toFile,
+      exists: path !== null,
+      length: path ? path.length - 1 : 0,
+      path: path || []
+    };
   }
 
   /**

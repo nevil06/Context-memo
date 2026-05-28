@@ -587,5 +587,3 @@ function detectEntryPoints(files) {
   
   return entryPoints.join(', ') || 'Unknown';
 }
-
-import path from 'path';

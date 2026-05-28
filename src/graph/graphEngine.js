@@ -4,12 +4,43 @@
  */
 
 export class GraphEngine {
-  constructor(nodes, edges) {
+  constructor(nodes = [], edges = []) {
     this.nodes = new Map(nodes.map(n => [n.id, n]));
     this.edges = edges;
     this.adjacencyList = this._buildAdjacencyList();
     this.reverseAdjacencyList = this._buildReverseAdjacencyList();
   }
+
+  /**
+   * Add node manually (for testing/dynamic building)
+   */
+  addNode(id, data = {}) {
+    const node = { id, file: id, ...data };
+    this.nodes.set(id, node);
+    if (!this.adjacencyList.has(id)) {
+      this.adjacencyList.set(id, []);
+    }
+    if (!this.reverseAdjacencyList.has(id)) {
+      this.reverseAdjacencyList.set(id, []);
+    }
+  }
+
+  /**
+   * Add edge manually (for testing/dynamic building)
+   */
+  addEdge(from, to, data = {}) {
+    const edge = { from, to, ...data };
+    this.edges.push(edge);
+    if (!this.adjacencyList.has(from)) {
+      this.adjacencyList.set(from, []);
+    }
+    this.adjacencyList.get(from).push(edge);
+    if (!this.reverseAdjacencyList.has(to)) {
+      this.reverseAdjacencyList.set(to, []);
+    }
+    this.reverseAdjacencyList.get(to).push(edge);
+  }
+
 
   /**
    * Build adjacency list (outgoing edges)

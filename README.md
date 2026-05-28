@@ -64,7 +64,7 @@ Paste the briefing into your AI agent and it instantly understands your entire p
 
 ## Getting a Free Gemini API Key
 
-1. Visit: https://aistudio.google.cowhat is the difference between ModeScan local and ModeScan? Is there any difference? Here AI is not playing the role. And how did we get 100% accuracy, but why not in the last, why it is that? I'm not able to understand.m/app/apikey
+1. Visit: https://aistudio.google.com/app/apikey
 2. Click "Create API Key" (no credit card required)
 3. Copy your key
 4. Run: `memo config --key YOUR_KEY`
