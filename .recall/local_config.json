@@ -1,9 +1,0 @@
-{
-  "provider": "ollama",
-  "model": "llama2-updated",
-  "embeddingModel": "nomic-embed-text",
-  "apiUrl": "http://localhost:11434",
-  "offline": true,
-  "initialized": true,
-  "timestamp": "2026-05-20T17:59:24.012Z"
-}

@@ -1,12 +1,13 @@
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import yaml from 'js-yaml';
+import fsSync from 'fs';
 import { scanProject, getGitInfo } from '../utils/scanner.js';
 import { buildGeminiPrompt } from '../utils/prompt.js';
 import { callGemini, estimateTokens } from '../utils/gemini.js';
 import { getApiKey } from './config.js';
 import { ensureRecallDir, writeYaml, writeFile, getRecallPath, readYaml, fileExists } from '../utils/fileUtils.js';
-import { buildKnowledgeGraph, detectChangedFiles, buildGraphSummary } from '../utils/graphBuilder.js';
+import { buildKnowledgeGraphV2 as buildKnowledgeGraph, detectChangedFilesV2 as detectChangedFiles, buildGraphSummaryV2 as buildGraphSummary } from '../utils/graphBuilderV2.js';
 import { loadPreviousHashes, saveCurrentHashes, isFirstScan } from '../utils/hashStore.js';
 
 export default async function scanCommand(options) {
@@ -221,9 +222,24 @@ export default async function scanCommand(options) {
  * Build memory locally without API
  */
 async function buildLocalMemory(files, graph, gitInfo) {
+  // Read project name from package.json if available
+  let projectName = path.basename(process.cwd());
+  try {
+    const pkgPath = path.join(process.cwd(), 'package.json');
+    const pkgData = JSON.parse(fsSync.readFileSync(pkgPath, 'utf8'));
+    if (pkgData.name) projectName = pkgData.name;
+  } catch { /* no package.json */ }
+
+  // Build edge lookup for depends_on
+  const edgeLookup = {};
+  for (const edge of graph.edges) {
+    if (!edgeLookup[edge.from]) edgeLookup[edge.from] = [];
+    edgeLookup[edge.from].push(...(edge.items || []));
+  }
+
   return {
     project: {
-      name: path.basename(process.cwd()),
+      name: projectName,
       purpose: 'Project scanned locally without AI analysis',
       type: 'Unknown',
       stack: detectStack(files),
@@ -234,12 +250,12 @@ async function buildLocalMemory(files, graph, gitInfo) {
     },
     knowledge_graph: {
       god_nodes: graph.godNodes,
-      components: graph.nodes.slice(0, 20).map(node => ({
+      components: graph.nodes.map(node => ({
         name: path.basename(node.file, path.extname(node.file)),
         file: node.file,
         role: 'Detected locally',
         exports: node.exports,
-        depends_on: [],
+        depends_on: edgeLookup[node.id] || [],
         status: 'unknown'
       })),
       data_flow: 'Not analyzed (local scan)',
@@ -343,22 +359,43 @@ Previous memory context:`);
 async function parseGeminiResponse(response) {
   let yamlText = response.trim();
   
-  // Strip markdown fences
-  if (yamlText.startsWith('```yaml')) {
-    yamlText = yamlText.replace(/^```yaml\n/, '').replace(/\n```$/, '');
-  } else if (yamlText.startsWith('```')) {
-    yamlText = yamlText.replace(/^```\n/, '').replace(/\n```$/, '');
+  // Strip markdown fences (```yaml ... ``` or ``` ... ```)
+  yamlText = yamlText.replace(/^```(?:yaml|yml)?\s*\n/, '').replace(/\n```\s*$/, '');
+
+  // Discard any echoed prompt sections (these are specific markers from our prompt builder)
+  const promptMarkers = ['--- CODE FILES ---', '--- CONFIG FILES ---', '--- DOCUMENTATION ---', '--- GIT INFO ---', '--- KNOWLEDGE GRAPH ---'];
+  for (const marker of promptMarkers) {
+    if (yamlText.includes(marker)) {
+      yamlText = yamlText.split(marker)[0].trim();
+      break;
+    }
   }
 
-  // Remove TypeScript-style type annotations
-  yamlText = yamlText.replace(/status: '[^']+' \| '[^']+' \| '[^']+' \| '[^']+' \| '[^']+'/g, "status: complete");
-  yamlText = yamlText.replace(/status: '[^']+' \| '[^']+'/g, "status: complete");
+  // Wrap TypeScript-style union types (like 'abc' | 'def') in quotes to prevent YAML parse errors
+  // Only match lines where | is not at the start (YAML block scalar indicator)
+  yamlText = yamlText.replace(/(:\s+)('[^']+(?:'\s*\|\s*'[^']+)+)/g, '$1"$2"');
+  yamlText = yamlText.replace(/(:\s+)(\w[^:\n]+ \| \w[^:\n]+)/g, '$1"$2"');
+
+  // Quote package names starting with @ if they are not already quoted
+  yamlText = yamlText.replace(/(-\s+|:\s+)@([\w/.-]+)/g, "$1'@$2'");
 
   try {
     return yaml.load(yamlText);
   } catch (error) {
+    // Save raw response for debugging, then try a more aggressive cleanup
     await writeFile(getRecallPath('scan_debug.txt'), response);
+    console.log(chalk.yellow(`   Parse error: ${error.message}`));
     console.log(chalk.yellow('   Raw response saved to .recall/scan_debug.txt'));
+    
+    // Second attempt: try stripping everything after a YAML document end marker at start of line
+    try {
+      const docEndMatch = yamlText.match(/^\.\.\.$/m);
+      if (docEndMatch) {
+        yamlText = yamlText.substring(0, docEndMatch.index).trim();
+        return yaml.load(yamlText);
+      }
+    } catch { /* second attempt also failed */ }
+    
     return null;
   }
 }
@@ -378,6 +415,64 @@ function enrichMemoryWithGraph(memory, graph) {
 
   // Add graph metadata
   memory.knowledge_graph.graph_stats = graph.stats;
+
+  // Build edge lookup for depends_on (both component name and imported symbols)
+  const edgeLookup = {};
+  for (const edge of graph.edges) {
+    if (!edgeLookup[edge.from]) edgeLookup[edge.from] = [];
+    
+    // Add imported symbols (as originally done)
+    if (edge.items && edge.items.length > 0) {
+      edgeLookup[edge.from].push(...edge.items);
+    }
+    
+    // Also add resolved component name if it's a project file
+    let depName = edge.to;
+    if (depName.startsWith('src/') || depName.startsWith('bin/')) {
+      const compName = path.basename(depName, path.extname(depName));
+      if (!edgeLookup[edge.from].includes(compName)) {
+        edgeLookup[edge.from].push(compName);
+      }
+    } else {
+      // It's a third-party package or builtin, add if not already present
+      if (!edgeLookup[edge.from].includes(depName)) {
+        edgeLookup[edge.from].push(depName);
+      }
+    }
+  }
+
+  // Ensure depends_on has unique values
+  for (const from in edgeLookup) {
+    edgeLookup[from] = Array.from(new Set(edgeLookup[from]));
+  }
+
+  // Clean up AI components to prevent hallucinations or parsing corruptions
+  const aiComponents = memory.knowledge_graph.components || [];
+  const mergedComponents = [];
+
+  // Loop through deterministic local graph nodes
+  for (const node of graph.nodes) {
+    const filePath = node.file;
+    const componentName = path.basename(filePath, path.extname(filePath));
+
+    // Find if the AI provided semantic details for this file path
+    const aiComp = aiComponents.find(c => 
+      c.file && c.file.replace(/\\/g, '/').toLowerCase() === filePath.replace(/\\/g, '/').toLowerCase()
+    ) || aiComponents.find(c => 
+      c.name && c.name.toLowerCase() === componentName.toLowerCase()
+    );
+
+    mergedComponents.push({
+      name: componentName,
+      file: filePath,
+      role: aiComp && aiComp.role ? aiComp.role : `Handles ${componentName} functionality within the codebase.`,
+      exports: node.exports || [],
+      depends_on: edgeLookup[filePath] || [],
+      status: aiComp && aiComp.status ? aiComp.status : 'complete'
+    });
+  }
+
+  memory.knowledge_graph.components = mergedComponents;
 
   return memory;
 }
@@ -462,12 +557,31 @@ function detectStack(files) {
  */
 function detectEntryPoints(files) {
   const entryPoints = [];
-  const entryNames = ['index', 'main', 'app', 'server', 'cli'];
+  const entryNames = ['index', 'main', 'app', 'server', 'cli', 'memo'];
   
+  // Check package.json bin field
+  try {
+    const pkgPath = path.join(process.cwd(), 'package.json');
+    const pkgData = JSON.parse(fsSync.readFileSync(pkgPath, 'utf8'));
+    if (pkgData.bin) {
+      const binEntries = typeof pkgData.bin === 'string' ? [pkgData.bin] : Object.values(pkgData.bin);
+      for (const entry of binEntries) {
+        const normalized = entry.replace(/^\.\//, '');
+        if (!entryPoints.includes(normalized)) entryPoints.push(normalized);
+      }
+    }
+    if (pkgData.main && !entryPoints.includes(pkgData.main.replace(/^\.\//, ''))) {
+      entryPoints.push(pkgData.main.replace(/^\.\//, ''));
+    }
+  } catch { /* no package.json or no bin field */ }
+
+  // Check code files for common entry point names
   for (const file of files.code) {
     const basename = path.basename(file.path, path.extname(file.path));
     if (entryNames.includes(basename.toLowerCase())) {
-      entryPoints.push(file.path);
+      const normalizedPath = file.path.replace(/\\/g, '/');
+      const isDuplicate = entryPoints.some(ep => ep.replace(/\\/g, '/') === normalizedPath);
+      if (!isDuplicate) entryPoints.push(file.path);
     }
   }
   

@@ -1,54 +1,49 @@
 project:
   name: context-memo
-  purpose: Provides a persistent memory layer for AI coding agents, enabling seamless context switching and preventing information loss. It solves the problem of AI agents forgetting project context when sessions end or agents are switched, benefiting developers by saving time and improving AI productivity.
+  purpose: |
+    Provides a persistent memory layer for AI coding agents by generating and managing a knowledge graph and task state. It aims to solve the problem of AI agents losing context when switching sessions or accounts.
   type: CLI
   stack:
     - Node.js
-    - commander
+    - JavaScript
+    - Commander.js
     - js-yaml
-    - clipboardy
+    - '@babel/parser'
+    - '@babel/traverse'
     - chalk
+    - clipboardy
     - inquirer
-    - https
-    - fs
-    - path
-    - os
-    - crypto
-  entry_points:
-    - bin/memo.js
+  entry_points: bin/memo.js
   environment_vars: []
-  constraints:
-    - Free Gemini API (no credit card required)
-    - Local-only scan mode for privacy
-    - Incremental scans to minimize token usage
+  constraints: Free Gemini API key required.
 knowledge_graph:
   god_nodes:
-    - name: scan
-      why_critical: Imports 11 dependencies and contains 9 functions, acting as the core logic for project analysis and AI interaction.
-      file: src\commands\scan.js
-      connections: 11
     - name: memo
-      why_critical: The main CLI entry point, importing all command modules and orchestrating their execution.
+      why_critical: The main CLI entry point, imports 14 dependencies and orchestrates command execution.
       file: bin\memo.js
-      connections: 9
-    - name: config
-      why_critical: Handles API key configuration and retrieval, a critical dependency for AI interaction.
-      file: src\commands\config.js
-      connections: 4
-    - name: load
-      why_critical: Responsible for building and presenting agent briefings, a key output of the memory system.
-      file: src\commands\load.js
-      connections: 4
-    - name: watch
-      why_critical: Implements an auto-scan feature that triggers memory updates based on file changes.
-      file: src\commands\watch.js
-      connections: 4
+      connections: 14
+    - name: scan
+      why_critical: Core scanning logic that interacts with Gemini API and builds the knowledge graph.
+      file: src\commands\scan.js
+      connections: 12
+    - name: health
+      why_critical: Implements the repository health dashboard command.
+      file: src\commands\health.js
+      connections: 8
+    - name: timeline
+      why_critical: Handles the edit replay timeline functionality.
+      file: src\commands\timeline.js
+      connections: 7
+    - name: trust
+      why_critical: Implements the AI trust meter functionality.
+      file: src\commands\trust.js
+      connections: 7
   components:
-    - name: initCommand
+    - name: init
       file: src\commands\init.js
-      role: Initializes the .recall/ directory and its template files.
+      role: Initializes the .recall/ directory and template files.
       exports:
-        - default
+        - initCommand
       depends_on:
         - chalk
         - inquirer
@@ -57,40 +52,306 @@ knowledge_graph:
         - writeYaml
         - writeFile
         - getRecallPath
+        - fileUtils
       status: complete
-    - name: scanCommand
-      file: src\commands\scan.js
-      role: Orchestrates the project scanning process, including file analysis, Git info gathering, knowledge graph building, and Gemini API calls.
+    - name: memo
+      file: bin\memo.js
+      role: The main command-line interface entry point for the context-memo tool.
+      exports: []
+      depends_on:
+        - Command
+        - commander
+        - initCommand
+        - init
+        - scanCommand
+        - scan
+        - updateCommand
+        - update
+        - loadCommand
+        - load
+        - statusCommand
+        - status
+        - installCommand
+        - install
+        - configCommand
+        - config
+        - watchCommand
+        - watch
+        - validateCommand
+        - validate
+        - executeHealthCommand
+        - health
+        - executeTrustCommand
+        - trust
+        - executeTimelineCommand
+        - timeline
+        - executeLocalCommand
+        - local
+      status: complete
+    - name: coder
+      file: src\agents\coder.js
+      role: Generates code based on plans and context.
       exports:
-        - default
+        - CoderAgent
+      depends_on: []
+      status: complete
+    - name: orchestrator
+      file: src\agents\orchestrator.js
+      role: Coordinates the multi-agent pipeline execution.
+      exports:
+        - Orchestrator
+        - createOrchestrator
+      depends_on:
+        - PlannerAgent
+        - planner
+        - RetrieverAgent
+        - retriever
+        - CoderAgent
+        - coder
+        - ValidatorAgent
+        - validator
+      status: complete
+    - name: planner
+      file: src\agents\planner.js
+      role: Creates execution plans from task descriptions.
+      exports:
+        - PlannerAgent
+      depends_on: []
+      status: complete
+    - name: retriever
+      file: src\agents\retriever.js
+      role: Retrieves relevant context using graph and registry data.
+      exports:
+        - RetrieverAgent
+      depends_on: []
+      status: complete
+    - name: validator
+      file: src\agents\validator.js
+      role: Validates generated code independently.
+      exports:
+        - ValidatorAgent
+      depends_on:
+        - validateCode
+        - validator
+      status: complete
+    - name: checksumEngine
+      file: src\checksum\checksumEngine.js
+      role: Manages file checksums for cache invalidation.
+      exports:
+        - ChecksumEngine
+        - createChecksumEngine
+      depends_on:
+        - crypto
+        - fs
+        - fs/promises
+        - getRecallPath
+        - fileExists
+        - fileUtils
+      status: complete
+    - name: invalidation
+      file: src\checksum\invalidation.js
+      role: Implements cache invalidation strategies.
+      exports:
+        - InvalidationStrategy
+        - createInvalidationStrategy
+        - CacheManager
+        - createCacheManager
+      depends_on: []
+      status: complete
+    - name: config
+      file: src\commands\config.js
+      role: Manages the Gemini API key configuration.
+      exports:
+        - configCommand
+        - getApiKey
+      depends_on:
+        - fs
+        - fs/promises
+        - path
+        - os
+        - chalk
+      status: complete
+    - name: health
+      file: src\commands\health.js
+      role: Implements the repository health dashboard.
+      exports:
+        - executeHealthCommand
+        - getHealthScore
+        - isHealthy
+      depends_on:
+        - HealthDashboard
+        - healthDashboard
+        - formatHealthReport
+        - formatHealthSummary
+        - dashboardFormatter
+        - SymbolRegistry
+        - symbolRegistry
+        - GraphEngine
+        - graphEngine
+        - ChecksumEngine
+        - checksumEngine
+        - getRecallPath
+        - fileExists
+        - fileUtils
+        - fs
+        - fs/promises
+        - chalk
+      status: complete
+    - name: install
+      file: src\commands\install.js
+      role: Installs agent integration configurations.
+      exports:
+        - installCommand
+      depends_on:
+        - fs
+        - fs/promises
+        - path
+        - chalk
+      status: complete
+    - name: load
+      file: src\commands\load.js
+      role: Loads and formats the agent briefing from memory.yaml.
+      exports:
+        - loadCommand
+      depends_on:
+        - chalk
+        - ensureRecallDir
+        - readYaml
+        - getRecallPath
+        - fileExists
+        - fileUtils
+        - buildBriefing
+        - estimateTokens
+        - assembler
+        - copyToClipboard
+        - clipboard
+      status: complete
+    - name: local
+      file: src\commands\local.js
+      role: Manages the local-first runtime for offline operation.
+      exports:
+        - executeLocalCommand
+        - getLocalStatus
+        - isLocalAvailable
+      depends_on:
+        - LocalRuntime
+        - localRuntime
+        - formatLocalStatus
+        - formatInitResult
+        - formatModelTest
+        - formatEmbeddingStats
+        - formatSearchResults
+        - formatCodeAnalysis
+        - localFormatter
+        - chalk
+      status: complete
+    - name: scan
+      file: src\commands\scan.js
+      role: Scans the project, builds the knowledge graph, and calls the Gemini API.
+      exports:
+        - scanCommand
       depends_on:
         - chalk
         - inquirer
         - yaml
+        - js-yaml
+        - fsSync
+        - fs
         - scanProject
         - getGitInfo
+        - scanner
         - buildGeminiPrompt
+        - prompt
         - callGemini
         - estimateTokens
+        - gemini
         - getApiKey
+        - config
         - ensureRecallDir
         - writeYaml
         - writeFile
         - getRecallPath
         - readYaml
         - fileExists
+        - fileUtils
         - buildKnowledgeGraph
         - detectChangedFiles
         - buildGraphSummary
+        - graphBuilderV2
         - loadPreviousHashes
         - saveCurrentHashes
         - isFirstScan
+        - hashStore
+        - path
       status: complete
-    - name: updateCommand
-      file: src\commands\update.js
-      role: Interactively updates the task state, progress, and decision logs.
+    - name: status
+      file: src\commands\status.js
+      role: Displays a terminal dashboard of the project's status.
       exports:
-        - default
+        - statusCommand
+      depends_on:
+        - chalk
+        - ensureRecallDir
+        - readYaml
+        - getRecallPath
+        - fileExists
+        - fileUtils
+      status: complete
+    - name: timeline
+      file: src\commands\timeline.js
+      role: Implements the edit replay timeline functionality.
+      exports:
+        - executeTimelineCommand
+        - recordChange
+        - getRecentChanges
+        - getTimelineStats
+      depends_on:
+        - EditTimeline
+        - editTimeline
+        - formatTimelineReport
+        - formatFileTimeline
+        - formatChangeComparison
+        - timelineFormatter
+        - SymbolRegistry
+        - symbolRegistry
+        - GraphEngine
+        - graphEngine
+        - getRecallPath
+        - fileExists
+        - fileUtils
+        - fs
+        - fs/promises
+        - chalk
+      status: complete
+    - name: trust
+      file: src\commands\trust.js
+      role: Implements the AI trust meter.
+      exports:
+        - executeTrustCommand
+        - getTrustScore
+        - isTrusted
+      depends_on:
+        - TrustMeter
+        - trustMeter
+        - formatTrustReport
+        - formatTrustSummary
+        - trustFormatter
+        - SymbolRegistry
+        - symbolRegistry
+        - GraphEngine
+        - graphEngine
+        - getRecallPath
+        - fileExists
+        - fileUtils
+        - fs
+        - fs/promises
+        - chalk
+      status: complete
+    - name: update
+      file: src\commands\update.js
+      role: Allows interactive updates to the task state and progress.
+      exports:
+        - updateCommand
       depends_on:
         - chalk
         - inquirer
@@ -100,103 +361,354 @@ knowledge_graph:
         - getRecallPath
         - fileExists
         - appendToFile
+        - fileUtils
       status: complete
-    - name: loadCommand
-      file: src\commands\load.js
-      role: Reads the project memory and task state to build and display an agent briefing.
+    - name: validate
+      file: src\commands\validate.js
+      role: Validates repository code syntax, imports, and symbols.
       exports:
-        - default
+        - validateCommand
       depends_on:
         - chalk
         - ensureRecallDir
-        - readYaml
         - getRecallPath
-        - fileExists
-        - buildBriefing
-        - estimateTokens
-        - copyToClipboard
-      status: complete
-    - name: statusCommand
-      file: src\commands\status.js
-      role: Displays a dashboard summarizing the project's status, progress, and key components.
-      exports:
-        - default
-      depends_on:
-        - chalk
-        - ensureRecallDir
-        - readYaml
-        - getRecallPath
-        - fileExists
-      status: complete
-    - name: installCommand
-      file: src\commands\install.js
-      role: Creates integration files for various AI agents to automatically load context.
-      exports:
-        - default
-      depends_on:
+        - fileUtils
+        - createRegistry
+        - symbolRegistry
+        - validateCode
+        - generateValidationReport
+        - validator
+        - scanProject
+        - scanner
         - fs
-        - path
-        - chalk
+        - fs/promises
       status: complete
-    - name: configCommand
-      file: src\commands\config.js
-      role: Manages the Gemini API key configuration.
-      exports:
-        - default
-      depends_on:
-        - fs
-        - path
-        - os
-        - chalk
-      status: complete
-    - name: watchCommand
+    - name: watch
       file: src\commands\watch.js
-      role: Monitors project files for changes and triggers scans automatically.
+      role: Watches for file changes and triggers auto-scans.
       exports:
-        - default
+        - watchCommand
       depends_on:
         - fs
         - path
         - chalk
         - execSync
+        - child_process
       status: complete
-    - name: scanner
-      file: src\utils\scanner.js
-      role: Scans the project directory, categorizes files, and extracts Git information.
+    - name: dashboardFormatter
+      file: src\dashboard\dashboardFormatter.js
+      role: Formats the health dashboard for terminal display.
       exports:
-        - scanProject
-        - getGitInfo
+        - formatHealthReport
+        - formatHealthSummary
+      depends_on:
+        - chalk
+      status: complete
+    - name: healthDashboard
+      file: src\dashboard\healthDashboard.js
+      role: Analyzes repository health metrics.
+      exports:
+        - HealthDashboard
+        - createHealthDashboard
+      depends_on: []
+      status: complete
+    - name: graphEngine
+      file: src\graph\graphEngine.js
+      role: Core graph operations and queries for dependency analysis.
+      exports:
+        - GraphEngine
+        - createGraphEngine
+      depends_on: []
+      status: complete
+    - name: impactAnalysis
+      file: src\graph\impactAnalysis.js
+      role: Calculates the impact of code changes.
+      exports:
+        - calculateImpact
+        - calculateRiskScore
+        - findCriticalPaths
+        - identifyBottlenecks
+        - identifyUnstableModules
+        - generateImpactReport
+      depends_on:
+        - reverseBfs
+        - traversal
+      status: complete
+    - name: traversal
+      file: src\graph\traversal.js
+      role: Implements graph traversal algorithms like DFS and BFS.
+      exports:
+        - dfs
+        - bfs
+        - reverseDfs
+        - reverseBfs
+        - topologicalSort
+        - findAllPaths
+        - getDependencyLayers
+        - getSubgraph
+      depends_on: []
+      status: complete
+    - name: localFormatter
+      file: src\local\localFormatter.js
+      role: Formats local runtime status and results.
+      exports:
+        - formatLocalStatus
+        - formatSearchResults
+        - formatModelTest
+        - formatEmbeddingStats
+        - formatInitResult
+        - formatCodeAnalysis
+        - formatLocalSummary
+      depends_on:
+        - chalk
+      status: complete
+    - name: localRuntime
+      file: src\local\localRuntime.js
+      role: Manages the local-first runtime with Ollama integration.
+      exports:
+        - LocalRuntime
+        - createLocalRuntime
       depends_on:
         - fs
+        - fs/promises
+        - getRecallPath
+        - fileExists
+        - fileUtils
+      status: complete
+    - name: contextCompressor
+      file: src\memory\contextCompressor.js
+      role: Creates hierarchical summaries for efficient context usage.
+      exports:
+        - compressRepository
+        - generateCompactContext
+        - estimateContextTokens
+        - generateLayeredContext
+      depends_on:
         - path
       status: complete
-    - name: promptBuilder
-      file: src\utils\prompt.js
-      role: Constructs the detailed prompt for the Gemini API based on project analysis.
+    - name: relevanceRanker
+      file: src\memory\relevanceRanker.js
+      role: Ranks files by relevance for context prioritization.
       exports:
-        - buildGeminiPrompt
-      depends_on:
-        - buildFileTree
+        - rankByRelevance
+        - getTopRelevant
+        - rankByDependencyDistance
+        - rankByImpact
+        - selectSmartContext
+        - explainContextSelection
+      depends_on: []
       status: complete
-    - name: geminiApi
-      file: src\utils\gemini.js
-      role: Handles communication with the Gemini API.
+    - name: workingMemory
+      file: src\memory\workingMemory.js
+      role: Manages hot/warm/cold context for optimal context window usage.
       exports:
-        - callGemini
-        - estimateTokens
+        - WorkingMemory
+        - createWorkingMemory
+        - updateWorkingMemoryFromGraph
+      depends_on:
+        - fs
+        - fs/promises
+        - getRecallPath
+        - fileExists
+        - fileUtils
+      status: complete
+    - name: astParser
+      file: src\parsers\astParser.js
+      role: Provides an interface for parsing source files using AST.
+      exports:
+        - parseFile
+        - isSupported
+        - getSupportedExtensions
+      depends_on:
+        - parseJavaScript
+        - jsParser
+      status: complete
+    - name: jsParser
+      file: src\parsers\jsParser.js
+      role: Parses JavaScript/TypeScript files using Babel.
+      exports:
+        - parseJavaScript
+      depends_on:
+        - parse
+        - '@babel/parser'
+        - traverse
+        - '@babel/traverse'
+        - path
+      status: complete
+    - name: symbolRegistry
+      file: src\registry\symbolRegistry.js
+      role: Central storage for repository symbols with fast lookup.
+      exports:
+        - SymbolRegistry
+        - createRegistry
+      depends_on:
+        - fs
+        - fs/promises
+        - getRecallPath
+        - fileExists
+        - fileUtils
+      status: complete
+    - name: symbolValidator
+      file: src\registry\symbolValidator.js
+      role: Validates symbols against the registry.
+      exports:
+        - validateImport
+        - validateFunctionCall
+        - validateClass
+        - validateFileImports
+        - validateSymbolExists
+        - validateSymbols
+        - generateValidationReport
+      depends_on: []
+      status: complete
+    - name: astRetriever
+      file: src\retrieval\astRetriever.js
+      role: Structure-based retrieval using AST and symbol registry.
+      exports:
+        - ASTRetriever
+      depends_on: []
+      status: complete
+    - name: graphRetriever
+      file: src\retrieval\graphRetriever.js
+      role: Dependency-based retrieval using the knowledge graph.
+      exports:
+        - GraphRetriever
+      depends_on: []
+      status: complete
+    - name: hybridRetriever
+      file: src\retrieval\hybridRetriever.js
+      role: Combines AST, graph, and semantic retrieval strategies.
+      exports:
+        - HybridRetriever
+        - createHybridRetriever
+      depends_on:
+        - ASTRetriever
+        - astRetriever
+        - GraphRetriever
+        - graphRetriever
+      status: complete
+    - name: confidenceScorer
+      file: src\scoring\confidenceScorer.js
+      role: Calculates trust metrics for AI operations.
+      exports:
+        - calculateConfidence
+        - calculateSymbolCoverage
+        - calculateValidationPass
+        - calculateRetrievalCoverage
+        - calculateDependencyResolution
+        - calculateGraphCompleteness
+        - calculateComprehensiveConfidence
+        - calculateGenerationConfidence
+        - calculateEditConfidence
+        - generateConfidenceReport
+        - ConfidenceTracker
+        - createConfidenceTracker
+      depends_on: []
+      status: complete
+    - name: metrics
+      file: src\scoring\metrics.js
+      role: Defines standard metrics for confidence scoring.
+      exports:
+        - calculateRepositoryHealth
+        - calculateCodeQuality
+        - calculateDependencyHealth
+        - calculateContextCoverage
+        - calculateVerificationMetrics
+        - calculatePerformanceMetrics
+        - aggregateMetrics
+        - generateMetricsReport
+      depends_on: []
+      status: complete
+    - name: editTimeline
+      file: src\timeline\editTimeline.js
+      role: Tracks and visualizes code changes over time.
+      exports:
+        - EditTimeline
+        - createEditTimeline
+      depends_on:
+        - fs
+        - fs/promises
+        - getRecallPath
+        - fileExists
+        - fileUtils
+      status: complete
+    - name: timelineFormatter
+      file: src\timeline\timelineFormatter.js
+      role: Formats the edit timeline for terminal display.
+      exports:
+        - formatTimelineReport
+        - formatFileTimeline
+        - formatChangeComparison
+        - formatTimelineSummary
+      depends_on:
+        - chalk
+      status: complete
+    - name: repositoryTools
+      file: src\tools\repositoryTools.js
+      role: Defines the available repository tools and their parameters.
+      exports:
+        - TOOLS
+        - getTool
+        - getToolsByCategory
+        - getToolNames
+        - validateToolParameters
+        - generateToolDocs
+      depends_on: []
+      status: complete
+    - name: toolExecutor
+      file: src\tools\toolExecutor.js
+      role: Executes repository tools with parameter validation.
+      exports:
+        - ToolExecutor
+        - createToolExecutor
+      depends_on:
+        - fs
+        - fs/promises
+        - validateToolParameters
+        - repositoryTools
+        - parseFile
+        - astParser
+        - validateCodeFn
+        - validator
+        - calculateImpact
+        - impactAnalysis
+      status: complete
+    - name: trustFormatter
+      file: src\trust\trustFormatter.js
+      role: Formats trust metrics for terminal display.
+      exports:
+        - formatTrustReport
+        - formatTrustSummary
+      depends_on:
+        - chalk
+      status: complete
+    - name: trustMeter
+      file: src\trust\trustMeter.js
+      role: Tracks and displays AI operation confidence and trust metrics.
+      exports:
+        - TrustMeter
+        - createTrustMeter
       depends_on: []
       status: complete
     - name: assembler
       file: src\utils\assembler.js
-      role: Builds agent briefings from memory data in different modes.
+      role: Builds agent briefings from memory and task state.
       exports:
         - buildBriefing
         - estimateTokens
       depends_on: []
       status: complete
+    - name: clipboard
+      file: src\utils\clipboard.js
+      role: Utility for copying text to the clipboard.
+      exports:
+        - copyToClipboard
+      depends_on:
+        - clipboardy
+      status: complete
     - name: fileUtils
       file: src\utils\fileUtils.js
-      role: Provides utility functions for file system operations, including reading and writing YAML and JSON.
+      role: Utility functions for file operations.
       exports:
         - ensureRecallDir
         - createRecallDir
@@ -209,183 +721,505 @@ knowledge_graph:
         - appendToFile
       depends_on:
         - fs
+        - fs/promises
         - path
         - yaml
+        - js-yaml
       status: complete
-    - name: clipboard
-      file: src\utils\clipboard.js
-      role: Handles copying text to the system clipboard.
+    - name: gemini
+      file: src\utils\gemini.js
+      role: Handles API calls to the Gemini model.
       exports:
-        - copyToClipboard
+        - callGemini
+        - estimateTokens
       depends_on:
-        - clipboardy
+        - https
       status: complete
     - name: graphBuilder
       file: src\utils\graphBuilder.js
-      role: Builds the knowledge graph from scanned files, extracting code structure and dependencies.
+      role: Builds a knowledge graph from project files (older version).
       exports:
         - buildKnowledgeGraph
         - detectChangedFiles
         - buildGraphSummary
       depends_on:
         - fs
+        - fs/promises
         - path
         - crypto
       status: complete
+    - name: graphBuilderV2
+      file: src\utils\graphBuilderV2.js
+      role: Builds an AST-powered knowledge graph.
+      exports:
+        - buildKnowledgeGraphV2
+        - detectChangedFilesV2
+        - buildGraphSummaryV2
+      depends_on:
+        - fs
+        - fs/promises
+        - path
+        - crypto
+        - parseFile
+        - isSupported
+        - astParser
+        - createRegistry
+        - symbolRegistry
+      status: complete
     - name: hashStore
       file: src\utils\hashStore.js
-      role: Manages the storage and retrieval of file hashes for incremental scanning.
+      role: Manages file hashes for incremental scanning.
       exports:
         - loadPreviousHashes
         - saveCurrentHashes
         - isFirstScan
       depends_on:
         - fs
+        - fs/promises
         - getRecallPath
         - fileExists
+        - fileUtils
       status: complete
-    - name: testIncremental
+    - name: prompt
+      file: src\utils\prompt.js
+      role: Builds the Gemini prompt with project context.
+      exports:
+        - buildGeminiPrompt
+      depends_on:
+        - buildFileTree
+        - scanner
+      status: complete
+    - name: scanner
+      file: src\utils\scanner.js
+      role: Scans the project directory for relevant files.
+      exports:
+        - scanProject
+        - buildFileTree
+        - getGitInfo
+      depends_on:
+        - fs
+        - fs/promises
+        - path
+      status: complete
+    - name: importValidator
+      file: src\validation\importValidator.js
+      role: Validates import statements against the symbol registry.
+      exports:
+        - validateImports
+        - validateImportStatement
+      depends_on:
+        - parseFile
+        - astParser
+        - path
+        - fs
+        - fs/promises
+      status: complete
+    - name: pathValidator
+      file: src\validation\pathValidator.js
+      role: Validates file paths and import resolutions.
+      exports:
+        - validatePaths
+        - validatePath
+        - validatePathInProject
+      depends_on:
+        - path
+        - fs
+        - fs/promises
+      status: complete
+    - name: symbolValidator
+      file: src\validation\symbolValidator.js
+      role: Validates symbols against the registry.
+      exports:
+        - validateSymbols
+        - validateFunctionCall
+        - validateClassReference
+        - validateExport
+        - validateSymbolList
+      depends_on:
+        - parseFile
+        - astParser
+      status: complete
+    - name: syntaxValidator
+      file: src\validation\syntaxValidator.js
+      role: Validates code syntax using the parser.
+      exports:
+        - validateSyntax
+        - validateJSON
+        - checkCommonIssues
+        - validateStructure
+      depends_on:
+        - parse
+        - '@babel/parser'
+      status: complete
+    - name: validator
+      file: src\validation\validator.js
+      role: Orchestrates the validation pipeline for generated code.
+      exports:
+        - ValidationResult
+        - validateCode
+        - validateFiles
+        - validateEdit
+        - generateValidationReport
+        - isValidationPassed
+      depends_on:
+        - validateImports
+        - importValidator
+        - validateSymbols
+        - symbolValidator
+        - validatePaths
+        - pathValidator
+        - validateSyntax
+        - syntaxValidator
+      status: complete
+    - name: test-ast-parser
+      file: test-ast-parser.js
+      role: Handles test-ast-parser functionality within the codebase.
+      exports: []
+      depends_on:
+        - parseFile
+        - astParser
+        - createRegistry
+        - symbolRegistry
+        - validateFileImports
+        - symbolValidator
+        - fs
+        - fs/promises
+      status: complete
+    - name: test-checksum
+      file: test-checksum.js
+      role: Handles test-checksum functionality within the codebase.
+      exports: []
+      depends_on:
+        - createChecksumEngine
+        - checksumEngine
+        - createInvalidationStrategy
+        - createCacheManager
+        - invalidation
+        - createGraphEngine
+        - graphEngine
+        - createRegistry
+        - symbolRegistry
+        - readFile
+        - fs/promises
+      status: complete
+    - name: test-confidence
+      file: test-confidence.js
+      role: Handles test-confidence functionality within the codebase.
+      exports: []
+      depends_on:
+        - calculateComprehensiveConfidence
+        - calculateGenerationConfidence
+        - generateConfidenceReport
+        - createConfidenceTracker
+        - confidenceScorer
+        - aggregateMetrics
+        - generateMetricsReport
+        - metrics
+        - createGraphEngine
+        - graphEngine
+        - createRegistry
+        - symbolRegistry
+        - createWorkingMemory
+        - workingMemory
+        - createChecksumEngine
+        - checksumEngine
+        - readFile
+        - fs/promises
+      status: complete
+    - name: test-edit-timeline
+      file: test-edit-timeline.js
+      role: Handles test-edit-timeline functionality within the codebase.
+      exports: []
+      depends_on:
+        - EditTimeline
+        - editTimeline
+        - formatTimelineReport
+        - formatFileTimeline
+        - timelineFormatter
+        - SymbolRegistry
+        - symbolRegistry
+        - GraphEngine
+        - graphEngine
+      status: complete
+    - name: test-graph-engine
+      file: test-graph-engine.js
+      role: Handles test-graph-engine functionality within the codebase.
+      exports: []
+      depends_on:
+        - readFile
+        - fs/promises
+        - createGraphEngine
+        - graphEngine
+        - calculateImpact
+        - generateImpactReport
+        - impactAnalysis
+        - dfs
+        - bfs
+        - topologicalSort
+        - traversal
+      status: complete
+    - name: test-health-dashboard
+      file: test-health-dashboard.js
+      role: Handles test-health-dashboard functionality within the codebase.
+      exports: []
+      depends_on:
+        - HealthDashboard
+        - healthDashboard
+        - formatHealthReport
+        - dashboardFormatter
+        - SymbolRegistry
+        - symbolRegistry
+        - GraphEngine
+        - graphEngine
+        - ChecksumEngine
+        - checksumEngine
+      status: complete
+    - name: test-hybrid-retrieval
+      file: test-hybrid-retrieval.js
+      role: Handles test-hybrid-retrieval functionality within the codebase.
+      exports: []
+      depends_on:
+        - HybridRetriever
+        - hybridRetriever
+        - ASTRetriever
+        - astRetriever
+        - GraphRetriever
+        - graphRetriever
+        - SymbolRegistry
+        - symbolRegistry
+        - GraphEngine
+        - graphEngine
+        - WorkingMemory
+        - workingMemory
+      status: complete
+    - name: test-incremental
       file: test-incremental.js
-      role: Test file to trigger incremental scan.
+      role: Handles test-incremental functionality within the codebase.
       exports:
         - testFunction
       depends_on: []
       status: complete
-  data_flow: Project files are scanned, analyzed for code structure and Git history, and then used to construct a prompt for the Gemini API. The API response, containing project memory, is parsed into YAML and saved, enabling agents to load comprehensive briefings for seamless context switching.
+    - name: test-local-runtime
+      file: test-local-runtime.js
+      role: Handles test-local-runtime functionality within the codebase.
+      exports: []
+      depends_on:
+        - LocalRuntime
+        - localRuntime
+        - formatLocalStatus
+        - formatSearchResults
+        - formatModelTest
+        - localFormatter
+      status: complete
+    - name: test-orchestrator
+      file: test-orchestrator.js
+      role: Handles test-orchestrator functionality within the codebase.
+      exports: []
+      depends_on:
+        - createOrchestrator
+        - orchestrator
+        - createGraphEngine
+        - graphEngine
+        - createRegistry
+        - symbolRegistry
+        - createWorkingMemory
+        - workingMemory
+        - readFile
+        - fs/promises
+      status: complete
+    - name: test-recall-accuracy
+      file: test-recall-accuracy.js
+      role: Handles test-recall-accuracy functionality within the codebase.
+      exports: []
+      depends_on:
+        - fs
+        - fs/promises
+        - path
+        - yaml
+        - js-yaml
+        - fileURLToPath
+        - url
+        - dirname
+      status: complete
+    - name: test-retrieval
+      file: test-retrieval.js
+      role: Handles test-retrieval functionality within the codebase.
+      exports: []
+      depends_on:
+        - SymbolRegistry
+        - symbolRegistry
+        - GraphEngine
+        - graphEngine
+        - WorkingMemory
+        - workingMemory
+        - HybridRetriever
+        - hybridRetriever
+        - ASTRetriever
+        - astRetriever
+        - GraphRetriever
+        - graphRetriever
+      status: complete
+    - name: test-tools
+      file: test-tools.js
+      role: Handles test-tools functionality within the codebase.
+      exports: []
+      depends_on:
+        - TOOLS
+        - validateToolParameters
+        - generateToolDocs
+        - repositoryTools
+        - createToolExecutor
+        - toolExecutor
+        - createGraphEngine
+        - graphEngine
+        - createRegistry
+        - symbolRegistry
+        - readFile
+        - fs/promises
+      status: complete
+    - name: test-trust-meter
+      file: test-trust-meter.js
+      role: Handles test-trust-meter functionality within the codebase.
+      exports: []
+      depends_on:
+        - TrustMeter
+        - trustMeter
+        - formatTrustReport
+        - trustFormatter
+        - SymbolRegistry
+        - symbolRegistry
+        - GraphEngine
+        - graphEngine
+      status: complete
+    - name: test-validator
+      file: test-validator.js
+      role: Handles test-validator functionality within the codebase.
+      exports: []
+      depends_on:
+        - validateCode
+        - validator
+        - createRegistry
+        - symbolRegistry
+        - parseFile
+        - astParser
+        - fs
+        - fs/promises
+      status: complete
+    - name: test-working-memory
+      file: test-working-memory.js
+      role: Handles test-working-memory functionality within the codebase.
+      exports: []
+      depends_on:
+        - createWorkingMemory
+        - updateWorkingMemoryFromGraph
+        - workingMemory
+        - compressRepository
+        - generateCompactContext
+        - estimateContextTokens
+        - contextCompressor
+        - selectSmartContext
+        - explainContextSelection
+        - relevanceRanker
+        - createGraphEngine
+        - graphEngine
+        - createRegistry
+        - symbolRegistry
+        - readFile
+        - fs/promises
+      status: complete
+  data_flow: |
+    Files are scanned, parsed into an AST, and used to build a knowledge graph and symbol registry. This data, along with git information and task state, is used to prompt the Gemini API for memory generation. The generated memory file (.recall/memory.yaml) is then used to create agent briefings.
   api_endpoints: []
-  data_models:
-    - project:
-        name: string
-        purpose: string
-        type: string
-        stack: string
-        entry_points: string[]
-        environment_vars: string[]
-        constraints: string
-        non_goals: string[]
-    - knowledge_graph:
-        god_nodes:
-          - name: string
-            why_critical: string
-            file: string
-            connections: number
-        components:
-          - name: string
-            file: string
-            role: string
-            exports: string[]
-            depends_on: string[]
-            status: complete
-        data_flow: string
-        api_endpoints:
-          - METHOD: string
-            path: string
-            description: string
-        data_models: string[]
-        external_services: string[]
-    - progress:
-        percent_done: number
-        phase: string
-        what_works: string[]
-        what_is_broken: string[]
-        what_is_missing: string[]
-        technical_debt: string[]
-    - task_state:
-        last_task: string
-        current_problem: string
-        continue_here:
-          file: string
-          location: string
-          instruction: string
-        next_steps: string[]
-        blocked_on: string
-        completed_recently: string[]
-    - decisions:
-        - decision: string
-          why: string
-          impact: string
-    - _meta:
-        scan_count: number
-        last_scan_timestamp: string
-        file_hashes:
-          '[object Object]': string
+  data_models: []
   external_services:
     - Gemini API (generativelanguage.googleapis.com)
   graph_stats:
-    totalFiles: 18
-    totalConnections: 56
-    avgConnections: 3.111111111111111
+    totalFiles: 76
+    totalConnections: 214
+    avgConnections: 2.8157894736842106
+    files: 76
+    functions: 286
+    classes: 21
+    exports: 180
+    imports: 214
+    uniqueFunctions: 256
+    uniqueClasses: 21
+    uniqueExports: 176
 progress:
-  percent_done: 95
-  phase: nearly_complete
+  percent_done: 100
+  phase: complete
   what_works:
-    - Initialization of .recall/ directory and template files.
-    - Project scanning with file categorization and Git integration.
-    - Gemini API integration for memory generation.
-    - Knowledge graph construction with god node identification.
-    - Task state tracking and continuation point definition.
-    - Agent briefing generation in multiple modes (quick, full, onboard).
-    - Clipboard integration for easy briefing transfer.
-    - Status dashboard with progress visualization.
-    - Configuration management for API keys.
-    - Watch mode for automatic scanning on file changes.
-    - Incremental scanning for token efficiency.
-    - Agent integration file generation for popular AI tools.
-    - Added a test file for incremental scan functionality.
-  what_is_broken:
-    - src\commands\scan.js: The `buildGeminiPrompt` function might not correctly format all sections of the prompt, potentially leading to incomplete or malformed YAML responses from Gemini.
-  what_is_missing:
-    - A more robust error handling mechanism for Gemini API responses, specifically for cases where the API returns unexpected structures or empty candidates.
-    - Advanced conflict resolution for `memo update` if multiple agents are modifying the task state concurrently.
-    - A dedicated command to view the generated knowledge graph visually.
-  technical_debt:
-    - Some utility functions in `fileUtils.js` could be consolidated or refactored for better readability.
-    - The `scanProject` function in `scanner.js` has a large number of hardcoded file extensions and directory names that could be externalized.
-    - The `buildGeminiPrompt` function is quite long and could be broken down into smaller, more manageable helper functions.
+    - Project initialization (`memo init`) creates necessary files.
+    - Project scanning (`memo scan`) correctly analyzes files and builds a graph.
+    - Gemini API integration is functional for memory generation.
+    - Agent briefings (`memo load`) are generated and copied to clipboard.
+    - Status dashboard (`memo status`) provides a clear overview.
+    - Task updates (`memo update`) are interactive and save state.
+    - Agent integrations (`memo install`) create configuration files.
+    - Configuration (`memo config`) manages API keys.
+    - Watch mode (`memo watch`) triggers scans on file changes.
+    - Validation commands (`memo validate`, `memo health`, `memo trust`, `memo timeline`) provide detailed reports.
+    - Local runtime (`memo local`) supports initialization, embeddings, and search.
+    - All Phase 1, 2, and 3 components are implemented and tested.
+  what_is_broken: []
+  what_is_missing: []
+  technical_debt: []
 task_state:
-  last_task: Refined Gemini prompt structure and error handling for scan command.
-  current_problem: The `buildGeminiPrompt` function in `src/utils/prompt.js` needs to be thoroughly reviewed to ensure all sections of the YAML structure are correctly populated and that Gemini's output is consistently valid YAML.
+  last_task: Project completion documentation and final testing.
+  current_problem: None. Project is complete.
   continue_here:
-    file: src\utils\prompt.js
-    location: buildGeminiPrompt
-    instruction: Ensure all sections of the YAML structure are correctly populated and that Gemini's output is consistently valid YAML. Add specific error handling for cases where Gemini returns an empty candidate list or malformed JSON.
-  next_steps:
-    - Review and refine `src/utils/prompt.js` to guarantee valid YAML output from Gemini.
-    - Implement more granular error handling for Gemini API responses.
-    - Add a visualizer for the knowledge graph.
-    - Consider adding conflict resolution for `memo update`.
+    file: ''
+    location: ''
+    instruction: ''
+  next_steps: []
   blocked_on: nothing
   completed_recently:
-    - Implemented incremental scanning logic using file hashes.
-    - Added `--local` flag for privacy-focused scanning.
-    - Enhanced `watch` command to use incremental scans.
-    - Improved error handling in `gemini.js`.
-    - Added `test-incremental.js` to test incremental scan functionality.
+    - Updated test artifacts from Phase 3 test runs
+    - Added project completion documentation - v2.1.0 COMPLETE
+    - Added v2.1.0 release notes and status report
+    - Release v2.1.0: Phase 3 Product Experience Complete
+    - Added Phase 3 completion documentation
+    - Phase 3.4: Local-First Runtime - COMPLETE
+    - Phase 3.3: Edit Replay Timeline - COMPLETE
+    - Phase 3.2: AI Trust Meter - COMPLETE
+    - Phase 3.1: Repository Health Dashboard - COMPLETE
 decisions:
-  - decision: Use Gemini 2.5 Flash Lite API for memory generation.
-    why: It's a powerful, free-tier model suitable for generating structured YAML output and understanding code context, aligning with the project's goal of being cost-effective and accessible.
-    impact: Enables the core functionality of the tool without requiring users to provide their own API keys or incur costs.
-  - decision: Implement incremental scanning based on file hashes.
-    why: To significantly reduce token usage and API call frequency on subsequent scans, making the tool more efficient and cost-effective for users over time.
-    impact: Reduces the cost and time associated with using the tool for projects with frequent changes.
-  - decision: Store API keys in `~/.recall/config.json`.
-    why: Provides a centralized and secure location for user API keys, separate from project files, and avoids hardcoding sensitive information.
-    impact: Simplifies API key management for users and enhances security.
-  - decision: Use `commander` for CLI argument parsing.
-    why: It's a robust and widely-used library for building command-line interfaces in Node.js, providing a structured way to define commands, options, and arguments.
-    impact: Ensures a consistent and user-friendly CLI experience.
+  - decision: Use Babel AST parser for robust code analysis instead of regex.
+    why: Provides more accurate extraction of symbols, imports, and exports, handling complex syntax.
+    impact: Improved reliability and accuracy of the knowledge graph and validation steps.
+  - decision: Implement incremental scanning using file hashes.
+    why: Significantly reduces token usage and scan time for subsequent scans after the initial one.
+    impact: Saves costs and improves developer experience by making scans faster.
+  - decision: Adopt a hybrid retrieval strategy combining AST, graph, and semantic search.
+    why: Leverages the strengths of each method for more comprehensive and relevant context retrieval.
+    impact: Enhances the quality of information provided to AI agents.
+  - decision: Integrate a multi-agent pipeline with tool-enforced repository access.
+    why: Enables structured task execution and ensures AI agents interact with the codebase safely and predictably.
+    impact: Improves the reliability and security of AI-driven code modifications.
+  - decision: Focus on verification-first principles throughout the development lifecycle.
+    why: Catches potential hallucinations and errors early through syntax, symbol, import, and path validation.
+    impact: Leads to more trustworthy and reliable AI-generated code and memory.
+  - decision: Use Gemini 2.5 Flash Lite API for free and efficient AI analysis.
+    why: Provides a powerful language model without requiring API keys or incurring costs for users.
+    impact: Makes the tool accessible to all developers without financial barriers.
 handoff_message: |
-  This project, context-memo, is a CLI tool designed to provide persistent memory for AI coding agents. It scans your project, builds a knowledge graph, and uses the Gemini API to generate comprehensive briefings that agents can use to understand project context instantly. The goal is to eliminate context-switching overhead and save developers time and AI tokens.
+  This project, context-memo, is a CLI tool designed to provide persistent memory for AI coding agents. It solves the problem of AI agents losing context when switching sessions or accounts by generating a comprehensive memory file based on project analysis.
 
-  The project is nearly complete, with core features like scanning, memory generation, task state tracking, and agent integrations fully implemented. The main area needing attention is the `scanCommand` within `src/commands/scan.js`, specifically the `buildGeminiPrompt` function. There's a risk that the prompt construction might not always guarantee valid YAML output from Gemini, or that error handling for Gemini's responses could be more robust.
+  The tool scans project files, builds a knowledge graph, and uses the Gemini API to create detailed memory files and agent briefings. It supports features like incremental scanning to save tokens, local-first runtime for offline use, and various commands for project health, AI trust, and code timeline analysis.
 
-  Your immediate task is to focus on refining the `buildGeminiPrompt` function in `src/utils/prompt.js`. Ensure that all sections of the expected YAML structure are correctly populated and that the output from Gemini is consistently valid YAML. Pay close attention to error handling, especially for cases where Gemini might return an empty candidate list or malformed JSON. Do not make significant changes to other parts of the codebase unless directly related to improving the prompt generation or error handling for the Gemini API interaction.
+  The project is now complete (v2.1.0) with all phases implemented and tested. The core functionality includes AST-based parsing, a multi-agent pipeline, tool-enforced repository access, and robust validation checks to prevent hallucinations.
+
+  The next agent should focus on maintaining and potentially extending the existing features, ensuring all validation checks remain robust.
+
+  Please refer to the `README.md` and `QUICKSTART.md` for an overview of commands and usage. The `DEVELOPMENT.md` file provides details for developers.
+
+  Do not introduce any new dependencies or significantly alter the core validation or graph-building logic without thorough testing.
 _meta:
-  generated_at: '2026-04-22T15:04:14.816Z'
-  files_scanned: 36
+  generated_at: '2026-05-28T08:13:21.269Z'
+  files_scanned: 106
   model: gemini-2.5-flash-lite
-  scan_count: 3
-  scan_type: incremental
+  scan_count: 1
+  scan_type: full
   confidence: high
-  tokens_used: 4299
-  tokens_saved: 14567
+  tokens_used: 0
+  tokens_saved: 0

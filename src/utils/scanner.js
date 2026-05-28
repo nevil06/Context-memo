@@ -47,7 +47,7 @@ export async function scanProject(quick = false) {
   });
 
   // Limit files based on mode
-  const maxCodeFiles = quick ? 20 : 50;
+  const maxCodeFiles = quick ? 50 : 200;
   const maxCharsPerFile = quick ? 1500 : 2500;
 
   files.code = files.code.slice(0, maxCodeFiles);

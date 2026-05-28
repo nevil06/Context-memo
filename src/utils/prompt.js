@@ -27,11 +27,8 @@ knowledge_graph:
       file: [file path]
       connections: [number]
   components:
-    - name: [component name]
-      file: [exact file path]
+    - file: [exact file path]
       role: [1 sentence what it does]
-      exports: [key functions/classes it exposes]
-      depends_on: [other components it uses]
       status: [complete|in_progress|broken|stub|not_started]
   data_flow: [input to output end-to-end in 1-2 sentences]
   api_endpoints: [METHOD /path — what it does]
