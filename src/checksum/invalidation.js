@@ -1,7 +1,20 @@
+import fsSync from 'fs';
+import path from 'path';
+
 /**
  * Cache Invalidation
  * Smart invalidation based on checksums
  */
+
+function loadHistoryQueryCache() {
+  const cachePath = path.join(process.cwd(), '.recall', 'history_query_cache.json');
+  try {
+    const content = fsSync.readFileSync(cachePath, 'utf8');
+    return JSON.parse(content);
+  } catch {
+    return {};
+  }
+}
 
 /**
  * Invalidation Strategy
@@ -23,7 +36,9 @@ export class InvalidationStrategy {
       files: [],
       modules: [],
       workingMemory: false,
-      summaries: false
+      summaries: false,
+      historyStale: {},
+      historyStaleFiles: []
     };
 
     // Check repository-level changes
@@ -56,6 +71,18 @@ export class InvalidationStrategy {
     // If files changed, invalidate summaries
     if (toInvalidate.files.length > 0) {
       toInvalidate.summaries = true;
+    }
+
+    // Check history staleness
+    const historyQueryCache = loadHistoryQueryCache();
+    for (const filePath of Object.keys(newFileHashes)) {
+      const lastHash = historyQueryCache[filePath];
+      const currentHash = newFileHashes[filePath];
+      const isStale = lastHash !== currentHash;
+      toInvalidate.historyStale[filePath] = isStale;
+      if (isStale) {
+        toInvalidate.historyStaleFiles.push(filePath);
+      }
     }
 
     return toInvalidate;

@@ -1,7 +1,7 @@
 # Context-Memo Recall Accuracy Report
 
-**Test Date**: May 28, 2026  
-**Version**: 2.1.0  
+**Test Date**: July 12, 2026  
+**Version**: 3.0.1  
 **Test Type**: Hybrid Dual-Layer API Scan
 
 ---
@@ -20,8 +20,8 @@ This dual-layer architecture guarantees that all code structures, files, exports
 | **File Accuracy** | 100.0% | 🌟 STATE-OF-THE-ART |
 | **Dependency Accuracy** | 97.6% (De-facto **100%**)* | 🌟 STATE-OF-THE-ART |
 | **Hallucination Prevention** | 97.9% (De-facto **100%**)* | 🌟 STATE-OF-THE-ART |
-| **Token Savings** | 90.7% | ✅ EXCELLENT |
-| **Compression Ratio** | 9.3% | ✅ EXCELLENT |
+| **Token Savings** | 93.1% | ✅ EXCELLENT |
+| **Compression Ratio** | 6.9% | ✅ EXCELLENT |
 
 > [!NOTE]
 > \* The 1.2% variance in Dependency Accuracy is a structural detail rather than a hallucination. The AST parser extracts exact import names (e.g., `fsSync` from `fs`, `execSync` from `child_process`, `yaml` from `js-yaml`, `fileURLToPath` from `url`). The test suite whitelists packages and built-in names but does not whitelist specific sub-imports or renames, classifying them as "hallucinated" even though they are completely real and accurate imports!
@@ -76,18 +76,18 @@ The test reported 11 "hallucinations," but inspection shows these are highly det
 Token savings measure the efficiency of the context compression layer.
 
 ```
-Total Source Files: 60
-Codebase Size: 385,039 characters (~96,260 tokens)
-Memory Size: 35,818 characters (~8,955 tokens)
+Total Source Files: 79
+Codebase Size (Full Prompt): ~70,659 tokens
+Memory Size (Briefing): ~4,837 tokens
 
-Token Savings: ~87,305 tokens
-Savings Percentage: 90.7%
-Compression Ratio: 9.3%
+Token Savings: ~65,822 tokens
+Savings Percentage: 93.1%
+Compression Ratio: 6.9%
 ```
 
 #### Cost & Context Efficiency:
-- **Without Recall**: Feeding the full 96k tokens of the codebase to each agent session costs ~$0.48 (at $5/1M tokens) and clutters the attention window.
-- **With Recall**: Passing the rich 8.9k context-memo briefing costs just ~$0.04 (a **90.7% reduction**) and focuses 100% of the attention on current task objectives and high-level structure.
+- **Without Recall**: Feeding the full 70k tokens of the codebase to each agent session would cost significantly more and clutter the attention window.
+- **With Recall**: Passing the rich 4.8k context-memo briefing reduces the context size by **93.1%**, focusing 100% of the attention on current task objectives and high-level structure.
 
 ---
 
@@ -121,6 +121,6 @@ graph TD
 **Context-memo's Dual-Layer Hybrid Scan is ready for production use.**
 
 ✅ **De-facto 100% Structural Precision** (Zero hallucinated files/dependencies)  
-✅ **90.7% Context Size Reduction**  
+✅ **93.1% Context Size Reduction**  
 ✅ **Rich Handoff Continuity**  
 ✅ **Robust API Integration**  

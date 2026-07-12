@@ -199,6 +199,15 @@ export function calculateGenerationConfidence(context) {
   // Syntax validation (10%)
   score += syntaxValid ? 10 : 0;
 
+  // History citation factor
+  if (context.ignoredHistoryFailure) {
+    score -= 30;
+  } else if (context.citesHistory) {
+    score += 10;
+  }
+
+  score = Math.max(0, Math.min(100, score));
+
   return {
     score: Math.round(score),
     level: getConfidenceLevel(score),
@@ -236,9 +245,16 @@ export function calculateEditConfidence(edit, graph, registry) {
   if (metrics && metrics.totalConnections > 10) {
     score -= 10; // High-risk edit
   }
+
+  // Check if it ignored known prior-failure history or cited it
+  if (edit.ignoredHistoryFailure) {
+    score -= 40;
+  } else if (edit.citesHistory) {
+    score += 10;
+  }
   
   return {
-    score: Math.max(0, score),
+    score: Math.max(0, Math.min(100, score)),
     level: getConfidenceLevel(score),
     risk: metrics?.totalConnections > 10 ? 'high' : 'low'
   };

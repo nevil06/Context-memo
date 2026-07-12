@@ -1,6 +1,6 @@
 import { buildFileTree } from './scanner.js';
 
-export function buildGeminiPrompt(files, gitInfo, graphSummary) {
+export function buildGeminiPrompt(files, gitInfo, graphSummary, historyContext) {
   const sections = [];
 
   sections.push(`You are analyzing a software project to build a comprehensive memory file for AI agent handoffs.
@@ -74,6 +74,14 @@ handoff_message: |
   This is the MOST IMPORTANT field — it replaces thousands of
   tokens of re-explanation. Be direct and specific.]
 `);
+
+  if (historyContext) {
+    sections.push('\n## Verified prior session history (from local history index — treat as ground truth, do not contradict)');
+    sections.push(historyContext);
+    sections.push('\n## Instructions');
+    sections.push('Only state a decision/fact as settled if it appears above or in the code itself.');
+    sections.push('If you are inferring rather than citing, prefix the line with "[inference]".');
+  }
 
   sections.push('\n--- PROJECT CONTEXT ---\n');
 

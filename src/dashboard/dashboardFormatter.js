@@ -64,6 +64,12 @@ export function formatHealthReport(report) {
     lines.push('');
   }
 
+  // History Grounding
+  if (report.historyGrounding) {
+    lines.push(formatHistoryGrounding(report.historyGrounding));
+    lines.push('');
+  }
+
   // Recommendations
   if (report.recommendations.length > 0) {
     lines.push(formatRecommendations(report.recommendations));
@@ -398,9 +404,43 @@ export function formatHealthSummary(report) {
   if (report.godFiles.length > 0) issues.push(`${report.godFiles.length} god files`);
   if (report.circularDependencies.length > 0) issues.push(`${report.circularDependencies.length} cycles`);
   if (report.bottlenecks.length > 0) issues.push(`${report.bottlenecks.length} bottlenecks`);
+  if (report.historyGrounding && report.historyGrounding.citationRate < 100) {
+    issues.push(`history citation rate ${report.historyGrounding.citationRate}%`);
+  }
   
   if (issues.length > 0) {
     lines.push(`Issues: ${issues.join(', ')}`);
+  }
+  
+  return lines.join('\n');
+}
+
+/**
+ * Format history grounding section
+ */
+function formatHistoryGrounding(metrics) {
+  const lines = [];
+  
+  lines.push(chalk.bold('🔗 HISTORY GROUNDING (Hallucination Reduction)'));
+  lines.push(chalk.gray('─'.repeat(55)));
+  
+  const citationColor = getScoreColor(metrics.citationRate);
+  lines.push(`Citation Rate: ${citationColor(metrics.citationRate + '%')}`);
+  lines.push(`Checked Claims: ${metrics.checkedClaims}`);
+  lines.push(`Cited Claims:   ${metrics.citedClaims}`);
+  lines.push(`Uncited Claims: ${metrics.uncitedClaims}`);
+  
+  if (metrics.flagged && metrics.flagged.length > 0) {
+    lines.push('');
+    lines.push(chalk.yellow('Flagged Claims (Unverified Facts):'));
+    for (const item of metrics.flagged.slice(0, 5)) {
+      lines.push(`  ${chalk.yellow('•')} "${item.claim}"`);
+    }
+    if (metrics.flagged.length > 5) {
+      lines.push(chalk.gray(`  ... and ${metrics.flagged.length - 5} more`));
+    }
+  } else {
+    lines.push(chalk.green('\n✓ All factual claims are grounded in past session history.'));
   }
   
   return lines.join('\n');

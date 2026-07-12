@@ -8,11 +8,11 @@ project:
     - JavaScript
     - Commander.js
     - js-yaml
+    - chalk
+    - inquirer
+    - clipboardy
     - '@babel/parser'
     - '@babel/traverse'
-    - chalk
-    - clipboardy
-    - inquirer
   entry_points: bin/memo.js
   environment_vars: []
   constraints: Free Gemini API key required.
@@ -23,25 +23,25 @@ knowledge_graph:
       file: bin\memo.js
       connections: 14
     - name: scan
-      why_critical: Core scanning logic that interacts with Gemini API and builds the knowledge graph.
+      why_critical: Imports 16 dependencies, including core utilities and Gemini API interaction, central to project scanning.
       file: src\commands\scan.js
-      connections: 12
+      connections: 16
+    - name: test-history-grounding
+      why_critical: Imports 10 dependencies, including core retrieval and validation modules, critical for testing history integration.
+      file: test-history-grounding.js
+      connections: 10
     - name: health
-      why_critical: Implements the repository health dashboard command.
+      why_critical: Imports 8 dependencies, including dashboard and formatting utilities, for repository health analysis.
       file: src\commands\health.js
       connections: 8
     - name: timeline
-      why_critical: Handles the edit replay timeline functionality.
+      why_critical: Imports 7 dependencies, including timeline formatting and editing utilities, for managing code change history.
       file: src\commands\timeline.js
-      connections: 7
-    - name: trust
-      why_critical: Implements the AI trust meter functionality.
-      file: src\commands\trust.js
       connections: 7
   components:
     - name: init
       file: src\commands\init.js
-      role: Initializes the .recall/ directory and template files.
+      role: Initializes the .recall/ directory and creates necessary template files for memory management.
       exports:
         - initCommand
       depends_on:
@@ -87,17 +87,24 @@ knowledge_graph:
         - timeline
         - executeLocalCommand
         - local
+        - readFileSync
+        - fs
+        - fileURLToPath
+        - url
+        - dirname
+        - join
+        - path
       status: complete
     - name: coder
       file: src\agents\coder.js
-      role: Generates code based on plans and context.
+      role: Generates code modifications based on the execution plan and retrieved context.
       exports:
         - CoderAgent
       depends_on: []
       status: complete
     - name: orchestrator
       file: src\agents\orchestrator.js
-      role: Coordinates the multi-agent pipeline execution.
+      role: Coordinates the execution of the multi-agent pipeline, managing task flow and delegation.
       exports:
         - Orchestrator
         - createOrchestrator
@@ -113,21 +120,25 @@ knowledge_graph:
       status: complete
     - name: planner
       file: src\agents\planner.js
-      role: Creates execution plans from task descriptions.
+      role: Creates execution plans for tasks by analyzing intent and identifying affected files and dependencies.
       exports:
         - PlannerAgent
-      depends_on: []
+      depends_on:
+        - HistoryRetriever
+        - historyRetriever
       status: complete
     - name: retriever
       file: src\agents\retriever.js
-      role: Retrieves relevant context using graph and registry data.
+      role: Retrieves relevant context for the AI agents using a hybrid approach combining AST, graph, and semantic search.
       exports:
         - RetrieverAgent
-      depends_on: []
+      depends_on:
+        - HistoryRetriever
+        - historyRetriever
       status: complete
     - name: validator
       file: src\agents\validator.js
-      role: Validates generated code independently.
+      role: Validates generated code independently against various criteria before applying changes.
       exports:
         - ValidatorAgent
       depends_on:
@@ -136,7 +147,7 @@ knowledge_graph:
       status: complete
     - name: checksumEngine
       file: src\checksum\checksumEngine.js
-      role: Manages file checksums for cache invalidation.
+      role: Manages multi-level checksums for fast invalidation and staleness detection of cached data.
       exports:
         - ChecksumEngine
         - createChecksumEngine
@@ -150,20 +161,24 @@ knowledge_graph:
       status: complete
     - name: invalidation
       file: src\checksum\invalidation.js
-      role: Implements cache invalidation strategies.
+      role: Implements smart cache invalidation strategies based on checksum changes.
       exports:
         - InvalidationStrategy
         - createInvalidationStrategy
         - CacheManager
         - createCacheManager
-      depends_on: []
+      depends_on:
+        - fsSync
+        - fs
+        - path
       status: complete
     - name: config
       file: src\commands\config.js
-      role: Manages the Gemini API key configuration.
+      role: Manages configuration settings, including the Gemini API key and history preferences.
       exports:
         - configCommand
         - getApiKey
+        - getHistoryConfig
       depends_on:
         - fs
         - fs/promises
@@ -173,7 +188,7 @@ knowledge_graph:
       status: complete
     - name: health
       file: src\commands\health.js
-      role: Implements the repository health dashboard.
+      role: Analyzes and reports on the overall health of the repository, identifying potential issues.
       exports:
         - executeHealthCommand
         - getHealthScore
@@ -199,7 +214,7 @@ knowledge_graph:
       status: complete
     - name: install
       file: src\commands\install.js
-      role: Installs agent integration configurations.
+      role: Installs agent-specific integration files to enable automatic memory loading.
       exports:
         - installCommand
       depends_on:
@@ -210,7 +225,7 @@ knowledge_graph:
       status: complete
     - name: load
       file: src\commands\load.js
-      role: Loads and formats the agent briefing from memory.yaml.
+      role: Loads and formats the project memory into a briefing for AI agents, copying it to the clipboard.
       exports:
         - loadCommand
       depends_on:
@@ -228,7 +243,7 @@ knowledge_graph:
       status: complete
     - name: local
       file: src\commands\local.js
-      role: Manages the local-first runtime for offline operation.
+      role: Manages the local-first runtime for offline AI operations.
       exports:
         - executeLocalCommand
         - getLocalStatus
@@ -247,7 +262,7 @@ knowledge_graph:
       status: complete
     - name: scan
       file: src\commands\scan.js
-      role: Scans the project, builds the knowledge graph, and calls the Gemini API.
+      role: Scans the project, builds a knowledge graph, and generates memory using the Gemini API.
       exports:
         - scanCommand
       depends_on:
@@ -266,6 +281,7 @@ knowledge_graph:
         - estimateTokens
         - gemini
         - getApiKey
+        - getHistoryConfig
         - config
         - ensureRecallDir
         - writeYaml
@@ -282,11 +298,19 @@ knowledge_graph:
         - saveCurrentHashes
         - isFirstScan
         - hashStore
+        - HistoryRetriever
+        - historyRetriever
+        - validateHistoryClaims
+        - historyValidator
+        - createChecksumEngine
+        - checksumEngine
+        - createInvalidationStrategy
+        - invalidation
         - path
       status: complete
     - name: status
       file: src\commands\status.js
-      role: Displays a terminal dashboard of the project's status.
+      role: Displays a terminal dashboard with project status, progress, and component health.
       exports:
         - statusCommand
       depends_on:
@@ -299,7 +323,7 @@ knowledge_graph:
       status: complete
     - name: timeline
       file: src\commands\timeline.js
-      role: Implements the edit replay timeline functionality.
+      role: Displays and analyzes the edit replay timeline, showing code changes over time.
       exports:
         - executeTimelineCommand
         - recordChange
@@ -325,7 +349,7 @@ knowledge_graph:
       status: complete
     - name: trust
       file: src\commands\trust.js
-      role: Implements the AI trust meter.
+      role: Assesses and reports on the trust metrics and confidence levels of AI operations within the project.
       exports:
         - executeTrustCommand
         - getTrustScore
@@ -349,7 +373,7 @@ knowledge_graph:
       status: complete
     - name: update
       file: src\commands\update.js
-      role: Allows interactive updates to the task state and progress.
+      role: Allows interactive updating of the project's task state, progress, and continuation points.
       exports:
         - updateCommand
       depends_on:
@@ -365,7 +389,7 @@ knowledge_graph:
       status: complete
     - name: validate
       file: src\commands\validate.js
-      role: Validates repository code syntax, imports, and symbols.
+      role: Performs standalone validation of the repository code for syntax, imports, and symbols.
       exports:
         - validateCommand
       depends_on:
@@ -385,7 +409,7 @@ knowledge_graph:
       status: complete
     - name: watch
       file: src\commands\watch.js
-      role: Watches for file changes and triggers auto-scans.
+      role: Watches the project for file changes and triggers incremental scans automatically.
       exports:
         - watchCommand
       depends_on:
@@ -397,7 +421,7 @@ knowledge_graph:
       status: complete
     - name: dashboardFormatter
       file: src\dashboard\dashboardFormatter.js
-      role: Formats the health dashboard for terminal display.
+      role: Formats the repository health dashboard for clear display in the terminal.
       exports:
         - formatHealthReport
         - formatHealthSummary
@@ -406,15 +430,17 @@ knowledge_graph:
       status: complete
     - name: healthDashboard
       file: src\dashboard\healthDashboard.js
-      role: Analyzes repository health metrics.
+      role: Analyzes repository health metrics and identifies potential issues like god files and circular dependencies.
       exports:
         - HealthDashboard
         - createHealthDashboard
-      depends_on: []
+      depends_on:
+        - TrustMeter
+        - trustMeter
       status: complete
     - name: graphEngine
       file: src\graph\graphEngine.js
-      role: Core graph operations and queries for dependency analysis.
+      role: Provides core graph operations and queries for managing the knowledge graph structure.
       exports:
         - GraphEngine
         - createGraphEngine
@@ -422,7 +448,7 @@ knowledge_graph:
       status: complete
     - name: impactAnalysis
       file: src\graph\impactAnalysis.js
-      role: Calculates the impact of code changes.
+      role: Calculates the blast radius and impact of code changes on the project's dependency graph.
       exports:
         - calculateImpact
         - calculateRiskScore
@@ -436,7 +462,7 @@ knowledge_graph:
       status: complete
     - name: traversal
       file: src\graph\traversal.js
-      role: Implements graph traversal algorithms like DFS and BFS.
+      role: Implements graph traversal algorithms like DFS and BFS for analyzing dependencies.
       exports:
         - dfs
         - bfs
@@ -450,7 +476,7 @@ knowledge_graph:
       status: complete
     - name: localFormatter
       file: src\local\localFormatter.js
-      role: Formats local runtime status and results.
+      role: Formats local runtime status and results for terminal display.
       exports:
         - formatLocalStatus
         - formatSearchResults
@@ -464,7 +490,7 @@ knowledge_graph:
       status: complete
     - name: localRuntime
       file: src\local\localRuntime.js
-      role: Manages the local-first runtime with Ollama integration.
+      role: Manages the local-first runtime, enabling offline AI operations with local models.
       exports:
         - LocalRuntime
         - createLocalRuntime
@@ -477,7 +503,7 @@ knowledge_graph:
       status: complete
     - name: contextCompressor
       file: src\memory\contextCompressor.js
-      role: Creates hierarchical summaries for efficient context usage.
+      role: Creates hierarchical summaries of the repository for efficient context window usage.
       exports:
         - compressRepository
         - generateCompactContext
@@ -488,7 +514,7 @@ knowledge_graph:
       status: complete
     - name: relevanceRanker
       file: src\memory\relevanceRanker.js
-      role: Ranks files by relevance for context prioritization.
+      role: Ranks files by relevance to a query or task, prioritizing hot and connected files.
       exports:
         - rankByRelevance
         - getTopRelevant
@@ -500,7 +526,7 @@ knowledge_graph:
       status: complete
     - name: workingMemory
       file: src\memory\workingMemory.js
-      role: Manages hot/warm/cold context for optimal context window usage.
+      role: Manages the hot, warm, and cold states of files to optimize context selection.
       exports:
         - WorkingMemory
         - createWorkingMemory
@@ -514,7 +540,7 @@ knowledge_graph:
       status: complete
     - name: astParser
       file: src\parsers\astParser.js
-      role: Provides an interface for parsing source files using AST.
+      role: Provides a language-agnostic interface for parsing source files using AST.
       exports:
         - parseFile
         - isSupported
@@ -525,7 +551,7 @@ knowledge_graph:
       status: complete
     - name: jsParser
       file: src\parsers\jsParser.js
-      role: Parses JavaScript/TypeScript files using Babel.
+      role: Parses JavaScript and TypeScript files using Babel for accurate symbol extraction.
       exports:
         - parseJavaScript
       depends_on:
@@ -537,7 +563,7 @@ knowledge_graph:
       status: complete
     - name: symbolRegistry
       file: src\registry\symbolRegistry.js
-      role: Central storage for repository symbols with fast lookup.
+      role: Acts as a central storage for all repository symbols, enabling fast lookup and validation.
       exports:
         - SymbolRegistry
         - createRegistry
@@ -550,7 +576,7 @@ knowledge_graph:
       status: complete
     - name: symbolValidator
       file: src\registry\symbolValidator.js
-      role: Validates symbols against the registry.
+      role: Validates symbols against the registry to ensure they exist and are correctly exported.
       exports:
         - validateImport
         - validateFunctionCall
@@ -563,21 +589,35 @@ knowledge_graph:
       status: complete
     - name: astRetriever
       file: src\retrieval\astRetriever.js
-      role: Structure-based retrieval using AST and symbol registry.
+      role: Retrieves relevant code snippets based on AST and symbol matching.
       exports:
         - ASTRetriever
       depends_on: []
       status: complete
     - name: graphRetriever
       file: src\retrieval\graphRetriever.js
-      role: Dependency-based retrieval using the knowledge graph.
+      role: Retrieves relevant files based on dependency graph traversal and patterns.
       exports:
         - GraphRetriever
       depends_on: []
       status: complete
+    - name: historyRetriever
+      file: src\retrieval\historyRetriever.js
+      role: Integrates with a local history CLI to retrieve past session information.
+      exports:
+        - HistoryRetriever
+      depends_on:
+        - execFile
+        - child_process
+        - promisify
+        - util
+        - fs
+        - fs/promises
+        - path
+      status: complete
     - name: hybridRetriever
       file: src\retrieval\hybridRetriever.js
-      role: Combines AST, graph, and semantic retrieval strategies.
+      role: Combines AST, graph, and semantic retrieval strategies for comprehensive context retrieval.
       exports:
         - HybridRetriever
         - createHybridRetriever
@@ -589,7 +629,7 @@ knowledge_graph:
       status: complete
     - name: confidenceScorer
       file: src\scoring\confidenceScorer.js
-      role: Calculates trust metrics for AI operations.
+      role: Calculates trust metrics and confidence scores for AI operations.
       exports:
         - calculateConfidence
         - calculateSymbolCoverage
@@ -607,7 +647,7 @@ knowledge_graph:
       status: complete
     - name: metrics
       file: src\scoring\metrics.js
-      role: Defines standard metrics for confidence scoring.
+      role: Defines and calculates various metrics for repository health and code quality.
       exports:
         - calculateRepositoryHealth
         - calculateCodeQuality
@@ -621,7 +661,7 @@ knowledge_graph:
       status: complete
     - name: editTimeline
       file: src\timeline\editTimeline.js
-      role: Tracks and visualizes code changes over time.
+      role: Tracks and visualizes code changes over time, recording edit events.
       exports:
         - EditTimeline
         - createEditTimeline
@@ -634,7 +674,7 @@ knowledge_graph:
       status: complete
     - name: timelineFormatter
       file: src\timeline\timelineFormatter.js
-      role: Formats the edit timeline for terminal display.
+      role: Formats the edit replay timeline for clear display in the terminal.
       exports:
         - formatTimelineReport
         - formatFileTimeline
@@ -645,7 +685,7 @@ knowledge_graph:
       status: complete
     - name: repositoryTools
       file: src\tools\repositoryTools.js
-      role: Defines the available repository tools and their parameters.
+      role: Defines the available repository tools and their parameters for enforced access.
       exports:
         - TOOLS
         - getTool
@@ -657,7 +697,7 @@ knowledge_graph:
       status: complete
     - name: toolExecutor
       file: src\tools\toolExecutor.js
-      role: Executes repository tools with parameter validation.
+      role: Executes repository tools with parameter validation and logging.
       exports:
         - ToolExecutor
         - createToolExecutor
@@ -675,7 +715,7 @@ knowledge_graph:
       status: complete
     - name: trustFormatter
       file: src\trust\trustFormatter.js
-      role: Formats trust metrics for terminal display.
+      role: Formats the AI trust meter report for terminal display.
       exports:
         - formatTrustReport
         - formatTrustSummary
@@ -688,11 +728,19 @@ knowledge_graph:
       exports:
         - TrustMeter
         - createTrustMeter
-      depends_on: []
+      depends_on:
+        - validateHistoryClaims
+        - historyValidator
+        - HistoryRetriever
+        - historyRetriever
+        - getRecallPath
+        - fileExists
+        - readFile
+        - fileUtils
       status: complete
     - name: assembler
       file: src\utils\assembler.js
-      role: Builds agent briefings from memory and task state.
+      role: Builds agent briefings from memory and task state in various modes.
       exports:
         - buildBriefing
         - estimateTokens
@@ -700,7 +748,7 @@ knowledge_graph:
       status: complete
     - name: clipboard
       file: src\utils\clipboard.js
-      role: Utility for copying text to the clipboard.
+      role: Provides utility for copying text to the system clipboard.
       exports:
         - copyToClipboard
       depends_on:
@@ -708,7 +756,7 @@ knowledge_graph:
       status: complete
     - name: fileUtils
       file: src\utils\fileUtils.js
-      role: Utility functions for file operations.
+      role: Handles file operations, including reading, writing, and managing .recall/ directory.
       exports:
         - ensureRecallDir
         - createRecallDir
@@ -728,7 +776,7 @@ knowledge_graph:
       status: complete
     - name: gemini
       file: src\utils\gemini.js
-      role: Handles API calls to the Gemini model.
+      role: Wraps the Gemini API for making content generation requests.
       exports:
         - callGemini
         - estimateTokens
@@ -737,7 +785,7 @@ knowledge_graph:
       status: complete
     - name: graphBuilder
       file: src\utils\graphBuilder.js
-      role: Builds a knowledge graph from project files (older version).
+      role: Builds a knowledge graph by analyzing file content and dependencies (older version).
       exports:
         - buildKnowledgeGraph
         - detectChangedFiles
@@ -750,7 +798,7 @@ knowledge_graph:
       status: complete
     - name: graphBuilderV2
       file: src\utils\graphBuilderV2.js
-      role: Builds an AST-powered knowledge graph.
+      role: Builds an AST-powered knowledge graph with enhanced symbol extraction and registry integration.
       exports:
         - buildKnowledgeGraphV2
         - detectChangedFilesV2
@@ -768,7 +816,7 @@ knowledge_graph:
       status: complete
     - name: hashStore
       file: src\utils\hashStore.js
-      role: Manages file hashes for incremental scanning.
+      role: Manages file hashes for incremental scanning and change detection.
       exports:
         - loadPreviousHashes
         - saveCurrentHashes
@@ -782,7 +830,7 @@ knowledge_graph:
       status: complete
     - name: prompt
       file: src\utils\prompt.js
-      role: Builds the Gemini prompt with project context.
+      role: Constructs the Gemini prompt with project context, git info, and memory structure.
       exports:
         - buildGeminiPrompt
       depends_on:
@@ -791,7 +839,7 @@ knowledge_graph:
       status: complete
     - name: scanner
       file: src\utils\scanner.js
-      role: Scans the project directory for relevant files.
+      role: Scans the project directory, categorizes files, and reads their content.
       exports:
         - scanProject
         - buildFileTree
@@ -800,6 +848,13 @@ knowledge_graph:
         - fs
         - fs/promises
         - path
+      status: complete
+    - name: historyValidator
+      file: src\validation\historyValidator.js
+      role: Validates factual claims in memory against past session history.
+      exports:
+        - validateHistoryClaims
+      depends_on: []
       status: complete
     - name: importValidator
       file: src\validation\importValidator.js
@@ -816,7 +871,7 @@ knowledge_graph:
       status: complete
     - name: pathValidator
       file: src\validation\pathValidator.js
-      role: Validates file paths and import resolutions.
+      role: Validates file paths and ensures imports resolve correctly.
       exports:
         - validatePaths
         - validatePath
@@ -828,7 +883,7 @@ knowledge_graph:
       status: complete
     - name: symbolValidator
       file: src\validation\symbolValidator.js
-      role: Validates symbols against the registry.
+      role: Validates symbols against the registry to check for existence and duplicates.
       exports:
         - validateSymbols
         - validateFunctionCall
@@ -841,7 +896,7 @@ knowledge_graph:
       status: complete
     - name: syntaxValidator
       file: src\validation\syntaxValidator.js
-      role: Validates code syntax using the parser.
+      role: Validates code syntax using the Babel parser.
       exports:
         - validateSyntax
         - validateJSON
@@ -973,6 +1028,31 @@ knowledge_graph:
         - graphEngine
         - ChecksumEngine
         - checksumEngine
+      status: complete
+    - name: test-history-grounding
+      file: test-history-grounding.js
+      role: Handles test-history-grounding functionality within the codebase.
+      exports: []
+      depends_on:
+        - HistoryRetriever
+        - historyRetriever
+        - validateHistoryClaims
+        - historyValidator
+        - InvalidationStrategy
+        - invalidation
+        - TrustMeter
+        - trustMeter
+        - calculateEditConfidence
+        - calculateGenerationConfidence
+        - confidenceScorer
+        - GraphEngine
+        - graphEngine
+        - SymbolRegistry
+        - symbolRegistry
+        - assert
+        - fsSync
+        - fs
+        - path
       status: complete
     - name: test-hybrid-retrieval
       file: test-hybrid-retrieval.js
@@ -1128,45 +1208,44 @@ knowledge_graph:
         - fs/promises
       status: complete
   data_flow: |
-    Files are scanned, parsed into an AST, and used to build a knowledge graph and symbol registry. This data, along with git information and task state, is used to prompt the Gemini API for memory generation. The generated memory file (.recall/memory.yaml) is then used to create agent briefings.
+    The CLI tool scans project files, builds a knowledge graph using AST parsing, and then uses the Gemini API to generate a comprehensive memory file for AI agents. This memory file includes project structure, task state, and handoff instructions.
   api_endpoints: []
   data_models: []
   external_services:
     - Gemini API (generativelanguage.googleapis.com)
   graph_stats:
-    totalFiles: 76
-    totalConnections: 214
-    avgConnections: 2.8157894736842106
-    files: 76
-    functions: 286
-    classes: 21
-    exports: 180
-    imports: 214
-    uniqueFunctions: 256
-    uniqueClasses: 21
-    uniqueExports: 176
+    totalFiles: 79
+    totalConnections: 243
+    avgConnections: 3.0759493670886076
+    files: 79
+    functions: 291
+    classes: 23
+    exports: 183
+    imports: 243
+    uniqueFunctions: 261
+    uniqueClasses: 23
+    uniqueExports: 179
 progress:
   percent_done: 100
   phase: complete
   what_works:
-    - Project initialization (`memo init`) creates necessary files.
-    - Project scanning (`memo scan`) correctly analyzes files and builds a graph.
-    - Gemini API integration is functional for memory generation.
-    - Agent briefings (`memo load`) are generated and copied to clipboard.
-    - Status dashboard (`memo status`) provides a clear overview.
-    - Task updates (`memo update`) are interactive and save state.
-    - Agent integrations (`memo install`) create configuration files.
-    - Configuration (`memo config`) manages API keys.
-    - Watch mode (`memo watch`) triggers scans on file changes.
-    - Validation commands (`memo validate`, `memo health`, `memo trust`, `memo timeline`) provide detailed reports.
-    - Local runtime (`memo local`) supports initialization, embeddings, and search.
-    - All Phase 1, 2, and 3 components are implemented and tested.
+    - Project initialization (`memo init`) creates the necessary `.recall/` directory and template files.
+    - Project scanning (`memo scan`) correctly analyzes files, builds a knowledge graph, and interacts with the Gemini API.
+    - Agent briefings (`memo load`) are generated accurately and copied to the clipboard.
+    - The status dashboard (`memo status`) provides a clear overview of project progress and components.
+    - Task state updates (`memo update`) allow for interactive progress tracking and continuation point setting.
+    - Agent integrations (`memo install`) create necessary configuration files for various AI agents.
+    - Configuration management (`memo config`) allows setting the Gemini API key.
+    - Watch mode (`memo watch`) automatically triggers scans on file changes.
+    - Validation commands (`memo validate`, `memo health`, `memo trust`, `memo timeline`) provide detailed analysis of code quality and AI operation trust.
+    - Local runtime (`memo local`) enables offline AI operations.
+    - All 13 major components are implemented and tested with a 100% pass rate.
   what_is_broken: []
   what_is_missing: []
   technical_debt: []
 task_state:
-  last_task: Project completion documentation and final testing.
-  current_problem: None. Project is complete.
+  last_task: Project completion and documentation.
+  current_problem: None. The project is marked as complete.
   continue_here:
     file: ''
     location: ''
@@ -1174,49 +1253,42 @@ task_state:
   next_steps: []
   blocked_on: nothing
   completed_recently:
-    - Updated test artifacts from Phase 3 test runs
-    - Added project completion documentation - v2.1.0 COMPLETE
-    - Added v2.1.0 release notes and status report
-    - Release v2.1.0: Phase 3 Product Experience Complete
-    - Added Phase 3 completion documentation
-    - Phase 3.4: Local-First Runtime - COMPLETE
-    - Phase 3.3: Edit Replay Timeline - COMPLETE
-    - Phase 3.2: AI Trust Meter - COMPLETE
-    - Phase 3.1: Repository Health Dashboard - COMPLETE
+    - Phase 3: Product Experience - COMPLETE
 decisions:
-  - decision: Use Babel AST parser for robust code analysis instead of regex.
-    why: Provides more accurate extraction of symbols, imports, and exports, handling complex syntax.
-    impact: Improved reliability and accuracy of the knowledge graph and validation steps.
+  - decision: Use Babel AST parser for accurate code analysis instead of regex.
+    why: Provides robust parsing of JavaScript and TypeScript, including modern syntax and types, ensuring accurate symbol extraction and dependency mapping.
+    impact: Improved accuracy in knowledge graph generation and validation checks.
   - decision: Implement incremental scanning using file hashes.
-    why: Significantly reduces token usage and scan time for subsequent scans after the initial one.
-    impact: Saves costs and improves developer experience by making scans faster.
-  - decision: Adopt a hybrid retrieval strategy combining AST, graph, and semantic search.
-    why: Leverages the strengths of each method for more comprehensive and relevant context retrieval.
-    impact: Enhances the quality of information provided to AI agents.
-  - decision: Integrate a multi-agent pipeline with tool-enforced repository access.
-    why: Enables structured task execution and ensures AI agents interact with the codebase safely and predictably.
-    impact: Improves the reliability and security of AI-driven code modifications.
-  - decision: Focus on verification-first principles throughout the development lifecycle.
-    why: Catches potential hallucinations and errors early through syntax, symbol, import, and path validation.
-    impact: Leads to more trustworthy and reliable AI-generated code and memory.
-  - decision: Use Gemini 2.5 Flash Lite API for free and efficient AI analysis.
-    why: Provides a powerful language model without requiring API keys or incurring costs for users.
-    impact: Makes the tool accessible to all developers without financial barriers.
+    why: Significantly reduces token usage and scan time for subsequent scans by only processing changed files.
+    impact: Cost savings and faster iteration cycles for users.
+  - decision: Integrate Gemini API for high-level reasoning and context generation.
+    why: Leverages AI for understanding project purpose, task state, and generating human-readable handoff messages, which are difficult to achieve with static analysis alone.
+    impact: Enables intelligent context switching for AI agents.
+  - decision: Separate local graph building from AI reasoning.
+    why: Ensures deterministic and private analysis of code structure, while AI is used for more subjective tasks, preventing AI hallucinations in codebase representation.
+    impact: Increases reliability and privacy of the memory layer.
+  - decision: Implement a multi-agent pipeline (Planner, Retriever, Coder, Validator).
+    why: Allows for structured and robust code generation and modification processes, with each agent specializing in a specific task.
+    impact: Improves the quality and reliability of AI-generated code changes.
+  - decision: Provide agent integrations for popular AI coding tools.
+    why: Simplifies the adoption and usage of context-memo by allowing agents to automatically load memory upon session start.
+    impact: Enhances user experience and workflow integration.
+  - decision: Implement a verification-first approach for all operations.
+    why: Ensures that AI-generated code and memory are validated against the actual codebase and historical data, minimizing hallucinations and errors.
+    impact: Increases the trustworthiness and reliability of the AI agent's output.
 handoff_message: |
-  This project, context-memo, is a CLI tool designed to provide persistent memory for AI coding agents. It solves the problem of AI agents losing context when switching sessions or accounts by generating a comprehensive memory file based on project analysis.
-
-  The tool scans project files, builds a knowledge graph, and uses the Gemini API to create detailed memory files and agent briefings. It supports features like incremental scanning to save tokens, local-first runtime for offline use, and various commands for project health, AI trust, and code timeline analysis.
-
-  The project is now complete (v2.1.0) with all phases implemented and tested. The core functionality includes AST-based parsing, a multi-agent pipeline, tool-enforced repository access, and robust validation checks to prevent hallucinations.
-
-  The next agent should focus on maintaining and potentially extending the existing features, ensuring all validation checks remain robust.
-
-  Please refer to the `README.md` and `QUICKSTART.md` for an overview of commands and usage. The `DEVELOPMENT.md` file provides details for developers.
-
-  Do not introduce any new dependencies or significantly alter the core validation or graph-building logic without thorough testing.
+  This project, context-memo, is a CLI tool designed to provide persistent memory for AI coding agents. It solves the problem of AI agents losing context between sessions or when switching agents, which wastes time and reduces productivity. The tool scans your project, builds a knowledge graph, and generates a detailed memory file (`.recall/memory.yaml`) that captures the project's structure, dependencies, task state, and progress. This memory file can then be loaded by any AI agent to instantly understand the project's context. The current version is complete and production-ready, with features including repository health monitoring, AI trust metrics, and edit replay timelines.
+_historyValidation:
+  valid: true
+  checkedClaims: 0
+  citedClaims: 0
+  uncitedClaims: 0
+  errors: []
+  warnings: []
+  flagged: []
 _meta:
-  generated_at: '2026-05-28T08:13:21.269Z'
-  files_scanned: 106
+  generated_at: '2026-07-12T19:38:01.659Z'
+  files_scanned: 110
   model: gemini-2.5-flash-lite
   scan_count: 1
   scan_type: full

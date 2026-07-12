@@ -1,3 +1,5 @@
+import { HistoryRetriever } from '../retrieval/historyRetriever.js';
+
 /**
  * Planner Agent
  * Creates execution plans without seeing raw code
@@ -8,6 +10,7 @@ export class PlannerAgent {
     this.context = context;
     this.graph = context.graph;
     this.registry = context.registry;
+    this.historyRetriever = new HistoryRetriever({ log: () => {} });
   }
 
   /**
@@ -39,8 +42,46 @@ export class PlannerAgent {
       // Create execution steps
       plan.steps = this.createSteps(intent, plan.affectedFiles);
 
+      // Check history grounding for rejected approaches
+      if (await this.historyRetriever.isAvailable()) {
+        for (const file of plan.affectedFiles) {
+          const events = await this.historyRetriever.retrieveForFile(file);
+          for (const event of events) {
+            const snippetLower = event.snippet.toLowerCase();
+            const isFailure =
+              snippetLower.includes('fail') ||
+              snippetLower.includes('reject') ||
+              snippetLower.includes('error') ||
+              snippetLower.includes('bug') ||
+              snippetLower.includes('broken') ||
+              snippetLower.includes('failed test');
+
+            if (isFailure) {
+              // Find steps associated with this file and flag them
+              for (const step of plan.steps) {
+                if (step.files && step.files.includes(file)) {
+                  step.description = `${step.description} (previously attempted, see history event ${event.eventId})`;
+                  step.citesHistory = true;
+                  step.citedEventId = event.eventId;
+                }
+              }
+              // Add a risk factor
+              plan.risks.push({
+                level: 'medium',
+                type: 'prior_failure_history',
+                message: `File ${file} has history of failure: history event ${event.eventId}`,
+                file
+              });
+            }
+          }
+        }
+      }
+
       // Assess risks
-      plan.risks = this.assessRisks(plan);
+      plan.risks = [
+        ...plan.risks,
+        ...this.assessRisks(plan)
+      ];
 
       // Calculate confidence
       plan.confidence = this.calculatePlanConfidence(plan);

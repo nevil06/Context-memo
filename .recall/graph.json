@@ -78,7 +78,7 @@
       "id": "bin\\memo.js",
       "file": "bin\\memo.js",
       "type": "module",
-      "hash": "70814e73949f28716e3d4f7f2c4b68c0",
+      "hash": "8e10d8e9c60e7a7ef22700db2172ff42",
       "exports": [],
       "functions": [],
       "classes": [],
@@ -227,11 +227,49 @@
             }
           ],
           "line": 16
+        },
+        {
+          "source": "fs",
+          "items": [
+            {
+              "name": "readFileSync",
+              "imported": "readFileSync",
+              "type": "named"
+            }
+          ],
+          "line": 18
+        },
+        {
+          "source": "url",
+          "items": [
+            {
+              "name": "fileURLToPath",
+              "imported": "fileURLToPath",
+              "type": "named"
+            }
+          ],
+          "line": 19
+        },
+        {
+          "source": "path",
+          "items": [
+            {
+              "name": "dirname",
+              "imported": "dirname",
+              "type": "named"
+            },
+            {
+              "name": "join",
+              "imported": "join",
+              "type": "named"
+            }
+          ],
+          "line": 20
         }
       ],
       "interfaces": [],
       "types": [],
-      "loc": 116
+      "loc": 125
     },
     {
       "id": "src\\agents\\coder.js",
@@ -313,7 +351,7 @@
       "id": "src\\agents\\orchestrator.js",
       "file": "src\\agents\\orchestrator.js",
       "type": "module",
-      "hash": "1ee7edad7ccab7637f1a690bcec760a9",
+      "hash": "343c6d583a8a69f0ac4e80cb2851d885",
       "exports": [
         "Orchestrator",
         "createOrchestrator"
@@ -324,7 +362,7 @@
           "params": [
             "context"
           ],
-          "line": 234,
+          "line": 273,
           "async": false
         }
       ],
@@ -348,31 +386,31 @@
               "name": "executeWithRetry",
               "kind": "method",
               "static": false,
-              "line": 108
+              "line": 147
             },
             {
               "name": "executeStepByStep",
               "kind": "method",
               "static": false,
-              "line": 141
+              "line": 180
             },
             {
               "name": "log",
               "kind": "method",
               "static": false,
-              "line": 186
+              "line": 225
             },
             {
               "name": "getSummary",
               "kind": "method",
               "static": false,
-              "line": 200
+              "line": 239
             },
             {
               "name": "clearLog",
               "kind": "method",
               "static": false,
-              "line": 226
+              "line": 265
             }
           ],
           "line": 14
@@ -426,13 +464,13 @@
       ],
       "interfaces": [],
       "types": [],
-      "loc": 237
+      "loc": 276
     },
     {
       "id": "src\\agents\\planner.js",
       "file": "src\\agents\\planner.js",
       "type": "module",
-      "hash": "8041b62cfb2d284b20466b3b14dcf246",
+      "hash": "291dc3bd1ee6accc3585e7b999ff1d19",
       "exports": [
         "PlannerAgent"
       ],
@@ -445,70 +483,82 @@
               "name": "constructor",
               "kind": "constructor",
               "static": false,
-              "line": 7
+              "line": 9
             },
             {
               "name": "createPlan",
               "kind": "method",
               "static": false,
-              "line": 16
+              "line": 19
             },
             {
               "name": "parseIntent",
               "kind": "method",
               "static": false,
-              "line": 69
+              "line": 110
             },
             {
               "name": "identifyAffectedFiles",
               "kind": "method",
               "static": false,
-              "line": 112
+              "line": 153
             },
             {
               "name": "identifyDependencies",
               "kind": "method",
               "static": false,
-              "line": 141
+              "line": 182
             },
             {
               "name": "createSteps",
               "kind": "method",
               "static": false,
-              "line": 164
+              "line": 205
             },
             {
               "name": "assessRisks",
               "kind": "method",
               "static": false,
-              "line": 201
+              "line": 242
             },
             {
               "name": "calculatePlanConfidence",
               "kind": "method",
               "static": false,
-              "line": 245
+              "line": 286
             },
             {
               "name": "validatePlan",
               "kind": "method",
               "static": false,
-              "line": 270
+              "line": 311
             }
           ],
-          "line": 6
+          "line": 8
         }
       ],
-      "imports": [],
+      "imports": [
+        {
+          "source": "src/retrieval/historyRetriever.js",
+          "items": [
+            {
+              "name": "HistoryRetriever",
+              "imported": "HistoryRetriever",
+              "type": "named"
+            }
+          ],
+          "line": 1
+        }
+      ],
       "interfaces": [],
       "types": [],
-      "loc": 306
+      "loc": 347
     },
     {
       "id": "src\\agents\\retriever.js",
       "file": "src\\agents\\retriever.js",
       "type": "module",
-      "hash": "f168a75b1a0153f7d75b04512c604342",
+      "hash": "fec154bdd0934ecdae9016638bdc3687",
       "exports": [
         "RetrieverAgent"
       ],
@@ -521,52 +571,64 @@
               "name": "constructor",
               "kind": "constructor",
               "static": false,
-              "line": 7
+              "line": 9
             },
             {
               "name": "retrieveContext",
               "kind": "method",
               "static": false,
-              "line": 17
+              "line": 20
             },
             {
               "name": "retrieveFile",
               "kind": "method",
               "static": false,
-              "line": 62
+              "line": 65
             },
             {
               "name": "retrieveSymbols",
               "kind": "method",
               "static": false,
-              "line": 92
+              "line": 98
             },
             {
               "name": "generateSummaries",
               "kind": "method",
               "static": false,
-              "line": 128
+              "line": 134
             },
             {
               "name": "getTemperature",
               "kind": "method",
               "static": false,
-              "line": 158
+              "line": 164
             },
             {
               "name": "retrieveByQuery",
               "kind": "method",
               "static": false,
-              "line": 171
+              "line": 177
             }
           ],
-          "line": 6
+          "line": 8
         }
       ],
-      "imports": [],
+      "imports": [
+        {
+          "source": "src/retrieval/historyRetriever.js",
+          "items": [
+            {
+              "name": "HistoryRetriever",
+              "imported": "HistoryRetriever",
+              "type": "named"
+            }
+          ],
+          "line": 1
+        }
+      ],
       "interfaces": [],
       "types": [],
-      "loc": 201
+      "loc": 207
     },
     {
       "id": "src\\agents\\validator.js",
@@ -853,7 +915,7 @@
       "id": "src\\checksum\\invalidation.js",
       "file": "src\\checksum\\invalidation.js",
       "type": "module",
-      "hash": "f8c97e3cc3ce919d517f10032697149b",
+      "hash": "9ce49c3146d57d6dcb52e284ee39f692",
       "exports": [
         "InvalidationStrategy",
         "createInvalidationStrategy",
@@ -862,17 +924,23 @@
       ],
       "functions": [
         {
+          "name": "loadHistoryQueryCache",
+          "params": [],
+          "line": 9,
+          "async": false
+        },
+        {
           "name": "createInvalidationStrategy",
           "params": [
             "checksumEngine"
           ],
-          "line": 217,
+          "line": 244,
           "async": false
         },
         {
           "name": "createCacheManager",
           "params": [],
-          "line": 285,
+          "line": 312,
           "async": false
         }
       ],
@@ -884,70 +952,70 @@
               "name": "constructor",
               "kind": "constructor",
               "static": false,
-              "line": 10
+              "line": 23
             },
             {
               "name": "checkInvalidation",
               "kind": "method",
               "static": false,
-              "line": 18
+              "line": 31
             },
             {
               "name": "executeInvalidation",
               "kind": "method",
               "static": false,
-              "line": 67
+              "line": 94
             },
             {
               "name": "_invalidateRepository",
               "kind": "method",
               "static": false,
-              "line": 111
+              "line": 138
             },
             {
               "name": "_invalidateGraph",
               "kind": "method",
               "static": false,
-              "line": 120
+              "line": 147
             },
             {
               "name": "_invalidateSymbols",
               "kind": "method",
               "static": false,
-              "line": 129
+              "line": 156
             },
             {
               "name": "_invalidateFiles",
               "kind": "method",
               "static": false,
-              "line": 138
+              "line": 165
             },
             {
               "name": "_invalidateModules",
               "kind": "method",
               "static": false,
-              "line": 149
+              "line": 176
             },
             {
               "name": "_invalidateWorkingMemory",
               "kind": "method",
               "static": false,
-              "line": 160
+              "line": 187
             },
             {
               "name": "_invalidateSummaries",
               "kind": "method",
               "static": false,
-              "line": 170
+              "line": 197
             },
             {
               "name": "getReport",
               "kind": "method",
               "static": false,
-              "line": 179
+              "line": 206
             }
           ],
-          "line": 9
+          "line": 22
         },
         {
           "name": "CacheManager",
@@ -956,49 +1024,71 @@
               "name": "constructor",
               "kind": "constructor",
               "static": false,
-              "line": 225
+              "line": 252
             },
             {
               "name": "getCache",
               "kind": "method",
               "static": false,
-              "line": 240
+              "line": 267
             },
             {
               "name": "setCache",
               "kind": "method",
               "static": false,
-              "line": 247
+              "line": 274
             },
             {
               "name": "clearAll",
               "kind": "method",
               "static": false,
-              "line": 254
+              "line": 281
             },
             {
               "name": "getStats",
               "kind": "method",
               "static": false,
-              "line": 265
+              "line": 292
             }
           ],
-          "line": 224
+          "line": 251
         }
       ],
-      "imports": [],
+      "imports": [
+        {
+          "source": "fs",
+          "items": [
+            {
+              "name": "fsSync",
+              "type": "default"
+            }
+          ],
+          "line": 1
+        },
+        {
+          "source": "path",
+          "items": [
+            {
+              "name": "path",
+              "type": "default"
+            }
+          ],
+          "line": 2
+        }
+      ],
       "interfaces": [],
       "types": [],
-      "loc": 288
+      "loc": 315
     },
     {
       "id": "src\\commands\\config.js",
       "file": "src\\commands\\config.js",
       "type": "module",
-      "hash": "0baa1d41ad0cc503072a0eb11c968597",
+      "hash": "26e29acdb9b6ba81fc29dc39a167fc04",
       "exports": [
         "configCommand",
-        "getApiKey"
+        "getApiKey",
+        "getHistoryConfig"
       ],
       "functions": [
         {
@@ -1032,7 +1122,13 @@
         {
           "name": "getApiKey",
           "params": [],
-          "line": 58,
+          "line": 89,
+          "async": true
+        },
+        {
+          "name": "getHistoryConfig",
+          "params": [],
+          "line": 94,
           "async": true
         }
       ],
@@ -1081,7 +1177,7 @@
       ],
       "interfaces": [],
       "types": [],
-      "loc": 62
+      "loc": 110
     },
     {
       "id": "src\\commands\\health.js",
@@ -1529,7 +1625,7 @@
       "id": "src\\commands\\scan.js",
       "file": "src\\commands\\scan.js",
       "type": "module",
-      "hash": "0df4a5b134b4b3752e8c33cb74c7babb",
+      "hash": "c7ae482815737e34c232e2e33044f2ec",
       "exports": [
         "scanCommand"
       ],
@@ -1539,7 +1635,7 @@
           "params": [
             "options"
           ],
-          "line": 13,
+          "line": 18,
           "async": true
         },
         {
@@ -1549,7 +1645,7 @@
             "graph",
             "gitInfo"
           ],
-          "line": 224,
+          "line": 265,
           "async": true
         },
         {
@@ -1557,9 +1653,10 @@
           "params": [
             "files",
             "gitInfo",
-            "graph"
+            "graph",
+            "historyContext"
           ],
-          "line": 294,
+          "line": 335,
           "async": false
         },
         {
@@ -1569,9 +1666,10 @@
             "graph",
             "gitInfo",
             "previousMemory",
-            "files"
+            "files",
+            "historyContext"
           ],
-          "line": 302,
+          "line": 343,
           "async": false
         },
         {
@@ -1579,7 +1677,7 @@
           "params": [
             "response"
           ],
-          "line": 359,
+          "line": 408,
           "async": true
         },
         {
@@ -1588,7 +1686,7 @@
             "memory",
             "graph"
           ],
-          "line": 406,
+          "line": 457,
           "async": false
         },
         {
@@ -1597,7 +1695,7 @@
             "memory",
             "options"
           ],
-          "line": 483,
+          "line": 534,
           "async": false
         },
         {
@@ -1605,7 +1703,7 @@
           "params": [
             "files"
           ],
-          "line": 542,
+          "line": 593,
           "async": false
         },
         {
@@ -1613,7 +1711,7 @@
           "params": [
             "files"
           ],
-          "line": 558,
+          "line": 609,
           "async": false
         }
       ],
@@ -1709,6 +1807,11 @@
               "name": "getApiKey",
               "imported": "getApiKey",
               "type": "named"
+            },
+            {
+              "name": "getHistoryConfig",
+              "imported": "getHistoryConfig",
+              "type": "named"
             }
           ],
           "line": 8
@@ -1792,6 +1895,50 @@
           "line": 11
         },
         {
+          "source": "src/retrieval/historyRetriever.js",
+          "items": [
+            {
+              "name": "HistoryRetriever",
+              "imported": "HistoryRetriever",
+              "type": "named"
+            }
+          ],
+          "line": 12
+        },
+        {
+          "source": "src/validation/historyValidator.js",
+          "items": [
+            {
+              "name": "validateHistoryClaims",
+              "imported": "validateHistoryClaims",
+              "type": "named"
+            }
+          ],
+          "line": 13
+        },
+        {
+          "source": "src/checksum/checksumEngine.js",
+          "items": [
+            {
+              "name": "createChecksumEngine",
+              "imported": "createChecksumEngine",
+              "type": "named"
+            }
+          ],
+          "line": 14
+        },
+        {
+          "source": "src/checksum/invalidation.js",
+          "items": [
+            {
+              "name": "createInvalidationStrategy",
+              "imported": "createInvalidationStrategy",
+              "type": "named"
+            }
+          ],
+          "line": 15
+        },
+        {
           "source": "path",
           "items": [
             {
@@ -1799,12 +1946,12 @@
               "type": "default"
             }
           ],
-          "line": 591
+          "line": 16
         }
       ],
       "interfaces": [],
       "types": [],
-      "loc": 592
+      "loc": 641
     },
     {
       "id": "src\\commands\\status.js",
@@ -2415,7 +2562,7 @@
       "id": "src\\dashboard\\dashboardFormatter.js",
       "file": "src\\dashboard\\dashboardFormatter.js",
       "type": "module",
-      "hash": "4555e7b952352d88d064f9b43b9ec577",
+      "hash": "db79463542a92db5091514d2cd93438a",
       "exports": [
         "formatHealthReport",
         "formatHealthSummary"
@@ -2434,7 +2581,7 @@
           "params": [
             "overall"
           ],
-          "line": 84,
+          "line": 90,
           "async": false
         },
         {
@@ -2442,7 +2589,7 @@
           "params": [
             "godFiles"
           ],
-          "line": 109,
+          "line": 115,
           "async": false
         },
         {
@@ -2450,7 +2597,7 @@
           "params": [
             "cycles"
           ],
-          "line": 136,
+          "line": 142,
           "async": false
         },
         {
@@ -2458,7 +2605,7 @@
           "params": [
             "drift"
           ],
-          "line": 167,
+          "line": 173,
           "async": false
         },
         {
@@ -2466,7 +2613,7 @@
           "params": [
             "bottlenecks"
           ],
-          "line": 206,
+          "line": 212,
           "async": false
         },
         {
@@ -2474,7 +2621,7 @@
           "params": [
             "unstable"
           ],
-          "line": 231,
+          "line": 237,
           "async": false
         },
         {
@@ -2482,7 +2629,7 @@
           "params": [
             "orphaned"
           ],
-          "line": 256,
+          "line": 262,
           "async": false
         },
         {
@@ -2490,7 +2637,7 @@
           "params": [
             "hotspots"
           ],
-          "line": 279,
+          "line": 285,
           "async": false
         },
         {
@@ -2498,7 +2645,7 @@
           "params": [
             "recommendations"
           ],
-          "line": 304,
+          "line": 310,
           "async": false
         },
         {
@@ -2506,7 +2653,7 @@
           "params": [
             "score"
           ],
-          "line": 340,
+          "line": 346,
           "async": false
         },
         {
@@ -2514,7 +2661,7 @@
           "params": [
             "status"
           ],
-          "line": 351,
+          "line": 357,
           "async": false
         },
         {
@@ -2522,7 +2669,7 @@
           "params": [
             "severity"
           ],
-          "line": 365,
+          "line": 371,
           "async": false
         },
         {
@@ -2530,7 +2677,7 @@
           "params": [
             "priority"
           ],
-          "line": 378,
+          "line": 384,
           "async": false
         },
         {
@@ -2538,7 +2685,15 @@
           "params": [
             "report"
           ],
-          "line": 391,
+          "line": 397,
+          "async": false
+        },
+        {
+          "name": "formatHistoryGrounding",
+          "params": [
+            "metrics"
+          ],
+          "line": 421,
           "async": false
         }
       ],
@@ -2557,13 +2712,13 @@
       ],
       "interfaces": [],
       "types": [],
-      "loc": 409
+      "loc": 449
     },
     {
       "id": "src\\dashboard\\healthDashboard.js",
       "file": "src\\dashboard\\healthDashboard.js",
       "type": "module",
-      "hash": "e2a2ee9dce17fb3f4e9b704986e81ef5",
+      "hash": "488eb5a1b95ce0171f131e9f45ea82ce",
       "exports": [
         "HealthDashboard",
         "createHealthDashboard"
@@ -2574,7 +2729,7 @@
           "params": [
             "context"
           ],
-          "line": 498,
+          "line": 513,
           "async": false
         }
       ],
@@ -2586,130 +2741,148 @@
               "name": "constructor",
               "kind": "constructor",
               "static": false,
-              "line": 10
+              "line": 12
             },
             {
               "name": "generateReport",
               "kind": "method",
               "static": false,
-              "line": 20
+              "line": 22
+            },
+            {
+              "name": "getHistoryGroundingMetrics",
+              "kind": "method",
+              "static": false,
+              "line": 46
             },
             {
               "name": "getOverallHealth",
               "kind": "method",
               "static": false,
-              "line": 43
+              "line": 58
             },
             {
               "name": "identifyGodFiles",
               "kind": "method",
               "static": false,
-              "line": 98
+              "line": 113
             },
             {
               "name": "findCircularDependencies",
               "kind": "method",
               "static": false,
-              "line": 130
+              "line": 145
             },
             {
               "name": "detectArchitectureDrift",
               "kind": "method",
               "static": false,
-              "line": 144
+              "line": 159
             },
             {
               "name": "identifyBottlenecks",
               "kind": "method",
               "static": false,
-              "line": 225
+              "line": 240
             },
             {
               "name": "findUnstableModules",
               "kind": "method",
               "static": false,
-              "line": 252
+              "line": 267
             },
             {
               "name": "findOrphanedFiles",
               "kind": "method",
               "static": false,
-              "line": 278
+              "line": 293
             },
             {
               "name": "identifyComplexityHotspots",
               "kind": "method",
               "static": false,
-              "line": 298
+              "line": 313
             },
             {
               "name": "generateRecommendations",
               "kind": "method",
               "static": false,
-              "line": 335
+              "line": 350
             },
             {
               "name": "getFileLayer",
               "kind": "method",
               "static": false,
-              "line": 414
+              "line": 429
             },
             {
               "name": "getHealthGrade",
               "kind": "method",
               "static": false,
-              "line": 426
+              "line": 441
             },
             {
               "name": "getHealthStatus",
               "kind": "method",
               "static": false,
-              "line": 437
+              "line": 452
             },
             {
               "name": "getGodFileSeverity",
               "kind": "method",
               "static": false,
-              "line": 448
+              "line": 463
             },
             {
               "name": "getCycleSeverity",
               "kind": "method",
               "static": false,
-              "line": 458
+              "line": 473
             },
             {
               "name": "getBottleneckSeverity",
               "kind": "method",
               "static": false,
-              "line": 467
+              "line": 482
             },
             {
               "name": "getInstabilitySeverity",
               "kind": "method",
               "static": false,
-              "line": 477
+              "line": 492
             },
             {
               "name": "getComplexitySeverity",
               "kind": "method",
               "static": false,
-              "line": 487
+              "line": 502
             }
           ],
-          "line": 9
+          "line": 11
         }
       ],
-      "imports": [],
+      "imports": [
+        {
+          "source": "src/trust/trustMeter.js",
+          "items": [
+            {
+              "name": "TrustMeter",
+              "imported": "TrustMeter",
+              "type": "named"
+            }
+          ],
+          "line": 1
+        }
+      ],
       "interfaces": [],
       "types": [],
-      "loc": 502
+      "loc": 517
     },
     {
       "id": "src\\graph\\graphEngine.js",
       "file": "src\\graph\\graphEngine.js",
       "type": "module",
-      "hash": "00f1f90b693dabe52c5372818eb0b313",
+      "hash": "dcbb845d86316d20ba9ad597b19e3570",
       "exports": [
         "GraphEngine",
         "createGraphEngine"
@@ -2721,7 +2894,7 @@
             "id",
             "depth"
           ],
-          "line": 111,
+          "line": 142,
           "async": false
         },
         {
@@ -2730,7 +2903,7 @@
             "id",
             "depth"
           ],
-          "line": 135,
+          "line": 166,
           "async": false
         },
         {
@@ -2739,7 +2912,7 @@
             "nodeId",
             "path"
           ],
-          "line": 189,
+          "line": 220,
           "async": false
         },
         {
@@ -2747,7 +2920,7 @@
           "params": [
             "nodeId"
           ],
-          "line": 227,
+          "line": 258,
           "async": false
         },
         {
@@ -2756,7 +2929,7 @@
             "nodeId",
             "component"
           ],
-          "line": 248,
+          "line": 279,
           "async": false
         },
         {
@@ -2764,7 +2937,7 @@
           "params": [
             "graph"
           ],
-          "line": 336,
+          "line": 367,
           "async": false
         }
       ],
@@ -2779,94 +2952,106 @@
               "line": 7
             },
             {
-              "name": "_buildAdjacencyList",
+              "name": "addNode",
               "kind": "method",
               "static": false,
               "line": 17
             },
             {
+              "name": "addEdge",
+              "kind": "method",
+              "static": false,
+              "line": 31
+            },
+            {
+              "name": "_buildAdjacencyList",
+              "kind": "method",
+              "static": false,
+              "line": 48
+            },
+            {
               "name": "_buildReverseAdjacencyList",
               "kind": "method",
               "static": false,
-              "line": 36
+              "line": 67
             },
             {
               "name": "getNode",
               "kind": "method",
               "static": false,
-              "line": 55
+              "line": 86
             },
             {
               "name": "getAllNodes",
               "kind": "method",
               "static": false,
-              "line": 62
+              "line": 93
             },
             {
               "name": "getOutgoingEdges",
               "kind": "method",
               "static": false,
-              "line": 69
+              "line": 100
             },
             {
               "name": "getIncomingEdges",
               "kind": "method",
               "static": false,
-              "line": 76
+              "line": 107
             },
             {
               "name": "getDirectDependencies",
               "kind": "method",
               "static": false,
-              "line": 83
+              "line": 114
             },
             {
               "name": "getDirectDependents",
               "kind": "method",
               "static": false,
-              "line": 95
+              "line": 126
             },
             {
               "name": "getTransitiveDependencies",
               "kind": "method",
               "static": false,
-              "line": 107
+              "line": 138
             },
             {
               "name": "getTransitiveDependents",
               "kind": "method",
               "static": false,
-              "line": 131
+              "line": 162
             },
             {
               "name": "findPath",
               "kind": "method",
               "static": false,
-              "line": 155
+              "line": 186
             },
             {
               "name": "detectCircularDependencies",
               "kind": "method",
               "static": false,
-              "line": 184
+              "line": 215
             },
             {
               "name": "getStronglyConnectedComponents",
               "kind": "method",
               "static": false,
-              "line": 222
+              "line": 253
             },
             {
               "name": "getNodeMetrics",
               "kind": "method",
               "static": false,
-              "line": 276
+              "line": 307
             },
             {
               "name": "getStats",
               "kind": "method",
               "static": false,
-              "line": 301
+              "line": 332
             }
           ],
           "line": 6
@@ -2875,7 +3060,7 @@
       "imports": [],
       "interfaces": [],
       "types": [],
-      "loc": 339
+      "loc": 370
     },
     {
       "id": "src\\graph\\impactAnalysis.js",
@@ -4292,7 +4477,7 @@
       "id": "src\\retrieval\\graphRetriever.js",
       "file": "src\\retrieval\\graphRetriever.js",
       "type": "module",
-      "hash": "e178c441de36855df888dde8c4c89849",
+      "hash": "2ff82c4a95dfa0b04c57c68ee23143ac",
       "exports": [
         "GraphRetriever"
       ],
@@ -4335,49 +4520,61 @@
               "name": "getGodNodes",
               "kind": "method",
               "static": false,
-              "line": 166
+              "line": 168
             },
             {
               "name": "retrieveByConnectivity",
               "kind": "method",
               "static": false,
-              "line": 184
+              "line": 186
             },
             {
               "name": "retrieveByPathDistance",
               "kind": "method",
               "static": false,
-              "line": 215
+              "line": 217
             },
             {
               "name": "retrieveSubgraph",
               "kind": "method",
               "static": false,
-              "line": 251
+              "line": 253
+            },
+            {
+              "name": "findRelatedFiles",
+              "kind": "method",
+              "static": false,
+              "line": 303
+            },
+            {
+              "name": "getCriticalPath",
+              "kind": "method",
+              "static": false,
+              "line": 340
             },
             {
               "name": "extractFilePatterns",
               "kind": "method",
               "static": false,
-              "line": 301
+              "line": 354
             },
             {
               "name": "isCommonWord",
               "kind": "method",
               "static": false,
-              "line": 326
+              "line": 379
             },
             {
               "name": "matchesPattern",
               "kind": "method",
               "static": false,
-              "line": 337
+              "line": 390
             },
             {
               "name": "getGraphStats",
               "kind": "method",
               "static": false,
-              "line": 347
+              "line": 400
             }
           ],
           "line": 6
@@ -4386,7 +4583,132 @@
       "imports": [],
       "interfaces": [],
       "types": [],
-      "loc": 351
+      "loc": 404
+    },
+    {
+      "id": "src\\retrieval\\historyRetriever.js",
+      "file": "src\\retrieval\\historyRetriever.js",
+      "type": "module",
+      "hash": "508aab4dfda96922c2b1d924f6a3aa26",
+      "exports": [
+        "HistoryRetriever"
+      ],
+      "functions": [],
+      "classes": [
+        {
+          "name": "HistoryRetriever",
+          "methods": [
+            {
+              "name": "constructor",
+              "kind": "constructor",
+              "static": false,
+              "line": 14
+            },
+            {
+              "name": "isAvailable",
+              "kind": "method",
+              "static": false,
+              "line": 24
+            },
+            {
+              "name": "retrieveForFile",
+              "kind": "method",
+              "static": false,
+              "line": 41
+            },
+            {
+              "name": "retrieveForChangedFiles",
+              "kind": "method",
+              "static": false,
+              "line": 79
+            },
+            {
+              "name": "searchHistory",
+              "kind": "method",
+              "static": false,
+              "line": 121
+            },
+            {
+              "name": "formatForPrompt",
+              "kind": "method",
+              "static": false,
+              "line": 146
+            },
+            {
+              "name": "loadHistoryCache",
+              "kind": "method",
+              "static": false,
+              "line": 170
+            },
+            {
+              "name": "saveHistoryCache",
+              "kind": "method",
+              "static": false,
+              "line": 180
+            },
+            {
+              "name": "loadQueryCache",
+              "kind": "method",
+              "static": false,
+              "line": 190
+            },
+            {
+              "name": "saveQueryCache",
+              "kind": "method",
+              "static": false,
+              "line": 200
+            }
+          ],
+          "line": 13
+        }
+      ],
+      "imports": [
+        {
+          "source": "child_process",
+          "items": [
+            {
+              "name": "execFile",
+              "imported": "execFile",
+              "type": "named"
+            }
+          ],
+          "line": 1
+        },
+        {
+          "source": "util",
+          "items": [
+            {
+              "name": "promisify",
+              "imported": "promisify",
+              "type": "named"
+            }
+          ],
+          "line": 2
+        },
+        {
+          "source": "fs/promises",
+          "items": [
+            {
+              "name": "fs",
+              "type": "default"
+            }
+          ],
+          "line": 3
+        },
+        {
+          "source": "path",
+          "items": [
+            {
+              "name": "path",
+              "type": "default"
+            }
+          ],
+          "line": 4
+        }
+      ],
+      "interfaces": [],
+      "types": [],
+      "loc": 210
     },
     {
       "id": "src\\retrieval\\hybridRetriever.js",
@@ -4525,7 +4847,7 @@
       "id": "src\\scoring\\confidenceScorer.js",
       "file": "src\\scoring\\confidenceScorer.js",
       "type": "module",
-      "hash": "698b5ed194ecbcddbd43ea6da5032fa6",
+      "hash": "eee32c84e8367afa94c63bd83481315f",
       "exports": [
         "calculateConfidence",
         "calculateSymbolCoverage",
@@ -4623,7 +4945,7 @@
             "graph",
             "registry"
           ],
-          "line": 217,
+          "line": 226,
           "async": false
         },
         {
@@ -4631,7 +4953,7 @@
           "params": [
             "confidence"
           ],
-          "line": 250,
+          "line": 266,
           "async": false
         },
         {
@@ -4639,7 +4961,7 @@
           "params": [
             "confidence"
           ],
-          "line": 266,
+          "line": 282,
           "async": false
         },
         {
@@ -4647,13 +4969,13 @@
           "params": [
             "confidence"
           ],
-          "line": 285,
+          "line": 301,
           "async": false
         },
         {
           "name": "createConfidenceTracker",
           "params": [],
-          "line": 401,
+          "line": 417,
           "async": false
         }
       ],
@@ -4665,40 +4987,40 @@
               "name": "constructor",
               "kind": "constructor",
               "static": false,
-              "line": 320
+              "line": 336
             },
             {
               "name": "record",
               "kind": "method",
               "static": false,
-              "line": 328
+              "line": 344
             },
             {
               "name": "getAverage",
               "kind": "method",
               "static": false,
-              "line": 344
+              "line": 360
             },
             {
               "name": "getTrend",
               "kind": "method",
               "static": false,
-              "line": 354
+              "line": 370
             },
             {
               "name": "getStats",
               "kind": "method",
               "static": false,
-              "line": 375
+              "line": 391
             }
           ],
-          "line": 319
+          "line": 335
         }
       ],
       "imports": [],
       "interfaces": [],
       "types": [],
-      "loc": 404
+      "loc": 420
     },
     {
       "id": "src\\scoring\\metrics.js",
@@ -5511,7 +5833,7 @@
       "id": "src\\trust\\trustMeter.js",
       "file": "src\\trust\\trustMeter.js",
       "type": "module",
-      "hash": "0198c1da05772c74debbbe42635f13fd",
+      "hash": "0919a3bd1204dbf939fa77ab124177a6",
       "exports": [
         "TrustMeter",
         "createTrustMeter"
@@ -5522,7 +5844,7 @@
           "params": [
             "context"
           ],
-          "line": 556,
+          "line": 619,
           "async": false
         }
       ],
@@ -5534,106 +5856,156 @@
               "name": "constructor",
               "kind": "constructor",
               "static": false,
-              "line": 10
+              "line": 14
             },
             {
               "name": "generateReport",
               "kind": "method",
               "static": false,
-              "line": 21
+              "line": 25
+            },
+            {
+              "name": "getHistoryCitationMetrics",
+              "kind": "method",
+              "static": false,
+              "line": 48
             },
             {
               "name": "getOverallTrust",
               "kind": "method",
               "static": false,
-              "line": 44
+              "line": 81
             },
             {
               "name": "getSymbolVerificationMetrics",
               "kind": "method",
               "static": false,
-              "line": 118
+              "line": 168
             },
             {
               "name": "getImportValidationMetrics",
               "kind": "method",
               "static": false,
-              "line": 157
+              "line": 207
             },
             {
               "name": "getHallucinationRisk",
               "kind": "method",
               "static": false,
-              "line": 232
+              "line": 282
             },
             {
               "name": "getValidationHistory",
               "kind": "method",
               "static": false,
-              "line": 301
+              "line": 364
             },
             {
               "name": "getTrustTrend",
               "kind": "method",
               "static": false,
-              "line": 326
+              "line": 389
             },
             {
               "name": "getVerifiedSymbols",
               "kind": "method",
               "static": false,
-              "line": 351
+              "line": 414
             },
             {
               "name": "getUnverifiedSymbols",
               "kind": "method",
               "static": false,
-              "line": 391
+              "line": 454
             },
             {
               "name": "generateRecommendations",
               "kind": "method",
               "static": false,
-              "line": 427
+              "line": 490
             },
             {
               "name": "countOrphanedFiles",
               "kind": "method",
               "static": false,
-              "line": 493
+              "line": 556
             },
             {
               "name": "getTrustGrade",
               "kind": "method",
               "static": false,
-              "line": 509
+              "line": 572
             },
             {
               "name": "getTrustLevel",
               "kind": "method",
               "static": false,
-              "line": 523
+              "line": 586
             },
             {
               "name": "getTrustStatus",
               "kind": "method",
               "static": false,
-              "line": 535
+              "line": 598
             },
             {
               "name": "getRiskLevel",
               "kind": "method",
               "static": false,
-              "line": 545
+              "line": 608
             }
           ],
-          "line": 9
+          "line": 13
         }
       ],
-      "imports": [],
+      "imports": [
+        {
+          "source": "src/validation/historyValidator.js",
+          "items": [
+            {
+              "name": "validateHistoryClaims",
+              "imported": "validateHistoryClaims",
+              "type": "named"
+            }
+          ],
+          "line": 1
+        },
+        {
+          "source": "src/retrieval/historyRetriever.js",
+          "items": [
+            {
+              "name": "HistoryRetriever",
+              "imported": "HistoryRetriever",
+              "type": "named"
+            }
+          ],
+          "line": 2
+        },
+        {
+          "source": "src/utils/fileUtils.js",
+          "items": [
+            {
+              "name": "getRecallPath",
+              "imported": "getRecallPath",
+              "type": "named"
+            },
+            {
+              "name": "fileExists",
+              "imported": "fileExists",
+              "type": "named"
+            },
+            {
+              "name": "readFile",
+              "imported": "readFile",
+              "type": "named"
+            }
+          ],
+          "line": 3
+        }
+      ],
       "interfaces": [],
       "types": [],
-      "loc": 559
+      "loc": 622
     },
     {
       "id": "src\\utils\\assembler.js",
@@ -6256,7 +6628,7 @@
       "id": "src\\utils\\prompt.js",
       "file": "src\\utils\\prompt.js",
       "type": "module",
-      "hash": "fd2247cc733cb51a157b1675f38055f9",
+      "hash": "c1fe02173e3daecd5bfabd2a8703e028",
       "exports": [
         "buildGeminiPrompt"
       ],
@@ -6266,7 +6638,8 @@
           "params": [
             "files",
             "gitInfo",
-            "graphSummary"
+            "graphSummary",
+            "historyContext"
           ],
           "line": 3,
           "async": false
@@ -6288,7 +6661,7 @@
       ],
       "interfaces": [],
       "types": [],
-      "loc": 136
+      "loc": 144
     },
     {
       "id": "src\\utils\\scanner.js",
@@ -6371,6 +6744,31 @@
       "interfaces": [],
       "types": [],
       "loc": 140
+    },
+    {
+      "id": "src\\validation\\historyValidator.js",
+      "file": "src\\validation\\historyValidator.js",
+      "type": "module",
+      "hash": "434487ad0756c17273d0f8c4548c2839",
+      "exports": [
+        "validateHistoryClaims"
+      ],
+      "functions": [
+        {
+          "name": "validateHistoryClaims",
+          "params": [
+            "memoryDraftText",
+            "historyRetriever"
+          ],
+          "line": 9,
+          "async": true
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "interfaces": [],
+      "types": [],
+      "loc": 109
     },
     {
       "id": "src\\validation\\importValidator.js",
@@ -7350,6 +7748,170 @@
       "loc": 235
     },
     {
+      "id": "test-history-grounding.js",
+      "file": "test-history-grounding.js",
+      "type": "module",
+      "hash": "6663ebc1c95097cb18d8d0787b228b43",
+      "exports": [],
+      "functions": [
+        {
+          "name": "runTests",
+          "params": [],
+          "line": 40,
+          "async": true
+        }
+      ],
+      "classes": [
+        {
+          "name": "MockHistoryRetriever",
+          "methods": [
+            {
+              "name": "constructor",
+              "kind": "constructor",
+              "static": false,
+              "line": 20
+            },
+            {
+              "name": "isAvailable",
+              "kind": "method",
+              "static": false,
+              "line": 26
+            },
+            {
+              "name": "retrieveForFile",
+              "kind": "method",
+              "static": false,
+              "line": 30
+            },
+            {
+              "name": "searchHistory",
+              "kind": "method",
+              "static": false,
+              "line": 34
+            }
+          ],
+          "line": 19
+        }
+      ],
+      "imports": [
+        {
+          "source": "src/retrieval/historyRetriever.js",
+          "items": [
+            {
+              "name": "HistoryRetriever",
+              "imported": "HistoryRetriever",
+              "type": "named"
+            }
+          ],
+          "line": 7
+        },
+        {
+          "source": "src/validation/historyValidator.js",
+          "items": [
+            {
+              "name": "validateHistoryClaims",
+              "imported": "validateHistoryClaims",
+              "type": "named"
+            }
+          ],
+          "line": 8
+        },
+        {
+          "source": "src/checksum/invalidation.js",
+          "items": [
+            {
+              "name": "InvalidationStrategy",
+              "imported": "InvalidationStrategy",
+              "type": "named"
+            }
+          ],
+          "line": 9
+        },
+        {
+          "source": "src/trust/trustMeter.js",
+          "items": [
+            {
+              "name": "TrustMeter",
+              "imported": "TrustMeter",
+              "type": "named"
+            }
+          ],
+          "line": 10
+        },
+        {
+          "source": "src/scoring/confidenceScorer.js",
+          "items": [
+            {
+              "name": "calculateEditConfidence",
+              "imported": "calculateEditConfidence",
+              "type": "named"
+            },
+            {
+              "name": "calculateGenerationConfidence",
+              "imported": "calculateGenerationConfidence",
+              "type": "named"
+            }
+          ],
+          "line": 11
+        },
+        {
+          "source": "src/graph/graphEngine.js",
+          "items": [
+            {
+              "name": "GraphEngine",
+              "imported": "GraphEngine",
+              "type": "named"
+            }
+          ],
+          "line": 12
+        },
+        {
+          "source": "src/registry/symbolRegistry.js",
+          "items": [
+            {
+              "name": "SymbolRegistry",
+              "imported": "SymbolRegistry",
+              "type": "named"
+            }
+          ],
+          "line": 13
+        },
+        {
+          "source": "assert",
+          "items": [
+            {
+              "name": "assert",
+              "type": "default"
+            }
+          ],
+          "line": 14
+        },
+        {
+          "source": "fs",
+          "items": [
+            {
+              "name": "fsSync",
+              "type": "default"
+            }
+          ],
+          "line": 15
+        },
+        {
+          "source": "path",
+          "items": [
+            {
+              "name": "path",
+              "type": "default"
+            }
+          ],
+          "line": 16
+        }
+      ],
+      "interfaces": [],
+      "types": [],
+      "loc": 228
+    },
+    {
       "id": "test-hybrid-retrieval.js",
       "file": "test-hybrid-retrieval.js",
       "type": "module",
@@ -8241,6 +8803,34 @@
       "line": 16
     },
     {
+      "from": "bin\\memo.js",
+      "to": "fs",
+      "type": "imports",
+      "items": [
+        "readFileSync"
+      ],
+      "line": 18
+    },
+    {
+      "from": "bin\\memo.js",
+      "to": "url",
+      "type": "imports",
+      "items": [
+        "fileURLToPath"
+      ],
+      "line": 19
+    },
+    {
+      "from": "bin\\memo.js",
+      "to": "path",
+      "type": "imports",
+      "items": [
+        "dirname",
+        "join"
+      ],
+      "line": 20
+    },
+    {
       "from": "src\\agents\\orchestrator.js",
       "to": "src/agents/planner.js",
       "type": "imports",
@@ -8275,6 +8865,24 @@
         "ValidatorAgent"
       ],
       "line": 9
+    },
+    {
+      "from": "src\\agents\\planner.js",
+      "to": "src/retrieval/historyRetriever.js",
+      "type": "imports",
+      "items": [
+        "HistoryRetriever"
+      ],
+      "line": 1
+    },
+    {
+      "from": "src\\agents\\retriever.js",
+      "to": "src/retrieval/historyRetriever.js",
+      "type": "imports",
+      "items": [
+        "HistoryRetriever"
+      ],
+      "line": 1
     },
     {
       "from": "src\\agents\\validator.js",
@@ -8312,6 +8920,24 @@
         "fileExists"
       ],
       "line": 8
+    },
+    {
+      "from": "src\\checksum\\invalidation.js",
+      "to": "fs",
+      "type": "imports",
+      "items": [
+        "fsSync"
+      ],
+      "line": 1
+    },
+    {
+      "from": "src\\checksum\\invalidation.js",
+      "to": "path",
+      "type": "imports",
+      "items": [
+        "path"
+      ],
+      "line": 2
     },
     {
       "from": "src\\commands\\config.js",
@@ -8592,7 +9218,8 @@
       "to": "src/commands/config.js",
       "type": "imports",
       "items": [
-        "getApiKey"
+        "getApiKey",
+        "getHistoryConfig"
       ],
       "line": 8
     },
@@ -8634,12 +9261,48 @@
     },
     {
       "from": "src\\commands\\scan.js",
+      "to": "src/retrieval/historyRetriever.js",
+      "type": "imports",
+      "items": [
+        "HistoryRetriever"
+      ],
+      "line": 12
+    },
+    {
+      "from": "src\\commands\\scan.js",
+      "to": "src/validation/historyValidator.js",
+      "type": "imports",
+      "items": [
+        "validateHistoryClaims"
+      ],
+      "line": 13
+    },
+    {
+      "from": "src\\commands\\scan.js",
+      "to": "src/checksum/checksumEngine.js",
+      "type": "imports",
+      "items": [
+        "createChecksumEngine"
+      ],
+      "line": 14
+    },
+    {
+      "from": "src\\commands\\scan.js",
+      "to": "src/checksum/invalidation.js",
+      "type": "imports",
+      "items": [
+        "createInvalidationStrategy"
+      ],
+      "line": 15
+    },
+    {
+      "from": "src\\commands\\scan.js",
       "to": "path",
       "type": "imports",
       "items": [
         "path"
       ],
-      "line": 591
+      "line": 16
     },
     {
       "from": "src\\commands\\status.js",
@@ -8927,6 +9590,15 @@
       "line": 6
     },
     {
+      "from": "src\\dashboard\\healthDashboard.js",
+      "to": "src/trust/trustMeter.js",
+      "type": "imports",
+      "items": [
+        "TrustMeter"
+      ],
+      "line": 1
+    },
+    {
       "from": "src\\graph\\impactAnalysis.js",
       "to": "src/graph/traversal.js",
       "type": "imports",
@@ -9047,6 +9719,42 @@
       "line": 7
     },
     {
+      "from": "src\\retrieval\\historyRetriever.js",
+      "to": "child_process",
+      "type": "imports",
+      "items": [
+        "execFile"
+      ],
+      "line": 1
+    },
+    {
+      "from": "src\\retrieval\\historyRetriever.js",
+      "to": "util",
+      "type": "imports",
+      "items": [
+        "promisify"
+      ],
+      "line": 2
+    },
+    {
+      "from": "src\\retrieval\\historyRetriever.js",
+      "to": "fs/promises",
+      "type": "imports",
+      "items": [
+        "fs"
+      ],
+      "line": 3
+    },
+    {
+      "from": "src\\retrieval\\historyRetriever.js",
+      "to": "path",
+      "type": "imports",
+      "items": [
+        "path"
+      ],
+      "line": 4
+    },
+    {
       "from": "src\\retrieval\\hybridRetriever.js",
       "to": "src/retrieval/astRetriever.js",
       "type": "imports",
@@ -9145,6 +9853,35 @@
         "chalk"
       ],
       "line": 6
+    },
+    {
+      "from": "src\\trust\\trustMeter.js",
+      "to": "src/validation/historyValidator.js",
+      "type": "imports",
+      "items": [
+        "validateHistoryClaims"
+      ],
+      "line": 1
+    },
+    {
+      "from": "src\\trust\\trustMeter.js",
+      "to": "src/retrieval/historyRetriever.js",
+      "type": "imports",
+      "items": [
+        "HistoryRetriever"
+      ],
+      "line": 2
+    },
+    {
+      "from": "src\\trust\\trustMeter.js",
+      "to": "src/utils/fileUtils.js",
+      "type": "imports",
+      "items": [
+        "getRecallPath",
+        "fileExists",
+        "readFile"
+      ],
+      "line": 3
     },
     {
       "from": "src\\utils\\clipboard.js",
@@ -9680,6 +10417,97 @@
       "line": 9
     },
     {
+      "from": "test-history-grounding.js",
+      "to": "src/retrieval/historyRetriever.js",
+      "type": "imports",
+      "items": [
+        "HistoryRetriever"
+      ],
+      "line": 7
+    },
+    {
+      "from": "test-history-grounding.js",
+      "to": "src/validation/historyValidator.js",
+      "type": "imports",
+      "items": [
+        "validateHistoryClaims"
+      ],
+      "line": 8
+    },
+    {
+      "from": "test-history-grounding.js",
+      "to": "src/checksum/invalidation.js",
+      "type": "imports",
+      "items": [
+        "InvalidationStrategy"
+      ],
+      "line": 9
+    },
+    {
+      "from": "test-history-grounding.js",
+      "to": "src/trust/trustMeter.js",
+      "type": "imports",
+      "items": [
+        "TrustMeter"
+      ],
+      "line": 10
+    },
+    {
+      "from": "test-history-grounding.js",
+      "to": "src/scoring/confidenceScorer.js",
+      "type": "imports",
+      "items": [
+        "calculateEditConfidence",
+        "calculateGenerationConfidence"
+      ],
+      "line": 11
+    },
+    {
+      "from": "test-history-grounding.js",
+      "to": "src/graph/graphEngine.js",
+      "type": "imports",
+      "items": [
+        "GraphEngine"
+      ],
+      "line": 12
+    },
+    {
+      "from": "test-history-grounding.js",
+      "to": "src/registry/symbolRegistry.js",
+      "type": "imports",
+      "items": [
+        "SymbolRegistry"
+      ],
+      "line": 13
+    },
+    {
+      "from": "test-history-grounding.js",
+      "to": "assert",
+      "type": "imports",
+      "items": [
+        "assert"
+      ],
+      "line": 14
+    },
+    {
+      "from": "test-history-grounding.js",
+      "to": "fs",
+      "type": "imports",
+      "items": [
+        "fsSync"
+      ],
+      "line": 15
+    },
+    {
+      "from": "test-history-grounding.js",
+      "to": "path",
+      "type": "imports",
+      "items": [
+        "path"
+      ],
+      "line": 16
+    },
+    {
       "from": "test-hybrid-retrieval.js",
       "to": "src/retrieval/hybridRetriever.js",
       "type": "imports",
@@ -10079,26 +10907,37 @@
     {
       "name": "memo",
       "file": "bin\\memo.js",
-      "connections": 14,
+      "connections": 17,
       "incoming": 0,
-      "outgoing": 14,
+      "outgoing": 17,
       "exports": [],
       "functions": 0,
       "classes": 0,
-      "why_critical": "imports 14 dependencies"
+      "why_critical": "imports 17 dependencies"
     },
     {
       "name": "scan",
       "file": "src\\commands\\scan.js",
-      "connections": 12,
+      "connections": 16,
       "incoming": 0,
-      "outgoing": 12,
+      "outgoing": 16,
       "exports": [
         "scanCommand"
       ],
       "functions": 9,
       "classes": 0,
-      "why_critical": "imports 12 dependencies, 9 functions"
+      "why_critical": "imports 16 dependencies, 9 functions"
+    },
+    {
+      "name": "test-history-grounding",
+      "file": "test-history-grounding.js",
+      "connections": 10,
+      "incoming": 0,
+      "outgoing": 10,
+      "exports": [],
+      "functions": 1,
+      "classes": 1,
+      "why_critical": "imports 10 dependencies, 1 classes"
     },
     {
       "name": "health",
@@ -10130,48 +10969,33 @@
       "functions": 6,
       "classes": 0,
       "why_critical": "imports 7 dependencies, exports 4 items, 6 functions"
-    },
-    {
-      "name": "trust",
-      "file": "src\\commands\\trust.js",
-      "connections": 7,
-      "incoming": 0,
-      "outgoing": 7,
-      "exports": [
-        "executeTrustCommand",
-        "getTrustScore",
-        "isTrusted"
-      ],
-      "functions": 5,
-      "classes": 0,
-      "why_critical": "imports 7 dependencies"
     }
   ],
   "fileHashes": {
     "src\\commands\\init.js": "abfdff0cae30f27c2d591b8e92e5830c",
-    "bin\\memo.js": "70814e73949f28716e3d4f7f2c4b68c0",
+    "bin\\memo.js": "8e10d8e9c60e7a7ef22700db2172ff42",
     "src\\agents\\coder.js": "276dad36a3b6cc8fadff9725de20aa1e",
-    "src\\agents\\orchestrator.js": "1ee7edad7ccab7637f1a690bcec760a9",
-    "src\\agents\\planner.js": "8041b62cfb2d284b20466b3b14dcf246",
-    "src\\agents\\retriever.js": "f168a75b1a0153f7d75b04512c604342",
+    "src\\agents\\orchestrator.js": "343c6d583a8a69f0ac4e80cb2851d885",
+    "src\\agents\\planner.js": "291dc3bd1ee6accc3585e7b999ff1d19",
+    "src\\agents\\retriever.js": "fec154bdd0934ecdae9016638bdc3687",
     "src\\agents\\validator.js": "81793ee6687f627e954bbdf1acbc74e1",
     "src\\checksum\\checksumEngine.js": "fe2c37ca8cfd035abb2cae61b70ca6e3",
-    "src\\checksum\\invalidation.js": "f8c97e3cc3ce919d517f10032697149b",
-    "src\\commands\\config.js": "0baa1d41ad0cc503072a0eb11c968597",
+    "src\\checksum\\invalidation.js": "9ce49c3146d57d6dcb52e284ee39f692",
+    "src\\commands\\config.js": "26e29acdb9b6ba81fc29dc39a167fc04",
     "src\\commands\\health.js": "af3737f1325342954bfa83755c72fc8e",
     "src\\commands\\install.js": "8d79090a79bbe17b93804b30dbf803e0",
     "src\\commands\\load.js": "e2ebd155b44b5f040718ac047fac6b0c",
     "src\\commands\\local.js": "1e3b59b5551684a2fe6cf2892ca8ae66",
-    "src\\commands\\scan.js": "0df4a5b134b4b3752e8c33cb74c7babb",
+    "src\\commands\\scan.js": "c7ae482815737e34c232e2e33044f2ec",
     "src\\commands\\status.js": "40a834fc78b74cf1a0c59f46a5dbf4dc",
     "src\\commands\\timeline.js": "7517f9041a8eea72fefca741c153a122",
     "src\\commands\\trust.js": "605ff76878ce973563759c56f525ec5e",
     "src\\commands\\update.js": "e1b23fd9682c27deccc14363ce21a0e8",
     "src\\commands\\validate.js": "dc9acc07334bcc407440a0bc01a382a7",
     "src\\commands\\watch.js": "f3f463f925edec1aa8b74a9ebce9c022",
-    "src\\dashboard\\dashboardFormatter.js": "4555e7b952352d88d064f9b43b9ec577",
-    "src\\dashboard\\healthDashboard.js": "e2a2ee9dce17fb3f4e9b704986e81ef5",
-    "src\\graph\\graphEngine.js": "00f1f90b693dabe52c5372818eb0b313",
+    "src\\dashboard\\dashboardFormatter.js": "db79463542a92db5091514d2cd93438a",
+    "src\\dashboard\\healthDashboard.js": "488eb5a1b95ce0171f131e9f45ea82ce",
+    "src\\graph\\graphEngine.js": "dcbb845d86316d20ba9ad597b19e3570",
     "src\\graph\\impactAnalysis.js": "f8b0be01d28c764640c26f8dcafb6b32",
     "src\\graph\\traversal.js": "ebf351bf491591d8f4f66f9ab5415390",
     "src\\local\\localFormatter.js": "4724750f1bdf0a80748d78cfe5aff68c",
@@ -10184,16 +11008,17 @@
     "src\\registry\\symbolRegistry.js": "4db15d320e57bfd0012cba75c2eb0743",
     "src\\registry\\symbolValidator.js": "9c6301c56d71c3fb43044b4f1e6e21da",
     "src\\retrieval\\astRetriever.js": "b97f6db33876d64e59ca9b9f6c126ea0",
-    "src\\retrieval\\graphRetriever.js": "e178c441de36855df888dde8c4c89849",
+    "src\\retrieval\\graphRetriever.js": "2ff82c4a95dfa0b04c57c68ee23143ac",
+    "src\\retrieval\\historyRetriever.js": "508aab4dfda96922c2b1d924f6a3aa26",
     "src\\retrieval\\hybridRetriever.js": "c3a87db971bb89405ac40bd9091895a6",
-    "src\\scoring\\confidenceScorer.js": "698b5ed194ecbcddbd43ea6da5032fa6",
+    "src\\scoring\\confidenceScorer.js": "eee32c84e8367afa94c63bd83481315f",
     "src\\scoring\\metrics.js": "c8b1387ac1327fd0d26ad5306fb3d076",
     "src\\timeline\\editTimeline.js": "ffc30e4b8c6511d869312d49ff0d5305",
     "src\\timeline\\timelineFormatter.js": "1421a03219381838d37fc6b9f7e821d5",
     "src\\tools\\repositoryTools.js": "4fa273c8fd6ad11a8bdecc3ecd2ed828",
     "src\\tools\\toolExecutor.js": "7ca45451c58246b61b0577ccb099d246",
     "src\\trust\\trustFormatter.js": "1109b86e83be2478de095ecf5137920d",
-    "src\\trust\\trustMeter.js": "0198c1da05772c74debbbe42635f13fd",
+    "src\\trust\\trustMeter.js": "0919a3bd1204dbf939fa77ab124177a6",
     "src\\utils\\assembler.js": "5c0c38bc94b002fcb119d877805553f9",
     "src\\utils\\clipboard.js": "5f0607007891a486f5d09189f5fbcfb5",
     "src\\utils\\fileUtils.js": "8961f17cc17879e30523c8322e363b98",
@@ -10201,8 +11026,9 @@
     "src\\utils\\graphBuilder.js": "f78c5188d2e0e1c28c2a98050bf2ef3a",
     "src\\utils\\graphBuilderV2.js": "80cb9f27d01d16319bbaf0bbbbe0c704",
     "src\\utils\\hashStore.js": "2402cc054fb2e53b05bfb8c6aa4a9954",
-    "src\\utils\\prompt.js": "fd2247cc733cb51a157b1675f38055f9",
+    "src\\utils\\prompt.js": "c1fe02173e3daecd5bfabd2a8703e028",
     "src\\utils\\scanner.js": "b7f11a08a5462a72a3adad92a99700d9",
+    "src\\validation\\historyValidator.js": "434487ad0756c17273d0f8c4548c2839",
     "src\\validation\\importValidator.js": "a88ded833118d1db49556aacdfa00b3b",
     "src\\validation\\pathValidator.js": "1eb6076f6465169a724e412790e75c2d",
     "src\\validation\\symbolValidator.js": "cacb23189eb5a8825186d15c02ece110",
@@ -10214,6 +11040,7 @@
     "test-edit-timeline.js": "8f8e53a277f3f9055b7409da081d9289",
     "test-graph-engine.js": "604754175faff6e0056ea261c1d4b9a2",
     "test-health-dashboard.js": "a825017a2fad3427df3665b2efaea3c3",
+    "test-history-grounding.js": "6663ebc1c95097cb18d8d0787b228b43",
     "test-hybrid-retrieval.js": "e1a0069587d147b28fe2656ee22f6ece",
     "test-incremental.js": "af959457fc711decb99f7dc5bd3e20d8",
     "test-local-runtime.js": "3f6379810072998f7b7effb211f3e705",
@@ -10465,6 +11292,44 @@
               }
             ],
             "line": 16
+          },
+          {
+            "source": "fs",
+            "items": [
+              {
+                "name": "readFileSync",
+                "imported": "readFileSync",
+                "type": "named"
+              }
+            ],
+            "line": 18
+          },
+          {
+            "source": "url",
+            "items": [
+              {
+                "name": "fileURLToPath",
+                "imported": "fileURLToPath",
+                "type": "named"
+              }
+            ],
+            "line": 19
+          },
+          {
+            "source": "path",
+            "items": [
+              {
+                "name": "dirname",
+                "imported": "dirname",
+                "type": "named"
+              },
+              {
+                "name": "join",
+                "imported": "join",
+                "type": "named"
+              }
+            ],
+            "line": 20
           }
         ],
         "exports": [],
@@ -10472,8 +11337,16 @@
         "classes": [],
         "variables": [
           {
+            "name": "__dirname",
+            "line": 22
+          },
+          {
+            "name": "pkg",
+            "line": 23
+          },
+          {
             "name": "program",
-            "line": 18
+            "line": 25
           }
         ],
         "interfaces": [],
@@ -10661,7 +11534,7 @@
           {
             "name": "createOrchestrator",
             "type": "function",
-            "line": 234
+            "line": 273
           }
         ],
         "functions": [
@@ -10672,7 +11545,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 234
+            "line": 273
           }
         ],
         "classes": [
@@ -10695,31 +11568,31 @@
                 "name": "executeWithRetry",
                 "kind": "method",
                 "static": false,
-                "line": 108
+                "line": 147
               },
               {
                 "name": "executeStepByStep",
                 "kind": "method",
                 "static": false,
-                "line": 141
+                "line": 180
               },
               {
                 "name": "log",
                 "kind": "method",
                 "static": false,
-                "line": 186
+                "line": 225
               },
               {
                 "name": "getSummary",
                 "kind": "method",
                 "static": false,
-                "line": 200
+                "line": 239
               },
               {
                 "name": "clearLog",
                 "kind": "method",
                 "static": false,
-                "line": 226
+                "line": 265
               }
             ],
             "superClass": null,
@@ -10744,60 +11617,92 @@
             "line": 67
           },
           {
+            "name": "repeatingFailure",
+            "line": 75
+          },
+          {
+            "name": "matchedEventId",
+            "line": 76
+          },
+          {
+            "name": "fileContext",
+            "line": 78
+          },
+          {
+            "name": "snippetLower",
+            "line": 81
+          },
+          {
+            "name": "hasFailureKeywords",
+            "line": 82
+          },
+          {
             "name": "lastError",
-            "line": 109
+            "line": 148
           },
           {
             "name": "attempt",
-            "line": 111
-          },
-          {
-            "name": "result",
-            "line": 116
-          },
-          {
-            "name": "steps",
-            "line": 142
-          },
-          {
-            "name": "results",
-            "line": 149
-          },
-          {
-            "name": "previousResult",
             "line": 150
           },
           {
             "name": "result",
-            "line": 156
+            "line": 155
+          },
+          {
+            "name": "steps",
+            "line": 181
+          },
+          {
+            "name": "results",
+            "line": 188
+          },
+          {
+            "name": "previousResult",
+            "line": 189
+          },
+          {
+            "name": "result",
+            "line": 195
           },
           {
             "name": "entry",
-            "line": 187
+            "line": 226
           },
           {
             "name": "summary",
-            "line": 201
+            "line": 240
           },
           {
             "name": "start",
-            "line": 208
+            "line": 247
           },
           {
             "name": "end",
-            "line": 209
+            "line": 248
           }
         ],
         "interfaces": [],
         "types": []
       },
       "src\\agents\\planner.js": {
-        "imports": [],
+        "imports": [
+          {
+            "source": "src/retrieval/historyRetriever.js",
+            "items": [
+              {
+                "name": "HistoryRetriever",
+                "imported": "HistoryRetriever",
+                "type": "named"
+              }
+            ],
+            "line": 1
+          }
+        ],
         "exports": [
           {
             "name": "PlannerAgent",
             "type": "class",
-            "line": 6
+            "line": 8
           }
         ],
         "functions": [],
@@ -10809,145 +11714,169 @@
                 "name": "constructor",
                 "kind": "constructor",
                 "static": false,
-                "line": 7
+                "line": 9
               },
               {
                 "name": "createPlan",
                 "kind": "method",
                 "static": false,
-                "line": 16
+                "line": 19
               },
               {
                 "name": "parseIntent",
                 "kind": "method",
                 "static": false,
-                "line": 69
+                "line": 110
               },
               {
                 "name": "identifyAffectedFiles",
                 "kind": "method",
                 "static": false,
-                "line": 112
+                "line": 153
               },
               {
                 "name": "identifyDependencies",
                 "kind": "method",
                 "static": false,
-                "line": 141
+                "line": 182
               },
               {
                 "name": "createSteps",
                 "kind": "method",
                 "static": false,
-                "line": 164
+                "line": 205
               },
               {
                 "name": "assessRisks",
                 "kind": "method",
                 "static": false,
-                "line": 201
+                "line": 242
               },
               {
                 "name": "calculatePlanConfidence",
                 "kind": "method",
                 "static": false,
-                "line": 245
+                "line": 286
               },
               {
                 "name": "validatePlan",
                 "kind": "method",
                 "static": false,
-                "line": 270
+                "line": 311
               }
             ],
             "superClass": null,
-            "line": 6
+            "line": 8
           }
         ],
         "variables": [
           {
             "name": "plan",
-            "line": 17
+            "line": 20
           },
           {
             "name": "intent",
-            "line": 30
+            "line": 33
+          },
+          {
+            "name": "events",
+            "line": 48
+          },
+          {
+            "name": "snippetLower",
+            "line": 50
+          },
+          {
+            "name": "isFailure",
+            "line": 51
           },
           {
             "name": "validation",
-            "line": 49
+            "line": 90
           },
           {
             "name": "intent",
-            "line": 70
+            "line": 111
           },
           {
             "name": "taskLower",
-            "line": 77
+            "line": 118
           },
           {
             "name": "words",
-            "line": 98
+            "line": 139
           },
           {
             "name": "affected",
-            "line": 113
+            "line": 154
           },
           {
             "name": "keywords",
-            "line": 122
+            "line": 163
           },
           {
             "name": "fileLower",
-            "line": 125
+            "line": 166
           },
           {
             "name": "dependencies",
-            "line": 142
+            "line": 183
           },
           {
             "name": "deps",
-            "line": 146
+            "line": 187
           },
           {
             "name": "dependents",
-            "line": 152
+            "line": 193
           },
           {
             "name": "steps",
-            "line": 165
-          },
-          {
-            "name": "risks",
-            "line": 202
-          },
-          {
-            "name": "metrics",
             "line": 206
           },
           {
+            "name": "risks",
+            "line": 243
+          },
+          {
+            "name": "metrics",
+            "line": 247
+          },
+          {
             "name": "cycles",
-            "line": 218
+            "line": 259
           },
           {
             "name": "confidence",
-            "line": 246
+            "line": 287
           },
           {
             "name": "validation",
-            "line": 271
+            "line": 312
           }
         ],
         "interfaces": [],
         "types": []
       },
       "src\\agents\\retriever.js": {
-        "imports": [],
+        "imports": [
+          {
+            "source": "src/retrieval/historyRetriever.js",
+            "items": [
+              {
+                "name": "HistoryRetriever",
+                "imported": "HistoryRetriever",
+                "type": "named"
+              }
+            ],
+            "line": 1
+          }
+        ],
         "exports": [
           {
             "name": "RetrieverAgent",
             "type": "class",
-            "line": 6
+            "line": 8
           }
         ],
         "functions": [],
@@ -10959,117 +11888,121 @@
                 "name": "constructor",
                 "kind": "constructor",
                 "static": false,
-                "line": 7
+                "line": 9
               },
               {
                 "name": "retrieveContext",
                 "kind": "method",
                 "static": false,
-                "line": 17
+                "line": 20
               },
               {
                 "name": "retrieveFile",
                 "kind": "method",
                 "static": false,
-                "line": 62
+                "line": 65
               },
               {
                 "name": "retrieveSymbols",
                 "kind": "method",
                 "static": false,
-                "line": 92
+                "line": 98
               },
               {
                 "name": "generateSummaries",
                 "kind": "method",
                 "static": false,
-                "line": 128
+                "line": 134
               },
               {
                 "name": "getTemperature",
                 "kind": "method",
                 "static": false,
-                "line": 158
+                "line": 164
               },
               {
                 "name": "retrieveByQuery",
                 "kind": "method",
                 "static": false,
-                "line": 171
+                "line": 177
               }
             ],
             "superClass": null,
-            "line": 6
+            "line": 8
           }
         ],
         "variables": [
           {
             "name": "context",
-            "line": 18
+            "line": 21
           },
           {
             "name": "fileContext",
-            "line": 28
+            "line": 31
           },
           {
             "name": "depContext",
-            "line": 36
+            "line": 39
           },
           {
             "name": "node",
-            "line": 63
+            "line": 66
           },
           {
             "name": "symbols",
-            "line": 64
+            "line": 67
           },
           {
             "name": "metrics",
-            "line": 65
+            "line": 68
+          },
+          {
+            "name": "sessionHistory",
+            "line": 74
           },
           {
             "name": "symbols",
-            "line": 93
+            "line": 99
           },
           {
             "name": "fileSymbols",
-            "line": 96
+            "line": 102
           },
           {
             "name": "summaries",
-            "line": 129
+            "line": 135
           },
           {
             "name": "allFiles",
-            "line": 130
+            "line": 136
           },
           {
             "name": "relevantFiles",
-            "line": 133
+            "line": 139
           },
           {
             "name": "symbols",
-            "line": 141
+            "line": 147
           },
           {
             "name": "temps",
-            "line": 159
+            "line": 165
           },
           {
             "name": "allFiles",
-            "line": 172
+            "line": 178
           },
           {
             "name": "selection",
-            "line": 175
+            "line": 181
           },
           {
             "name": "context",
-            "line": 185
+            "line": 191
           },
           {
             "name": "fileContext",
-            "line": 192
+            "line": 198
           }
         ],
         "interfaces": [],
@@ -11530,30 +12463,58 @@
         "types": []
       },
       "src\\checksum\\invalidation.js": {
-        "imports": [],
+        "imports": [
+          {
+            "source": "fs",
+            "items": [
+              {
+                "name": "fsSync",
+                "type": "default"
+              }
+            ],
+            "line": 1
+          },
+          {
+            "source": "path",
+            "items": [
+              {
+                "name": "path",
+                "type": "default"
+              }
+            ],
+            "line": 2
+          }
+        ],
         "exports": [
           {
             "name": "InvalidationStrategy",
             "type": "class",
-            "line": 9
+            "line": 22
           },
           {
             "name": "createInvalidationStrategy",
             "type": "function",
-            "line": 217
+            "line": 244
           },
           {
             "name": "CacheManager",
             "type": "class",
-            "line": 224
+            "line": 251
           },
           {
             "name": "createCacheManager",
             "type": "function",
-            "line": 285
+            "line": 312
           }
         ],
         "functions": [
+          {
+            "name": "loadHistoryQueryCache",
+            "params": [],
+            "async": false,
+            "generator": false,
+            "line": 9
+          },
           {
             "name": "createInvalidationStrategy",
             "params": [
@@ -11561,14 +12522,14 @@
             ],
             "async": false,
             "generator": false,
-            "line": 217
+            "line": 244
           },
           {
             "name": "createCacheManager",
             "params": [],
             "async": false,
             "generator": false,
-            "line": 285
+            "line": 312
           }
         ],
         "classes": [
@@ -11579,71 +12540,71 @@
                 "name": "constructor",
                 "kind": "constructor",
                 "static": false,
-                "line": 10
+                "line": 23
               },
               {
                 "name": "checkInvalidation",
                 "kind": "method",
                 "static": false,
-                "line": 18
+                "line": 31
               },
               {
                 "name": "executeInvalidation",
                 "kind": "method",
                 "static": false,
-                "line": 67
+                "line": 94
               },
               {
                 "name": "_invalidateRepository",
                 "kind": "method",
                 "static": false,
-                "line": 111
+                "line": 138
               },
               {
                 "name": "_invalidateGraph",
                 "kind": "method",
                 "static": false,
-                "line": 120
+                "line": 147
               },
               {
                 "name": "_invalidateSymbols",
                 "kind": "method",
                 "static": false,
-                "line": 129
+                "line": 156
               },
               {
                 "name": "_invalidateFiles",
                 "kind": "method",
                 "static": false,
-                "line": 138
+                "line": 165
               },
               {
                 "name": "_invalidateModules",
                 "kind": "method",
                 "static": false,
-                "line": 149
+                "line": 176
               },
               {
                 "name": "_invalidateWorkingMemory",
                 "kind": "method",
                 "static": false,
-                "line": 160
+                "line": 187
               },
               {
                 "name": "_invalidateSummaries",
                 "kind": "method",
                 "static": false,
-                "line": 170
+                "line": 197
               },
               {
                 "name": "getReport",
                 "kind": "method",
                 "static": false,
-                "line": 179
+                "line": 206
               }
             ],
             "superClass": null,
-            "line": 9
+            "line": 22
           },
           {
             "name": "CacheManager",
@@ -11652,57 +12613,81 @@
                 "name": "constructor",
                 "kind": "constructor",
                 "static": false,
-                "line": 225
+                "line": 252
               },
               {
                 "name": "getCache",
                 "kind": "method",
                 "static": false,
-                "line": 240
+                "line": 267
               },
               {
                 "name": "setCache",
                 "kind": "method",
                 "static": false,
-                "line": 247
+                "line": 274
               },
               {
                 "name": "clearAll",
                 "kind": "method",
                 "static": false,
-                "line": 254
+                "line": 281
               },
               {
                 "name": "getStats",
                 "kind": "method",
                 "static": false,
-                "line": 265
+                "line": 292
               }
             ],
             "superClass": null,
-            "line": 224
+            "line": 251
           }
         ],
         "variables": [
           {
+            "name": "cachePath",
+            "line": 10
+          },
+          {
+            "name": "content",
+            "line": 12
+          },
+          {
             "name": "toInvalidate",
-            "line": 19
+            "line": 32
           },
           {
             "name": "fileChanges",
-            "line": 46
+            "line": 61
+          },
+          {
+            "name": "historyQueryCache",
+            "line": 77
+          },
+          {
+            "name": "lastHash",
+            "line": 79
+          },
+          {
+            "name": "currentHash",
+            "line": 80
+          },
+          {
+            "name": "isStale",
+            "line": 81
           },
           {
             "name": "invalidated",
-            "line": 68
+            "line": 95
           },
           {
             "name": "report",
-            "line": 180
+            "line": 207
           },
           {
             "name": "stats",
-            "line": 266
+            "line": 293
           }
         ],
         "interfaces": [],
@@ -11760,7 +12745,12 @@
           {
             "name": "getApiKey",
             "type": "function",
-            "line": 58
+            "line": 89
+          },
+          {
+            "name": "getHistoryConfig",
+            "type": "function",
+            "line": 94
           }
         ],
         "functions": [
@@ -11801,7 +12791,14 @@
             "params": [],
             "async": true,
             "generator": false,
-            "line": 58
+            "line": 89
+          },
+          {
+            "name": "getHistoryConfig",
+            "params": [],
+            "async": true,
+            "generator": false,
+            "line": 94
           }
         ],
         "classes": [],
@@ -11823,12 +12820,44 @@
             "line": 33
           },
           {
-            "name": "config",
-            "line": 40
+            "name": "historyConfig",
+            "line": 34
+          },
+          {
+            "name": "finalConfig",
+            "line": 35
+          },
+          {
+            "name": "updated",
+            "line": 45
           },
           {
             "name": "config",
-            "line": 59
+            "line": 48
+          },
+          {
+            "name": "config",
+            "line": 56
+          },
+          {
+            "name": "config",
+            "line": 64
+          },
+          {
+            "name": "limit",
+            "line": 65
+          },
+          {
+            "name": "config",
+            "line": 90
+          },
+          {
+            "name": "config",
+            "line": 95
+          },
+          {
+            "name": "defaultEnabled",
+            "line": 96
           }
         ],
         "interfaces": [],
@@ -12576,6 +13605,11 @@
                 "name": "getApiKey",
                 "imported": "getApiKey",
                 "type": "named"
+              },
+              {
+                "name": "getHistoryConfig",
+                "imported": "getHistoryConfig",
+                "type": "named"
               }
             ],
             "line": 8
@@ -12659,6 +13693,50 @@
             "line": 11
           },
           {
+            "source": "src/retrieval/historyRetriever.js",
+            "items": [
+              {
+                "name": "HistoryRetriever",
+                "imported": "HistoryRetriever",
+                "type": "named"
+              }
+            ],
+            "line": 12
+          },
+          {
+            "source": "src/validation/historyValidator.js",
+            "items": [
+              {
+                "name": "validateHistoryClaims",
+                "imported": "validateHistoryClaims",
+                "type": "named"
+              }
+            ],
+            "line": 13
+          },
+          {
+            "source": "src/checksum/checksumEngine.js",
+            "items": [
+              {
+                "name": "createChecksumEngine",
+                "imported": "createChecksumEngine",
+                "type": "named"
+              }
+            ],
+            "line": 14
+          },
+          {
+            "source": "src/checksum/invalidation.js",
+            "items": [
+              {
+                "name": "createInvalidationStrategy",
+                "imported": "createInvalidationStrategy",
+                "type": "named"
+              }
+            ],
+            "line": 15
+          },
+          {
             "source": "path",
             "items": [
               {
@@ -12666,14 +13744,14 @@
                 "type": "default"
               }
             ],
-            "line": 591
+            "line": 16
           }
         ],
         "exports": [
           {
             "name": "scanCommand",
             "type": "default",
-            "line": 13
+            "line": 18
           }
         ],
         "functions": [
@@ -12684,7 +13762,7 @@
             ],
             "async": true,
             "generator": false,
-            "line": 13
+            "line": 18
           },
           {
             "name": "buildLocalMemory",
@@ -12695,18 +13773,19 @@
             ],
             "async": true,
             "generator": false,
-            "line": 224
+            "line": 265
           },
           {
             "name": "buildFullPrompt",
             "params": [
               "files",
               "gitInfo",
-              "graph"
+              "graph",
+              "historyContext"
             ],
             "async": false,
             "generator": false,
-            "line": 294
+            "line": 335
           },
           {
             "name": "buildIncrementalPrompt",
@@ -12715,11 +13794,12 @@
               "graph",
               "gitInfo",
               "previousMemory",
-              "files"
+              "files",
+              "historyContext"
             ],
             "async": false,
             "generator": false,
-            "line": 302
+            "line": 343
           },
           {
             "name": "parseGeminiResponse",
@@ -12728,7 +13808,7 @@
             ],
             "async": true,
             "generator": false,
-            "line": 359
+            "line": 408
           },
           {
             "name": "enrichMemoryWithGraph",
@@ -12738,7 +13818,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 406
+            "line": 457
           },
           {
             "name": "printSummary",
@@ -12748,7 +13828,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 483
+            "line": 534
           },
           {
             "name": "detectStack",
@@ -12757,7 +13837,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 542
+            "line": 593
           },
           {
             "name": "detectEntryPoints",
@@ -12766,230 +13846,278 @@
             ],
             "async": false,
             "generator": false,
-            "line": 558
+            "line": 609
           }
         ],
         "classes": [],
         "variables": [
           {
             "name": "quick",
-            "line": 23
+            "line": 28
           },
           {
             "name": "localOnly",
-            "line": 24
-          },
-          {
-            "name": "firstScan",
-            "line": 25
-          },
-          {
-            "name": "files",
             "line": 29
           },
           {
-            "name": "totalFiles",
-            "line": 31
+            "name": "firstScan",
+            "line": 30
           },
           {
-            "name": "graph",
+            "name": "files",
+            "line": 34
+          },
+          {
+            "name": "totalFiles",
             "line": 36
           },
           {
+            "name": "graph",
+            "line": 41
+          },
+          {
             "name": "changeInfo",
-            "line": 44
+            "line": 49
           },
           {
             "name": "previousHashes",
-            "line": 47
+            "line": 52
           },
           {
             "name": "gitInfo",
-            "line": 62
+            "line": 67
+          },
+          {
+            "name": "historyConfig",
+            "line": 76
+          },
+          {
+            "name": "historyRetriever",
+            "line": 77
+          },
+          {
+            "name": "historyContext",
+            "line": 82
+          },
+          {
+            "name": "filesToQuery",
+            "line": 85
+          },
+          {
+            "name": "checksumEngine",
+            "line": 89
+          },
+          {
+            "name": "invalidation",
+            "line": 91
+          },
+          {
+            "name": "toInvalidate",
+            "line": 92
+          },
+          {
+            "name": "historyByFile",
+            "line": 94
+          },
+          {
+            "name": "filesWithHistory",
+            "line": 99
           },
           {
             "name": "tokensUsed",
-            "line": 71
+            "line": 108
           },
           {
             "name": "tokensSaved",
-            "line": 72
+            "line": 109
           },
           {
             "name": "apiKey",
-            "line": 84
+            "line": 121
           },
           {
             "name": "previousMemory",
-            "line": 102
+            "line": 139
           },
           {
             "name": "fullPrompt",
-            "line": 106
+            "line": 143
           },
           {
             "name": "fullTokens",
-            "line": 107
+            "line": 144
           },
           {
             "name": "tokens",
-            "line": 112
+            "line": 149
           },
           {
             "name": "percentSaved",
-            "line": 115
+            "line": 152
+          },
+          {
+            "name": "validationReport",
+            "line": 181
           },
           {
             "name": "existingMemory",
-            "line": 183
+            "line": 224
           },
           {
             "name": "scanCount",
-            "line": 187
-          },
-          {
-            "name": "decisionsText",
-            "line": 208
-          },
-          {
-            "name": "projectName",
-            "line": 226
-          },
-          {
-            "name": "pkgPath",
             "line": 228
           },
           {
-            "name": "pkgData",
-            "line": 229
+            "name": "decisionsText",
+            "line": 249
           },
           {
-            "name": "edgeLookup",
-            "line": 234
-          },
-          {
-            "name": "graphSummary",
-            "line": 295
-          },
-          {
-            "name": "sections",
-            "line": 303
-          },
-          {
-            "name": "file",
-            "line": 321
-          },
-          {
-            "name": "file",
-            "line": 332
-          },
-          {
-            "name": "graphSummary",
-            "line": 340
-          },
-          {
-            "name": "yamlText",
-            "line": 360
-          },
-          {
-            "name": "promptMarkers",
-            "line": 366
-          },
-          {
-            "name": "docEndMatch",
-            "line": 392
-          },
-          {
-            "name": "edgeLookup",
-            "line": 420
-          },
-          {
-            "name": "depName",
-            "line": 430
-          },
-          {
-            "name": "compName",
-            "line": 432
-          },
-          {
-            "name": "aiComponents",
-            "line": 450
-          },
-          {
-            "name": "mergedComponents",
-            "line": 451
-          },
-          {
-            "name": "filePath",
-            "line": 455
-          },
-          {
-            "name": "componentName",
-            "line": 456
-          },
-          {
-            "name": "aiComp",
-            "line": 459
-          },
-          {
-            "name": "proj",
-            "line": 484
-          },
-          {
-            "name": "progress",
-            "line": 485
-          },
-          {
-            "name": "task",
-            "line": 486
-          },
-          {
-            "name": "kg",
-            "line": 487
-          },
-          {
-            "name": "percent",
-            "line": 534
-          },
-          {
-            "name": "stack",
-            "line": 543
-          },
-          {
-            "name": "entryPoints",
-            "line": 559
-          },
-          {
-            "name": "entryNames",
-            "line": 560
+            "name": "projectName",
+            "line": 267
           },
           {
             "name": "pkgPath",
-            "line": 564
+            "line": 269
           },
           {
             "name": "pkgData",
-            "line": 565
+            "line": 270
+          },
+          {
+            "name": "edgeLookup",
+            "line": 275
+          },
+          {
+            "name": "graphSummary",
+            "line": 336
+          },
+          {
+            "name": "sections",
+            "line": 344
+          },
+          {
+            "name": "file",
+            "line": 362
+          },
+          {
+            "name": "file",
+            "line": 373
+          },
+          {
+            "name": "graphSummary",
+            "line": 381
+          },
+          {
+            "name": "yamlText",
+            "line": 409
+          },
+          {
+            "name": "promptMarkers",
+            "line": 415
+          },
+          {
+            "name": "docs",
+            "line": 432
+          },
+          {
+            "name": "docEndMatch",
+            "line": 442
+          },
+          {
+            "name": "docs",
+            "line": 445
+          },
+          {
+            "name": "edgeLookup",
+            "line": 471
+          },
+          {
+            "name": "depName",
+            "line": 481
+          },
+          {
+            "name": "compName",
+            "line": 483
+          },
+          {
+            "name": "aiComponents",
+            "line": 501
+          },
+          {
+            "name": "mergedComponents",
+            "line": 502
+          },
+          {
+            "name": "filePath",
+            "line": 506
+          },
+          {
+            "name": "componentName",
+            "line": 507
+          },
+          {
+            "name": "aiComp",
+            "line": 510
+          },
+          {
+            "name": "proj",
+            "line": 535
+          },
+          {
+            "name": "progress",
+            "line": 536
+          },
+          {
+            "name": "task",
+            "line": 537
+          },
+          {
+            "name": "kg",
+            "line": 538
+          },
+          {
+            "name": "percent",
+            "line": 585
+          },
+          {
+            "name": "stack",
+            "line": 594
+          },
+          {
+            "name": "entryPoints",
+            "line": 610
+          },
+          {
+            "name": "entryNames",
+            "line": 611
+          },
+          {
+            "name": "pkgPath",
+            "line": 615
+          },
+          {
+            "name": "pkgData",
+            "line": 616
           },
           {
             "name": "binEntries",
-            "line": 567
+            "line": 618
           },
           {
             "name": "normalized",
-            "line": 569
+            "line": 620
           },
           {
             "name": "basename",
-            "line": 580
+            "line": 631
           },
           {
             "name": "normalizedPath",
-            "line": 582
+            "line": 633
           },
           {
             "name": "isDuplicate",
-            "line": 583
+            "line": 634
           }
         ],
         "interfaces": [],
@@ -13976,7 +15104,7 @@
           {
             "name": "formatHealthSummary",
             "type": "function",
-            "line": 391
+            "line": 397
           }
         ],
         "functions": [
@@ -13996,7 +15124,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 84
+            "line": 90
           },
           {
             "name": "formatGodFiles",
@@ -14005,7 +15133,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 109
+            "line": 115
           },
           {
             "name": "formatCircularDependencies",
@@ -14014,7 +15142,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 136
+            "line": 142
           },
           {
             "name": "formatArchitectureDrift",
@@ -14023,7 +15151,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 167
+            "line": 173
           },
           {
             "name": "formatBottlenecks",
@@ -14032,7 +15160,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 206
+            "line": 212
           },
           {
             "name": "formatUnstableModules",
@@ -14041,7 +15169,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 231
+            "line": 237
           },
           {
             "name": "formatOrphanedFiles",
@@ -14050,7 +15178,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 256
+            "line": 262
           },
           {
             "name": "formatComplexityHotspots",
@@ -14059,7 +15187,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 279
+            "line": 285
           },
           {
             "name": "formatRecommendations",
@@ -14068,7 +15196,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 304
+            "line": 310
           },
           {
             "name": "getScoreColor",
@@ -14077,7 +15205,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 340
+            "line": 346
           },
           {
             "name": "getStatusBadge",
@@ -14086,7 +15214,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 351
+            "line": 357
           },
           {
             "name": "getSeverityBadge",
@@ -14095,7 +15223,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 365
+            "line": 371
           },
           {
             "name": "getPriorityBadge",
@@ -14104,7 +15232,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 378
+            "line": 384
           },
           {
             "name": "formatHealthSummary",
@@ -14113,7 +15241,16 @@
             ],
             "async": false,
             "generator": false,
-            "line": 391
+            "line": 397
+          },
+          {
+            "name": "formatHistoryGrounding",
+            "params": [
+              "metrics"
+            ],
+            "async": false,
+            "generator": false,
+            "line": 421
           }
         ],
         "classes": [],
@@ -14124,152 +15261,172 @@
           },
           {
             "name": "lines",
-            "line": 85
-          },
-          {
-            "name": "scoreColor",
             "line": 91
           },
           {
-            "name": "lines",
-            "line": 110
-          },
-          {
-            "name": "top",
-            "line": 117
-          },
-          {
-            "name": "severity",
-            "line": 119
+            "name": "scoreColor",
+            "line": 97
           },
           {
             "name": "lines",
-            "line": 137
+            "line": 116
           },
           {
             "name": "top",
-            "line": 144
+            "line": 123
           },
           {
             "name": "severity",
-            "line": 146
+            "line": 125
           },
           {
-            "name": "i",
-            "line": 149
+            "name": "lines",
+            "line": 143
           },
           {
-            "name": "file",
+            "name": "top",
             "line": 150
           },
           {
+            "name": "severity",
+            "line": 152
+          },
+          {
+            "name": "i",
+            "line": 155
+          },
+          {
+            "name": "file",
+            "line": 156
+          },
+          {
             "name": "arrow",
-            "line": 151
+            "line": 157
           },
           {
             "name": "lines",
-            "line": 168
+            "line": 174
           },
           {
             "name": "top",
-            "line": 177
+            "line": 183
           },
           {
             "name": "top",
-            "line": 190
+            "line": 196
           },
           {
             "name": "lines",
-            "line": 207
+            "line": 213
           },
           {
             "name": "top",
-            "line": 214
+            "line": 220
           },
           {
             "name": "severity",
-            "line": 216
+            "line": 222
           },
           {
             "name": "lines",
-            "line": 232
+            "line": 238
           },
           {
             "name": "top",
-            "line": 239
+            "line": 245
           },
           {
             "name": "severity",
-            "line": 241
+            "line": 247
           },
           {
             "name": "lines",
-            "line": 257
+            "line": 263
           },
           {
             "name": "top",
-            "line": 264
+            "line": 270
           },
           {
             "name": "lines",
-            "line": 280
+            "line": 286
           },
           {
             "name": "top",
-            "line": 287
+            "line": 293
           },
           {
             "name": "severity",
-            "line": 289
+            "line": 295
           },
           {
             "name": "lines",
-            "line": 305
+            "line": 311
           },
           {
             "name": "priority",
-            "line": 312
+            "line": 318
           },
           {
             "name": "badges",
-            "line": 352
+            "line": 358
           },
           {
             "name": "badges",
-            "line": 366
+            "line": 372
           },
           {
             "name": "badges",
-            "line": 379
+            "line": 385
           },
           {
             "name": "lines",
-            "line": 392
+            "line": 398
           },
           {
             "name": "scoreColor",
-            "line": 394
+            "line": 400
           },
           {
             "name": "issues",
-            "line": 397
+            "line": 403
+          },
+          {
+            "name": "lines",
+            "line": 422
+          },
+          {
+            "name": "citationColor",
+            "line": 427
           }
         ],
         "interfaces": [],
         "types": []
       },
       "src\\dashboard\\healthDashboard.js": {
-        "imports": [],
+        "imports": [
+          {
+            "source": "src/trust/trustMeter.js",
+            "items": [
+              {
+                "name": "TrustMeter",
+                "imported": "TrustMeter",
+                "type": "named"
+              }
+            ],
+            "line": 1
+          }
+        ],
         "exports": [
           {
             "name": "HealthDashboard",
             "type": "class",
-            "line": 9
+            "line": 11
           },
           {
             "name": "createHealthDashboard",
             "type": "function",
-            "line": 498
+            "line": 513
           }
         ],
         "functions": [
@@ -14280,7 +15437,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 498
+            "line": 513
           }
         ],
         "classes": [
@@ -14291,277 +15448,287 @@
                 "name": "constructor",
                 "kind": "constructor",
                 "static": false,
-                "line": 10
+                "line": 12
               },
               {
                 "name": "generateReport",
                 "kind": "method",
                 "static": false,
-                "line": 20
+                "line": 22
+              },
+              {
+                "name": "getHistoryGroundingMetrics",
+                "kind": "method",
+                "static": false,
+                "line": 46
               },
               {
                 "name": "getOverallHealth",
                 "kind": "method",
                 "static": false,
-                "line": 43
+                "line": 58
               },
               {
                 "name": "identifyGodFiles",
                 "kind": "method",
                 "static": false,
-                "line": 98
+                "line": 113
               },
               {
                 "name": "findCircularDependencies",
                 "kind": "method",
                 "static": false,
-                "line": 130
+                "line": 145
               },
               {
                 "name": "detectArchitectureDrift",
                 "kind": "method",
                 "static": false,
-                "line": 144
+                "line": 159
               },
               {
                 "name": "identifyBottlenecks",
                 "kind": "method",
                 "static": false,
-                "line": 225
+                "line": 240
               },
               {
                 "name": "findUnstableModules",
                 "kind": "method",
                 "static": false,
-                "line": 252
+                "line": 267
               },
               {
                 "name": "findOrphanedFiles",
                 "kind": "method",
                 "static": false,
-                "line": 278
+                "line": 293
               },
               {
                 "name": "identifyComplexityHotspots",
                 "kind": "method",
                 "static": false,
-                "line": 298
+                "line": 313
               },
               {
                 "name": "generateRecommendations",
                 "kind": "method",
                 "static": false,
-                "line": 335
+                "line": 350
               },
               {
                 "name": "getFileLayer",
                 "kind": "method",
                 "static": false,
-                "line": 414
+                "line": 429
               },
               {
                 "name": "getHealthGrade",
                 "kind": "method",
                 "static": false,
-                "line": 426
+                "line": 441
               },
               {
                 "name": "getHealthStatus",
                 "kind": "method",
                 "static": false,
-                "line": 437
+                "line": 452
               },
               {
                 "name": "getGodFileSeverity",
                 "kind": "method",
                 "static": false,
-                "line": 448
+                "line": 463
               },
               {
                 "name": "getCycleSeverity",
                 "kind": "method",
                 "static": false,
-                "line": 458
+                "line": 473
               },
               {
                 "name": "getBottleneckSeverity",
                 "kind": "method",
                 "static": false,
-                "line": 467
+                "line": 482
               },
               {
                 "name": "getInstabilitySeverity",
                 "kind": "method",
                 "static": false,
-                "line": 477
+                "line": 492
               },
               {
                 "name": "getComplexitySeverity",
                 "kind": "method",
                 "static": false,
-                "line": 487
+                "line": 502
               }
             ],
             "superClass": null,
-            "line": 9
+            "line": 11
           }
         ],
         "variables": [
           {
             "name": "report",
-            "line": 21
+            "line": 23
           },
           {
-            "name": "score",
-            "line": 44
-          },
-          {
-            "name": "issues",
-            "line": 45
-          },
-          {
-            "name": "godFiles",
+            "name": "trustMeter",
             "line": 48
           },
           {
-            "name": "deduction",
-            "line": 50
+            "name": "score",
+            "line": 59
           },
           {
-            "name": "cycles",
-            "line": 56
-          },
-          {
-            "name": "deduction",
-            "line": 58
-          },
-          {
-            "name": "bottlenecks",
-            "line": 64
-          },
-          {
-            "name": "deduction",
-            "line": 66
-          },
-          {
-            "name": "unstable",
-            "line": 72
-          },
-          {
-            "name": "deduction",
-            "line": 74
-          },
-          {
-            "name": "orphaned",
-            "line": 80
-          },
-          {
-            "name": "deduction",
-            "line": 82
+            "name": "issues",
+            "line": 60
           },
           {
             "name": "godFiles",
-            "line": 99
+            "line": 63
           },
           {
-            "name": "metrics",
-            "line": 102
-          },
-          {
-            "name": "symbols",
-            "line": 105
+            "name": "deduction",
+            "line": 65
           },
           {
             "name": "cycles",
-            "line": 131
+            "line": 71
           },
           {
-            "name": "drift",
-            "line": 145
-          },
-          {
-            "name": "layers",
-            "line": 153
-          },
-          {
-            "name": "fileLayer",
-            "line": 162
-          },
-          {
-            "name": "allowedLayers",
-            "line": 165
-          },
-          {
-            "name": "deps",
-            "line": 166
-          },
-          {
-            "name": "depLayer",
-            "line": 169
-          },
-          {
-            "name": "symbols",
-            "line": 186
+            "name": "deduction",
+            "line": 73
           },
           {
             "name": "bottlenecks",
-            "line": 226
+            "line": 79
           },
           {
-            "name": "metrics",
-            "line": 229
-          },
-          {
-            "name": "dependents",
-            "line": 232
+            "name": "deduction",
+            "line": 81
           },
           {
             "name": "unstable",
-            "line": 253
+            "line": 87
           },
           {
-            "name": "metrics",
-            "line": 256
+            "name": "deduction",
+            "line": 89
           },
           {
             "name": "orphaned",
-            "line": 279
+            "line": 95
+          },
+          {
+            "name": "deduction",
+            "line": 97
+          },
+          {
+            "name": "godFiles",
+            "line": 114
           },
           {
             "name": "metrics",
-            "line": 282
-          },
-          {
-            "name": "hotspots",
-            "line": 299
+            "line": 117
           },
           {
             "name": "symbols",
-            "line": 302
+            "line": 120
+          },
+          {
+            "name": "cycles",
+            "line": 146
+          },
+          {
+            "name": "drift",
+            "line": 160
+          },
+          {
+            "name": "layers",
+            "line": 168
+          },
+          {
+            "name": "fileLayer",
+            "line": 177
+          },
+          {
+            "name": "allowedLayers",
+            "line": 180
+          },
+          {
+            "name": "deps",
+            "line": 181
+          },
+          {
+            "name": "depLayer",
+            "line": 184
+          },
+          {
+            "name": "symbols",
+            "line": 201
+          },
+          {
+            "name": "bottlenecks",
+            "line": 241
           },
           {
             "name": "metrics",
-            "line": 305
+            "line": 244
+          },
+          {
+            "name": "dependents",
+            "line": 247
+          },
+          {
+            "name": "unstable",
+            "line": 268
+          },
+          {
+            "name": "metrics",
+            "line": 271
+          },
+          {
+            "name": "orphaned",
+            "line": 294
+          },
+          {
+            "name": "metrics",
+            "line": 297
+          },
+          {
+            "name": "hotspots",
+            "line": 314
+          },
+          {
+            "name": "symbols",
+            "line": 317
+          },
+          {
+            "name": "metrics",
+            "line": 320
           },
           {
             "name": "functionCount",
-            "line": 308
+            "line": 323
           },
           {
             "name": "classCount",
-            "line": 309
+            "line": 324
           },
           {
             "name": "connections",
-            "line": 310
+            "line": 325
           },
           {
             "name": "complexityScore",
-            "line": 312
+            "line": 327
           },
           {
             "name": "recommendations",
-            "line": 336
+            "line": 351
           }
         ],
         "interfaces": [],
@@ -14578,7 +15745,7 @@
           {
             "name": "createGraphEngine",
             "type": "function",
-            "line": 336
+            "line": 367
           }
         ],
         "functions": [
@@ -14590,7 +15757,7 @@
             ],
             "async": false,
             "arrow": true,
-            "line": 111
+            "line": 142
           },
           {
             "name": "dfs",
@@ -14600,7 +15767,7 @@
             ],
             "async": false,
             "arrow": true,
-            "line": 135
+            "line": 166
           },
           {
             "name": "dfs",
@@ -14610,7 +15777,7 @@
             ],
             "async": false,
             "arrow": true,
-            "line": 189
+            "line": 220
           },
           {
             "name": "dfs1",
@@ -14619,7 +15786,7 @@
             ],
             "async": false,
             "arrow": true,
-            "line": 227
+            "line": 258
           },
           {
             "name": "dfs2",
@@ -14629,7 +15796,7 @@
             ],
             "async": false,
             "arrow": true,
-            "line": 248
+            "line": 279
           },
           {
             "name": "createGraphEngine",
@@ -14638,7 +15805,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 336
+            "line": 367
           }
         ],
         "classes": [
@@ -14652,94 +15819,106 @@
                 "line": 7
               },
               {
-                "name": "_buildAdjacencyList",
+                "name": "addNode",
                 "kind": "method",
                 "static": false,
                 "line": 17
               },
               {
+                "name": "addEdge",
+                "kind": "method",
+                "static": false,
+                "line": 31
+              },
+              {
+                "name": "_buildAdjacencyList",
+                "kind": "method",
+                "static": false,
+                "line": 48
+              },
+              {
                 "name": "_buildReverseAdjacencyList",
                 "kind": "method",
                 "static": false,
-                "line": 36
+                "line": 67
               },
               {
                 "name": "getNode",
                 "kind": "method",
                 "static": false,
-                "line": 55
+                "line": 86
               },
               {
                 "name": "getAllNodes",
                 "kind": "method",
                 "static": false,
-                "line": 62
+                "line": 93
               },
               {
                 "name": "getOutgoingEdges",
                 "kind": "method",
                 "static": false,
-                "line": 69
+                "line": 100
               },
               {
                 "name": "getIncomingEdges",
                 "kind": "method",
                 "static": false,
-                "line": 76
+                "line": 107
               },
               {
                 "name": "getDirectDependencies",
                 "kind": "method",
                 "static": false,
-                "line": 83
+                "line": 114
               },
               {
                 "name": "getDirectDependents",
                 "kind": "method",
                 "static": false,
-                "line": 95
+                "line": 126
               },
               {
                 "name": "getTransitiveDependencies",
                 "kind": "method",
                 "static": false,
-                "line": 107
+                "line": 138
               },
               {
                 "name": "getTransitiveDependents",
                 "kind": "method",
                 "static": false,
-                "line": 131
+                "line": 162
               },
               {
                 "name": "findPath",
                 "kind": "method",
                 "static": false,
-                "line": 155
+                "line": 186
               },
               {
                 "name": "detectCircularDependencies",
                 "kind": "method",
                 "static": false,
-                "line": 184
+                "line": 215
               },
               {
                 "name": "getStronglyConnectedComponents",
                 "kind": "method",
                 "static": false,
-                "line": 222
+                "line": 253
               },
               {
                 "name": "getNodeMetrics",
                 "kind": "method",
                 "static": false,
-                "line": 276
+                "line": 307
               },
               {
                 "name": "getStats",
                 "kind": "method",
                 "static": false,
-                "line": 301
+                "line": 332
               }
             ],
             "superClass": null,
@@ -14748,172 +15927,180 @@
         ],
         "variables": [
           {
-            "name": "adj",
+            "name": "node",
             "line": 18
           },
           {
+            "name": "edge",
+            "line": 32
+          },
+          {
             "name": "adj",
-            "line": 37
+            "line": 49
+          },
+          {
+            "name": "adj",
+            "line": 68
           },
           {
             "name": "edges",
-            "line": 84
-          },
-          {
-            "name": "edges",
-            "line": 96
-          },
-          {
-            "name": "visited",
-            "line": 108
-          },
-          {
-            "name": "result",
-            "line": 109
-          },
-          {
-            "name": "deps",
             "line": 115
           },
           {
+            "name": "edges",
+            "line": 127
+          },
+          {
             "name": "visited",
-            "line": 132
-          },
-          {
-            "name": "result",
-            "line": 133
-          },
-          {
-            "name": "dependents",
             "line": 139
           },
           {
-            "name": "queue",
-            "line": 158
+            "name": "result",
+            "line": 140
+          },
+          {
+            "name": "deps",
+            "line": 146
           },
           {
             "name": "visited",
-            "line": 159
-          },
-          {
-            "name": "path",
-            "line": 162
-          },
-          {
-            "name": "current",
             "line": 163
           },
           {
-            "name": "deps",
-            "line": 165
-          },
-          {
-            "name": "cycles",
-            "line": 185
-          },
-          {
-            "name": "visited",
-            "line": 186
-          },
-          {
-            "name": "recStack",
-            "line": 187
-          },
-          {
-            "name": "deps",
-            "line": 194
-          },
-          {
-            "name": "cycleStart",
-            "line": 200
-          },
-          {
-            "name": "cycle",
-            "line": 201
-          },
-          {
-            "name": "visited",
-            "line": 223
-          },
-          {
-            "name": "stack",
-            "line": 224
-          },
-          {
-            "name": "deps",
-            "line": 229
-          },
-          {
-            "name": "components",
-            "line": 246
+            "name": "result",
+            "line": 164
           },
           {
             "name": "dependents",
-            "line": 251
+            "line": 170
           },
           {
-            "name": "nodeId",
+            "name": "queue",
+            "line": 189
+          },
+          {
+            "name": "visited",
+            "line": 190
+          },
+          {
+            "name": "path",
+            "line": 193
+          },
+          {
+            "name": "current",
+            "line": 194
+          },
+          {
+            "name": "deps",
+            "line": 196
+          },
+          {
+            "name": "cycles",
+            "line": 216
+          },
+          {
+            "name": "visited",
+            "line": 217
+          },
+          {
+            "name": "recStack",
+            "line": 218
+          },
+          {
+            "name": "deps",
+            "line": 225
+          },
+          {
+            "name": "cycleStart",
+            "line": 231
+          },
+          {
+            "name": "cycle",
+            "line": 232
+          },
+          {
+            "name": "visited",
+            "line": 254
+          },
+          {
+            "name": "stack",
+            "line": 255
+          },
+          {
+            "name": "deps",
             "line": 260
           },
           {
-            "name": "component",
-            "line": 262
-          },
-          {
-            "name": "node",
+            "name": "components",
             "line": 277
           },
           {
-            "name": "directDeps",
-            "line": 280
-          },
-          {
-            "name": "directDependents",
-            "line": 281
-          },
-          {
-            "name": "transitiveDeps",
+            "name": "dependents",
             "line": 282
           },
           {
-            "name": "transitiveDependents",
-            "line": 283
+            "name": "nodeId",
+            "line": 291
           },
           {
-            "name": "nodeCount",
-            "line": 302
+            "name": "component",
+            "line": 293
           },
           {
-            "name": "edgeCount",
-            "line": 303
-          },
-          {
-            "name": "avgDegree",
-            "line": 304
-          },
-          {
-            "name": "maxFanIn",
-            "line": 306
-          },
-          {
-            "name": "maxFanOut",
-            "line": 307
-          },
-          {
-            "name": "totalFanIn",
+            "name": "node",
             "line": 308
           },
           {
-            "name": "totalFanOut",
-            "line": 309
+            "name": "directDeps",
+            "line": 311
           },
           {
-            "name": "fanIn",
+            "name": "directDependents",
             "line": 312
           },
           {
-            "name": "fanOut",
+            "name": "transitiveDeps",
             "line": 313
+          },
+          {
+            "name": "transitiveDependents",
+            "line": 314
+          },
+          {
+            "name": "nodeCount",
+            "line": 333
+          },
+          {
+            "name": "edgeCount",
+            "line": 334
+          },
+          {
+            "name": "avgDegree",
+            "line": 335
+          },
+          {
+            "name": "maxFanIn",
+            "line": 337
+          },
+          {
+            "name": "maxFanOut",
+            "line": 338
+          },
+          {
+            "name": "totalFanIn",
+            "line": 339
+          },
+          {
+            "name": "totalFanOut",
+            "line": 340
+          },
+          {
+            "name": "fanIn",
+            "line": 343
+          },
+          {
+            "name": "fanOut",
+            "line": 344
           }
         ],
         "interfaces": [],
@@ -17574,49 +18761,61 @@
                 "name": "getGodNodes",
                 "kind": "method",
                 "static": false,
-                "line": 166
+                "line": 168
               },
               {
                 "name": "retrieveByConnectivity",
                 "kind": "method",
                 "static": false,
-                "line": 184
+                "line": 186
               },
               {
                 "name": "retrieveByPathDistance",
                 "kind": "method",
                 "static": false,
-                "line": 215
+                "line": 217
               },
               {
                 "name": "retrieveSubgraph",
                 "kind": "method",
                 "static": false,
-                "line": 251
+                "line": 253
+              },
+              {
+                "name": "findRelatedFiles",
+                "kind": "method",
+                "static": false,
+                "line": 303
+              },
+              {
+                "name": "getCriticalPath",
+                "kind": "method",
+                "static": false,
+                "line": 340
               },
               {
                 "name": "extractFilePatterns",
                 "kind": "method",
                 "static": false,
-                "line": 301
+                "line": 354
               },
               {
                 "name": "isCommonWord",
                 "kind": "method",
                 "static": false,
-                "line": 326
+                "line": 379
               },
               {
                 "name": "matchesPattern",
                 "kind": "method",
                 "static": false,
-                "line": 337
+                "line": 390
               },
               {
                 "name": "getGraphStats",
                 "kind": "method",
                 "static": false,
-                "line": 347
+                "line": 400
               }
             ],
             "superClass": null,
@@ -17669,76 +18868,327 @@
             "line": 143
           },
           {
+            "name": "matchesItems",
+            "line": 146
+          },
+          {
+            "name": "matchesDirect",
+            "line": 149
+          },
+          {
             "name": "nodes",
-            "line": 167
+            "line": 169
           },
           {
             "name": "withMetrics",
-            "line": 168
+            "line": 170
           },
           {
             "name": "results",
-            "line": 187
+            "line": 189
           },
           {
             "name": "metrics",
-            "line": 193
+            "line": 195
           },
           {
             "name": "results",
-            "line": 218
+            "line": 220
           },
           {
             "name": "path",
-            "line": 225
+            "line": 227
           },
           {
             "name": "results",
-            "line": 254
+            "line": 256
           },
           {
             "name": "visited",
-            "line": 260
+            "line": 262
           },
           {
             "name": "queue",
-            "line": 263
+            "line": 265
           },
           {
             "name": "deps",
-            "line": 274
+            "line": 276
           },
           {
             "name": "dependents",
-            "line": 275
+            "line": 277
           },
           {
-            "name": "patterns",
-            "line": 302
-          },
-          {
-            "name": "extMatches",
+            "name": "results",
             "line": 305
           },
           {
+            "name": "targetDeps",
+            "line": 307
+          },
+          {
+            "name": "nodeDeps",
+            "line": 316
+          },
+          {
+            "name": "sharedCount",
+            "line": 317
+          },
+          {
+            "name": "path",
+            "line": 341
+          },
+          {
+            "name": "patterns",
+            "line": 355
+          },
+          {
+            "name": "extMatches",
+            "line": 358
+          },
+          {
             "name": "pathMatches",
-            "line": 309
+            "line": 362
           },
           {
             "name": "words",
-            "line": 313
+            "line": 366
           },
           {
             "name": "commonWords",
-            "line": 327
+            "line": 380
           },
           {
             "name": "pathLower",
-            "line": 338
+            "line": 391
           },
           {
             "name": "patternLower",
-            "line": 339
+            "line": 392
+          }
+        ],
+        "interfaces": [],
+        "types": []
+      },
+      "src\\retrieval\\historyRetriever.js": {
+        "imports": [
+          {
+            "source": "child_process",
+            "items": [
+              {
+                "name": "execFile",
+                "imported": "execFile",
+                "type": "named"
+              }
+            ],
+            "line": 1
+          },
+          {
+            "source": "util",
+            "items": [
+              {
+                "name": "promisify",
+                "imported": "promisify",
+                "type": "named"
+              }
+            ],
+            "line": 2
+          },
+          {
+            "source": "fs/promises",
+            "items": [
+              {
+                "name": "fs",
+                "type": "default"
+              }
+            ],
+            "line": 3
+          },
+          {
+            "source": "path",
+            "items": [
+              {
+                "name": "path",
+                "type": "default"
+              }
+            ],
+            "line": 4
+          }
+        ],
+        "exports": [
+          {
+            "name": "HistoryRetriever",
+            "type": "class",
+            "line": 13
+          }
+        ],
+        "functions": [],
+        "classes": [
+          {
+            "name": "HistoryRetriever",
+            "methods": [
+              {
+                "name": "constructor",
+                "kind": "constructor",
+                "static": false,
+                "line": 14
+              },
+              {
+                "name": "isAvailable",
+                "kind": "method",
+                "static": false,
+                "line": 24
+              },
+              {
+                "name": "retrieveForFile",
+                "kind": "method",
+                "static": false,
+                "line": 41
+              },
+              {
+                "name": "retrieveForChangedFiles",
+                "kind": "method",
+                "static": false,
+                "line": 79
+              },
+              {
+                "name": "searchHistory",
+                "kind": "method",
+                "static": false,
+                "line": 121
+              },
+              {
+                "name": "formatForPrompt",
+                "kind": "method",
+                "static": false,
+                "line": 146
+              },
+              {
+                "name": "loadHistoryCache",
+                "kind": "method",
+                "static": false,
+                "line": 170
+              },
+              {
+                "name": "saveHistoryCache",
+                "kind": "method",
+                "static": false,
+                "line": 180
+              },
+              {
+                "name": "loadQueryCache",
+                "kind": "method",
+                "static": false,
+                "line": 190
+              },
+              {
+                "name": "saveQueryCache",
+                "kind": "method",
+                "static": false,
+                "line": 200
+              }
+            ],
+            "superClass": null,
+            "line": 13
+          }
+        ],
+        "variables": [
+          {
+            "name": "execFileAsync",
+            "line": 6
+          },
+          {
+            "name": "HISTORY_BIN",
+            "line": 7
+          },
+          {
+            "name": "limit",
+            "line": 42
+          },
+          {
+            "name": "normalizedPath",
+            "line": 50
+          },
+          {
+            "name": "parsed",
+            "line": 60
+          },
+          {
+            "name": "staleFiles",
+            "line": 80
+          },
+          {
+            "name": "currentHashes",
+            "line": 81
+          },
+          {
+            "name": "limit",
+            "line": 82
+          },
+          {
+            "name": "historyCache",
+            "line": 88
+          },
+          {
+            "name": "queryCache",
+            "line": 89
+          },
+          {
+            "name": "results",
+            "line": 90
+          },
+          {
+            "name": "isStale",
+            "line": 93
+          },
+          {
+            "name": "history",
+            "line": 100
+          },
+          {
+            "name": "limit",
+            "line": 122
+          },
+          {
+            "name": "parsed",
+            "line": 136
+          },
+          {
+            "name": "maxChars",
+            "line": 147
+          },
+          {
+            "name": "lines",
+            "line": 148
+          },
+          {
+            "name": "formatted",
+            "line": 162
+          },
+          {
+            "name": "cachePath",
+            "line": 171
+          },
+          {
+            "name": "content",
+            "line": 173
+          },
+          {
+            "name": "cachePath",
+            "line": 181
+          },
+          {
+            "name": "cachePath",
+            "line": 191
+          },
+          {
+            "name": "content",
+            "line": 193
+          },
+          {
+            "name": "cachePath",
+            "line": 201
           }
         ],
         "interfaces": [],
@@ -18030,22 +19480,22 @@
           {
             "name": "calculateEditConfidence",
             "type": "function",
-            "line": 217
+            "line": 226
           },
           {
             "name": "generateConfidenceReport",
             "type": "function",
-            "line": 250
+            "line": 266
           },
           {
             "name": "ConfidenceTracker",
             "type": "class",
-            "line": 319
+            "line": 335
           },
           {
             "name": "createConfidenceTracker",
             "type": "function",
-            "line": 401
+            "line": 417
           }
         ],
         "functions": [
@@ -18142,7 +19592,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 217
+            "line": 226
           },
           {
             "name": "generateConfidenceReport",
@@ -18151,7 +19601,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 250
+            "line": 266
           },
           {
             "name": "getConfidenceSummary",
@@ -18160,7 +19610,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 266
+            "line": 282
           },
           {
             "name": "getRecommendations",
@@ -18169,14 +19619,14 @@
             ],
             "async": false,
             "generator": false,
-            "line": 285
+            "line": 301
           },
           {
             "name": "createConfidenceTracker",
             "params": [],
             "async": false,
             "generator": false,
-            "line": 401
+            "line": 417
           }
         ],
         "classes": [
@@ -18187,35 +19637,35 @@
                 "name": "constructor",
                 "kind": "constructor",
                 "static": false,
-                "line": 320
+                "line": 336
               },
               {
                 "name": "record",
                 "kind": "method",
                 "static": false,
-                "line": 328
+                "line": 344
               },
               {
                 "name": "getAverage",
                 "kind": "method",
                 "static": false,
-                "line": 344
+                "line": 360
               },
               {
                 "name": "getTrend",
                 "kind": "method",
                 "static": false,
-                "line": 354
+                "line": 370
               },
               {
                 "name": "getStats",
                 "kind": "method",
                 "static": false,
-                "line": 375
+                "line": 391
               }
             ],
             "superClass": null,
-            "line": 319
+            "line": 335
           }
         ],
         "variables": [
@@ -18285,47 +19735,47 @@
           },
           {
             "name": "score",
-            "line": 220
+            "line": 229
           },
           {
             "name": "metrics",
-            "line": 235
+            "line": 244
           },
           {
             "name": "report",
-            "line": 251
+            "line": 267
           },
           {
             "name": "recommendations",
-            "line": 286
+            "line": 302
           },
           {
             "name": "sum",
-            "line": 347
-          },
-          {
-            "name": "recent",
-            "line": 357
-          },
-          {
-            "name": "older",
-            "line": 358
-          },
-          {
-            "name": "recentAvg",
-            "line": 362
-          },
-          {
-            "name": "olderAvg",
             "line": 363
           },
           {
+            "name": "recent",
+            "line": 373
+          },
+          {
+            "name": "older",
+            "line": 374
+          },
+          {
+            "name": "recentAvg",
+            "line": 378
+          },
+          {
+            "name": "olderAvg",
+            "line": 379
+          },
+          {
             "name": "diff",
-            "line": 365
+            "line": 381
           },
           {
             "name": "scores",
-            "line": 386
+            "line": 402
           }
         ],
         "interfaces": [],
@@ -19859,17 +21309,61 @@
         "types": []
       },
       "src\\trust\\trustMeter.js": {
-        "imports": [],
+        "imports": [
+          {
+            "source": "src/validation/historyValidator.js",
+            "items": [
+              {
+                "name": "validateHistoryClaims",
+                "imported": "validateHistoryClaims",
+                "type": "named"
+              }
+            ],
+            "line": 1
+          },
+          {
+            "source": "src/retrieval/historyRetriever.js",
+            "items": [
+              {
+                "name": "HistoryRetriever",
+                "imported": "HistoryRetriever",
+                "type": "named"
+              }
+            ],
+            "line": 2
+          },
+          {
+            "source": "src/utils/fileUtils.js",
+            "items": [
+              {
+                "name": "getRecallPath",
+                "imported": "getRecallPath",
+                "type": "named"
+              },
+              {
+                "name": "fileExists",
+                "imported": "fileExists",
+                "type": "named"
+              },
+              {
+                "name": "readFile",
+                "imported": "readFile",
+                "type": "named"
+              }
+            ],
+            "line": 3
+          }
+        ],
         "exports": [
           {
             "name": "TrustMeter",
             "type": "class",
-            "line": 9
+            "line": 13
           },
           {
             "name": "createTrustMeter",
             "type": "function",
-            "line": 556
+            "line": 619
           }
         ],
         "functions": [
@@ -19880,7 +21374,7 @@
             ],
             "async": false,
             "generator": false,
-            "line": 556
+            "line": 619
           }
         ],
         "classes": [
@@ -19891,307 +21385,353 @@
                 "name": "constructor",
                 "kind": "constructor",
                 "static": false,
-                "line": 10
+                "line": 14
               },
               {
                 "name": "generateReport",
                 "kind": "method",
                 "static": false,
-                "line": 21
+                "line": 25
+              },
+              {
+                "name": "getHistoryCitationMetrics",
+                "kind": "method",
+                "static": false,
+                "line": 48
               },
               {
                 "name": "getOverallTrust",
                 "kind": "method",
                 "static": false,
-                "line": 44
+                "line": 81
               },
               {
                 "name": "getSymbolVerificationMetrics",
                 "kind": "method",
                 "static": false,
-                "line": 118
+                "line": 168
               },
               {
                 "name": "getImportValidationMetrics",
                 "kind": "method",
                 "static": false,
-                "line": 157
+                "line": 207
               },
               {
                 "name": "getHallucinationRisk",
                 "kind": "method",
                 "static": false,
-                "line": 232
+                "line": 282
               },
               {
                 "name": "getValidationHistory",
                 "kind": "method",
                 "static": false,
-                "line": 301
+                "line": 364
               },
               {
                 "name": "getTrustTrend",
                 "kind": "method",
                 "static": false,
-                "line": 326
+                "line": 389
               },
               {
                 "name": "getVerifiedSymbols",
                 "kind": "method",
                 "static": false,
-                "line": 351
+                "line": 414
               },
               {
                 "name": "getUnverifiedSymbols",
                 "kind": "method",
                 "static": false,
-                "line": 391
+                "line": 454
               },
               {
                 "name": "generateRecommendations",
                 "kind": "method",
                 "static": false,
-                "line": 427
+                "line": 490
               },
               {
                 "name": "countOrphanedFiles",
                 "kind": "method",
                 "static": false,
-                "line": 493
+                "line": 556
               },
               {
                 "name": "getTrustGrade",
                 "kind": "method",
                 "static": false,
-                "line": 509
+                "line": 572
               },
               {
                 "name": "getTrustLevel",
                 "kind": "method",
                 "static": false,
-                "line": 523
+                "line": 586
               },
               {
                 "name": "getTrustStatus",
                 "kind": "method",
                 "static": false,
-                "line": 535
+                "line": 598
               },
               {
                 "name": "getRiskLevel",
                 "kind": "method",
                 "static": false,
-                "line": 545
+                "line": 608
               }
             ],
             "superClass": null,
-            "line": 9
+            "line": 13
           }
         ],
         "variables": [
           {
             "name": "report",
-            "line": 22
+            "line": 26
           },
           {
-            "name": "score",
-            "line": 45
+            "name": "memoryPath",
+            "line": 56
           },
           {
-            "name": "factors",
-            "line": 46
+            "name": "memoryText",
+            "line": 62
           },
           {
-            "name": "symbolMetrics",
-            "line": 49
+            "name": "historyRetriever",
+            "line": 63
           },
           {
-            "name": "symbolRate",
-            "line": 50
-          },
-          {
-            "name": "deduction",
-            "line": 53
-          },
-          {
-            "name": "importMetrics",
+            "name": "validation",
             "line": 64
           },
           {
-            "name": "importRate",
-            "line": 65
+            "name": "total",
+            "line": 66
           },
           {
-            "name": "deduction",
-            "line": 68
+            "name": "citationRate",
+            "line": 67
           },
           {
-            "name": "hallucinationRisk",
-            "line": 79
+            "name": "score",
+            "line": 82
           },
           {
-            "name": "deduction",
-            "line": 81
-          },
-          {
-            "name": "history",
-            "line": 92
-          },
-          {
-            "name": "deduction",
-            "line": 94
-          },
-          {
-            "name": "stats",
-            "line": 119
-          },
-          {
-            "name": "totalSymbols",
-            "line": 121
-          },
-          {
-            "name": "verifiedSymbols",
-            "line": 122
-          },
-          {
-            "name": "verificationRate",
-            "line": 125
-          },
-          {
-            "name": "totalImports",
-            "line": 158
-          },
-          {
-            "name": "validImports",
-            "line": 159
-          },
-          {
-            "name": "invalidImports",
-            "line": 160
-          },
-          {
-            "name": "allSymbols",
-            "line": 162
-          },
-          {
-            "name": "sourceExists",
-            "line": 169
-          },
-          {
-            "name": "allItemsValid",
-            "line": 173
-          },
-          {
-            "name": "symbolName",
-            "line": 180
-          },
-          {
-            "name": "isValid",
-            "line": 181
-          },
-          {
-            "name": "validationRate",
-            "line": 216
-          },
-          {
-            "name": "riskScore",
-            "line": 233
-          },
-          {
-            "name": "risks",
-            "line": 234
+            "name": "factors",
+            "line": 83
           },
           {
             "name": "symbolMetrics",
-            "line": 237
+            "line": 86
           },
           {
-            "name": "risk",
-            "line": 239
+            "name": "symbolRate",
+            "line": 87
+          },
+          {
+            "name": "deduction",
+            "line": 90
           },
           {
             "name": "importMetrics",
-            "line": 250
+            "line": 101
           },
           {
-            "name": "risk",
-            "line": 252
+            "name": "importRate",
+            "line": 102
           },
           {
-            "name": "orphanedCount",
-            "line": 263
+            "name": "deduction",
+            "line": 105
           },
           {
-            "name": "risk",
-            "line": 265
+            "name": "hallucinationRisk",
+            "line": 116
           },
           {
-            "name": "cycles",
-            "line": 276
+            "name": "deduction",
+            "line": 118
           },
           {
-            "name": "risk",
-            "line": 278
+            "name": "history",
+            "line": 129
           },
           {
-            "name": "totalValidations",
-            "line": 305
+            "name": "deduction",
+            "line": 131
           },
           {
-            "name": "successfulValidations",
-            "line": 306
+            "name": "historyMetrics",
+            "line": 142
           },
           {
-            "name": "successRate",
-            "line": 308
+            "name": "deduction",
+            "line": 144
           },
           {
-            "name": "currentTrust",
-            "line": 330
+            "name": "stats",
+            "line": 169
           },
           {
-            "name": "verified",
-            "line": 352
+            "name": "totalSymbols",
+            "line": 171
+          },
+          {
+            "name": "verifiedSymbols",
+            "line": 172
+          },
+          {
+            "name": "verificationRate",
+            "line": 175
+          },
+          {
+            "name": "totalImports",
+            "line": 208
+          },
+          {
+            "name": "validImports",
+            "line": 209
+          },
+          {
+            "name": "invalidImports",
+            "line": 210
           },
           {
             "name": "allSymbols",
-            "line": 353
+            "line": 212
           },
           {
-            "name": "locations",
-            "line": 358
+            "name": "sourceExists",
+            "line": 219
           },
           {
-            "name": "locations",
-            "line": 372
-          },
-          {
-            "name": "unverified",
-            "line": 392
-          },
-          {
-            "name": "allSymbols",
-            "line": 393
+            "name": "allItemsValid",
+            "line": 223
           },
           {
             "name": "symbolName",
-            "line": 403
+            "line": 230
           },
           {
             "name": "isValid",
-            "line": 404
+            "line": 231
+          },
+          {
+            "name": "validationRate",
+            "line": 266
+          },
+          {
+            "name": "riskScore",
+            "line": 283
+          },
+          {
+            "name": "risks",
+            "line": 284
+          },
+          {
+            "name": "symbolMetrics",
+            "line": 287
+          },
+          {
+            "name": "risk",
+            "line": 289
+          },
+          {
+            "name": "importMetrics",
+            "line": 300
+          },
+          {
+            "name": "risk",
+            "line": 302
+          },
+          {
+            "name": "orphanedCount",
+            "line": 313
+          },
+          {
+            "name": "risk",
+            "line": 315
+          },
+          {
+            "name": "cycles",
+            "line": 326
+          },
+          {
+            "name": "risk",
+            "line": 328
+          },
+          {
+            "name": "historyMetrics",
+            "line": 339
+          },
+          {
+            "name": "risk",
+            "line": 341
+          },
+          {
+            "name": "totalValidations",
+            "line": 368
+          },
+          {
+            "name": "successfulValidations",
+            "line": 369
+          },
+          {
+            "name": "successRate",
+            "line": 371
+          },
+          {
+            "name": "currentTrust",
+            "line": 393
+          },
+          {
+            "name": "verified",
+            "line": 415
+          },
+          {
+            "name": "allSymbols",
+            "line": 416
+          },
+          {
+            "name": "locations",
+            "line": 421
+          },
+          {
+            "name": "locations",
+            "line": 435
+          },
+          {
+            "name": "unverified",
+            "line": 455
+          },
+          {
+            "name": "allSymbols",
+            "line": 456
+          },
+          {
+            "name": "symbolName",
+            "line": 466
+          },
+          {
+            "name": "isValid",
+            "line": 467
           },
           {
             "name": "recommendations",
-            "line": 428
+            "line": 491
           },
           {
             "name": "count",
-            "line": 494
+            "line": 557
           },
           {
             "name": "metrics",
-            "line": 497
+            "line": 560
           }
         ],
         "interfaces": [],
@@ -21314,7 +22854,8 @@
             "params": [
               "files",
               "gitInfo",
-              "graphSummary"
+              "graphSummary",
+              "historyContext"
             ],
             "async": false,
             "generator": false,
@@ -21522,6 +23063,61 @@
           {
             "name": "branch",
             "line": 133
+          }
+        ],
+        "interfaces": [],
+        "types": []
+      },
+      "src\\validation\\historyValidator.js": {
+        "imports": [],
+        "exports": [
+          {
+            "name": "validateHistoryClaims",
+            "type": "function",
+            "line": 9
+          }
+        ],
+        "functions": [
+          {
+            "name": "validateHistoryClaims",
+            "params": [
+              "memoryDraftText",
+              "historyRetriever"
+            ],
+            "async": true,
+            "generator": false,
+            "line": 9
+          }
+        ],
+        "classes": [],
+        "variables": [
+          {
+            "name": "result",
+            "line": 10
+          },
+          {
+            "name": "lines",
+            "line": 29
+          },
+          {
+            "name": "line",
+            "line": 32
+          },
+          {
+            "name": "claimText",
+            "line": 46
+          },
+          {
+            "name": "index",
+            "line": 50
+          },
+          {
+            "name": "isGrounded",
+            "line": 83
+          },
+          {
+            "name": "issue",
+            "line": 88
           }
         ],
         "interfaces": [],
@@ -23240,6 +24836,257 @@
         "interfaces": [],
         "types": []
       },
+      "test-history-grounding.js": {
+        "imports": [
+          {
+            "source": "src/retrieval/historyRetriever.js",
+            "items": [
+              {
+                "name": "HistoryRetriever",
+                "imported": "HistoryRetriever",
+                "type": "named"
+              }
+            ],
+            "line": 7
+          },
+          {
+            "source": "src/validation/historyValidator.js",
+            "items": [
+              {
+                "name": "validateHistoryClaims",
+                "imported": "validateHistoryClaims",
+                "type": "named"
+              }
+            ],
+            "line": 8
+          },
+          {
+            "source": "src/checksum/invalidation.js",
+            "items": [
+              {
+                "name": "InvalidationStrategy",
+                "imported": "InvalidationStrategy",
+                "type": "named"
+              }
+            ],
+            "line": 9
+          },
+          {
+            "source": "src/trust/trustMeter.js",
+            "items": [
+              {
+                "name": "TrustMeter",
+                "imported": "TrustMeter",
+                "type": "named"
+              }
+            ],
+            "line": 10
+          },
+          {
+            "source": "src/scoring/confidenceScorer.js",
+            "items": [
+              {
+                "name": "calculateEditConfidence",
+                "imported": "calculateEditConfidence",
+                "type": "named"
+              },
+              {
+                "name": "calculateGenerationConfidence",
+                "imported": "calculateGenerationConfidence",
+                "type": "named"
+              }
+            ],
+            "line": 11
+          },
+          {
+            "source": "src/graph/graphEngine.js",
+            "items": [
+              {
+                "name": "GraphEngine",
+                "imported": "GraphEngine",
+                "type": "named"
+              }
+            ],
+            "line": 12
+          },
+          {
+            "source": "src/registry/symbolRegistry.js",
+            "items": [
+              {
+                "name": "SymbolRegistry",
+                "imported": "SymbolRegistry",
+                "type": "named"
+              }
+            ],
+            "line": 13
+          },
+          {
+            "source": "assert",
+            "items": [
+              {
+                "name": "assert",
+                "type": "default"
+              }
+            ],
+            "line": 14
+          },
+          {
+            "source": "fs",
+            "items": [
+              {
+                "name": "fsSync",
+                "type": "default"
+              }
+            ],
+            "line": 15
+          },
+          {
+            "source": "path",
+            "items": [
+              {
+                "name": "path",
+                "type": "default"
+              }
+            ],
+            "line": 16
+          }
+        ],
+        "exports": [],
+        "functions": [
+          {
+            "name": "runTests",
+            "params": [],
+            "async": true,
+            "generator": false,
+            "line": 40
+          }
+        ],
+        "classes": [
+          {
+            "name": "MockHistoryRetriever",
+            "methods": [
+              {
+                "name": "constructor",
+                "kind": "constructor",
+                "static": false,
+                "line": 20
+              },
+              {
+                "name": "isAvailable",
+                "kind": "method",
+                "static": false,
+                "line": 26
+              },
+              {
+                "name": "retrieveForFile",
+                "kind": "method",
+                "static": false,
+                "line": 30
+              },
+              {
+                "name": "searchHistory",
+                "kind": "method",
+                "static": false,
+                "line": 34
+              }
+            ],
+            "superClass": "HistoryRetriever",
+            "line": 19
+          }
+        ],
+        "variables": [
+          {
+            "name": "mockData",
+            "line": 44
+          },
+          {
+            "name": "mockRetriever",
+            "line": 58
+          },
+          {
+            "name": "historyByFile",
+            "line": 62
+          },
+          {
+            "name": "formatted",
+            "line": 65
+          },
+          {
+            "name": "draftMemory",
+            "line": 73
+          },
+          {
+            "name": "validation",
+            "line": 82
+          },
+          {
+            "name": "mockHashes",
+            "line": 100
+          },
+          {
+            "name": "cacheDir",
+            "line": 106
+          },
+          {
+            "name": "mockChecksumEngine",
+            "line": 120
+          },
+          {
+            "name": "strategy",
+            "line": 128
+          },
+          {
+            "name": "invalidationResult",
+            "line": 129
+          },
+          {
+            "name": "mockContext",
+            "line": 152
+          },
+          {
+            "name": "trustMeter",
+            "line": 165
+          },
+          {
+            "name": "report",
+            "line": 166
+          },
+          {
+            "name": "historyFactor",
+            "line": 169
+          },
+          {
+            "name": "uncitedRisk",
+            "line": 175
+          },
+          {
+            "name": "genContextWithHistory",
+            "line": 182
+          },
+          {
+            "name": "genContextIgnoredFailure",
+            "line": 192
+          },
+          {
+            "name": "confCites",
+            "line": 203
+          },
+          {
+            "name": "confIgnored",
+            "line": 204
+          },
+          {
+            "name": "editCites",
+            "line": 211
+          },
+          {
+            "name": "editIgnored",
+            "line": 212
+          }
+        ],
+        "interfaces": [],
+        "types": []
+      },
       "test-hybrid-retrieval.js": {
         "imports": [
           {
@@ -24689,6 +26536,9 @@
         "createChecksumEngine": [
           "src\\checksum\\checksumEngine.js"
         ],
+        "loadHistoryQueryCache": [
+          "src\\checksum\\invalidation.js"
+        ],
         "createInvalidationStrategy": [
           "src\\checksum\\invalidation.js"
         ],
@@ -24708,6 +26558,9 @@
           "src\\commands\\config.js"
         ],
         "getApiKey": [
+          "src\\commands\\config.js"
+        ],
+        "getHistoryConfig": [
           "src\\commands\\config.js"
         ],
         "executeHealthCommand": [
@@ -24872,6 +26725,9 @@
           "src\\trust\\trustFormatter.js"
         ],
         "formatHealthSummary": [
+          "src\\dashboard\\dashboardFormatter.js"
+        ],
+        "formatHistoryGrounding": [
           "src\\dashboard\\dashboardFormatter.js"
         ],
         "createHealthDashboard": [
@@ -25359,6 +27215,9 @@
         "getGitInfo": [
           "src\\utils\\scanner.js"
         ],
+        "validateHistoryClaims": [
+          "src\\validation\\historyValidator.js"
+        ],
         "validateImports": [
           "src\\validation\\importValidator.js"
         ],
@@ -25436,6 +27295,9 @@
         ],
         "testGraphEngine": [
           "test-graph-engine.js"
+        ],
+        "runTests": [
+          "test-history-grounding.js"
         ],
         "testFunction": [
           "test-incremental.js"
@@ -25520,6 +27382,9 @@
         "GraphRetriever": [
           "src\\retrieval\\graphRetriever.js"
         ],
+        "HistoryRetriever": [
+          "src\\retrieval\\historyRetriever.js"
+        ],
         "HybridRetriever": [
           "src\\retrieval\\hybridRetriever.js"
         ],
@@ -25537,6 +27402,9 @@
         ],
         "ValidationResult": [
           "src\\validation\\validator.js"
+        ],
+        "MockHistoryRetriever": [
+          "test-history-grounding.js"
         ]
       },
       "exports": {
@@ -25583,6 +27451,9 @@
           "src\\commands\\config.js"
         ],
         "getApiKey": [
+          "src\\commands\\config.js"
+        ],
+        "getHistoryConfig": [
           "src\\commands\\config.js"
         ],
         "executeHealthCommand": [
@@ -25819,6 +27690,9 @@
         "GraphRetriever": [
           "src\\retrieval\\graphRetriever.js"
         ],
+        "HistoryRetriever": [
+          "src\\retrieval\\historyRetriever.js"
+        ],
         "HybridRetriever": [
           "src\\retrieval\\hybridRetriever.js"
         ],
@@ -26018,6 +27892,9 @@
         "getGitInfo": [
           "src\\utils\\scanner.js"
         ],
+        "validateHistoryClaims": [
+          "src\\validation\\historyValidator.js"
+        ],
         "validateImports": [
           "src\\validation\\importValidator.js"
         ],
@@ -26077,16 +27954,16 @@
     }
   },
   "stats": {
-    "totalFiles": 76,
-    "totalConnections": 214,
-    "avgConnections": 2.8157894736842106,
-    "files": 76,
-    "functions": 286,
-    "classes": 21,
-    "exports": 180,
-    "imports": 214,
-    "uniqueFunctions": 256,
-    "uniqueClasses": 21,
-    "uniqueExports": 176
+    "totalFiles": 79,
+    "totalConnections": 243,
+    "avgConnections": 3.0759493670886076,
+    "files": 79,
+    "functions": 291,
+    "classes": 23,
+    "exports": 183,
+    "imports": 243,
+    "uniqueFunctions": 261,
+    "uniqueClasses": 23,
+    "uniqueExports": 179
   }
 }

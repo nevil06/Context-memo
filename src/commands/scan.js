@@ -5,10 +5,15 @@ import fsSync from 'fs';
 import { scanProject, getGitInfo } from '../utils/scanner.js';
 import { buildGeminiPrompt } from '../utils/prompt.js';
 import { callGemini, estimateTokens } from '../utils/gemini.js';
-import { getApiKey } from './config.js';
+import { getApiKey, getHistoryConfig } from './config.js';
 import { ensureRecallDir, writeYaml, writeFile, getRecallPath, readYaml, fileExists } from '../utils/fileUtils.js';
 import { buildKnowledgeGraphV2 as buildKnowledgeGraph, detectChangedFilesV2 as detectChangedFiles, buildGraphSummaryV2 as buildGraphSummary } from '../utils/graphBuilderV2.js';
 import { loadPreviousHashes, saveCurrentHashes, isFirstScan } from '../utils/hashStore.js';
+import { HistoryRetriever } from '../retrieval/historyRetriever.js';
+import { validateHistoryClaims } from '../validation/historyValidator.js';
+import { createChecksumEngine } from '../checksum/checksumEngine.js';
+import { createInvalidationStrategy } from '../checksum/invalidation.js';
+import path from 'path';
 
 export default async function scanCommand(options) {
   console.log(chalk.blue('🔍 Scanning project...\n'));
@@ -22,17 +27,17 @@ export default async function scanCommand(options) {
 
   const quick = options.quick || false;
   const localOnly = options.local || false;
-  const firstScan = await isFirstScan();
+  const firstScan = await isFirstScan() || !(await fileExists(getRecallPath('memory.yaml')));
 
   // Step 1: Scan files
-  console.log(chalk.gray('Step 1/8: Scanning files...'));
+  console.log(chalk.gray('Step 1/9: Scanning files...'));
   const files = await scanProject(quick);
   
   const totalFiles = files.code.length + files.config.length + files.docs.length;
   console.log(chalk.green(`✅ Found ${files.code.length} code files, ${files.config.length} configs, ${files.docs.length} docs (${totalFiles} total)`));
 
   // Step 2: Build knowledge graph
-  console.log(chalk.gray('Step 2/8: Building knowledge graph...'));
+  console.log(chalk.gray('Step 2/9: Building knowledge graph...'));
   const graph = await buildKnowledgeGraph(process.cwd(), files.code);
   console.log(chalk.green(`✅ Graph built: ${graph.nodes.length} nodes, ${graph.edges.length} connections`));
   console.log(chalk.cyan(`   God nodes: ${graph.godNodes.map(n => n.name).join(', ')}`));
@@ -43,7 +48,7 @@ export default async function scanCommand(options) {
   // Step 3: Detect changes (if not first scan)
   let changeInfo = null;
   if (!firstScan) {
-    console.log(chalk.gray('Step 3/8: Detecting changes...'));
+    console.log(chalk.gray('Step 3/9: Detecting changes...'));
     const previousHashes = await loadPreviousHashes();
     changeInfo = await detectChangedFiles(previousHashes, files.code);
     
@@ -53,12 +58,12 @@ export default async function scanCommand(options) {
       console.log(chalk.green('   ✅ No changes detected'));
     }
   } else {
-    console.log(chalk.gray('Step 3/8: First scan detected'));
+    console.log(chalk.gray('Step 3/9: First scan detected'));
     console.log(chalk.cyan('   ✓ Full scan mode'));
   }
 
   // Step 4: Get git info
-  console.log(chalk.gray('Step 4/8: Gathering git info...'));
+  console.log(chalk.gray('Step 4/9: Gathering git info...'));
   const gitInfo = await getGitInfo();
   if (gitInfo.available) {
     console.log(chalk.green(`   ✅ Git: branch ${gitInfo.branch}, ${gitInfo.log.split('\n').filter(l => l).length} recent commits`));
@@ -66,19 +71,51 @@ export default async function scanCommand(options) {
     console.log(chalk.yellow('   ⚠️  Not a git repository'));
   }
 
-  // Step 5: Decide scan strategy
+  // Step 5: Query history grounding (if available)
+  console.log(chalk.gray('Step 5/9: Querying history grounding...'));
+  const historyConfig = await getHistoryConfig();
+  const historyRetriever = new HistoryRetriever({
+    log: console.log,
+    enabled: historyConfig.historyEnabled,
+    limit: historyConfig.historyLimit
+  });
+  let historyContext = '';
+
+  if (await historyRetriever.isAvailable()) {
+    const filesToQuery = changeInfo
+      ? changeInfo.changed.concat(changeInfo.added)
+      : files.code.map(f => f.path);
+
+    const checksumEngine = createChecksumEngine();
+    await checksumEngine.load();
+    const invalidation = createInvalidationStrategy(checksumEngine);
+    const toInvalidate = invalidation.checkInvalidation(graph, graph.registry || {}, graph.fileHashes);
+
+    const historyByFile = await historyRetriever.retrieveForChangedFiles(filesToQuery, {
+      staleFiles: toInvalidate.historyStaleFiles,
+      currentHashes: graph.fileHashes
+    });
+
+    const filesWithHistory = Object.keys(historyByFile).filter(f => historyByFile[f] && historyByFile[f].length > 0);
+    console.log(chalk.green(`   ✅ history grounding: ${filesWithHistory.length} files with prior session context`));
+    historyContext = historyRetriever.formatForPrompt(historyByFile);
+  } else {
+    console.log(chalk.yellow('   ⚠️  history grounding not installed or disabled — skipping history grounding'));
+  }
+
+  // Step 6: Decide scan strategy
   let memory;
   let tokensUsed = 0;
   let tokensSaved = 0;
 
   if (localOnly) {
     // LOCAL-ONLY MODE
-    console.log(chalk.gray('Step 5/8: Local-only mode (no API)...'));
+    console.log(chalk.gray('Step 6/9: Local-only mode (no API)...'));
     memory = await buildLocalMemory(files, graph, gitInfo);
     console.log(chalk.green('   ✅ Memory generated locally'));
     console.log(chalk.yellow('   ⚠️  Confidence: LOW (no AI reasoning)'));
-    console.log(chalk.gray('Step 6/8: Skipped (local mode)'));
-    console.log(chalk.gray('Step 7/8: Skipped (local mode)'));
+    console.log(chalk.gray('Step 7/9: Skipped (local mode)'));
+    console.log(chalk.gray('Step 8/9: Skipped (local mode)'));
   } else {
     // HYBRID MODE (with API)
     const apiKey = await getApiKey();
@@ -91,19 +128,19 @@ export default async function scanCommand(options) {
 
     if (firstScan || !changeInfo || changeInfo.hasChanges) {
       // Build prompt based on scan type
-      console.log(chalk.gray('Step 5/8: Building AI prompt...'));
+      console.log(chalk.gray('Step 6/9: Building AI prompt...'));
       
       let prompt;
       if (firstScan) {
         console.log(chalk.cyan('   ✓ Using FULL scan (first time)'));
-        prompt = buildFullPrompt(files, gitInfo, graph);
+        prompt = buildFullPrompt(files, gitInfo, graph, historyContext);
       } else {
         console.log(chalk.cyan('   ✓ Using INCREMENTAL scan'));
         const previousMemory = await readYaml(getRecallPath('memory.yaml'));
-        prompt = buildIncrementalPrompt(changeInfo, graph, gitInfo, previousMemory, files);
+        prompt = buildIncrementalPrompt(changeInfo, graph, gitInfo, previousMemory, files, historyContext);
         
         // Calculate tokens saved
-        const fullPrompt = buildFullPrompt(files, gitInfo, graph);
+        const fullPrompt = buildFullPrompt(files, gitInfo, graph, historyContext);
         const fullTokens = estimateTokens(fullPrompt);
         tokensUsed = estimateTokens(prompt);
         tokensSaved = fullTokens - tokensUsed;
@@ -116,8 +153,8 @@ export default async function scanCommand(options) {
         console.log(chalk.green(`   💰 Tokens saved: ~${tokensSaved.toLocaleString()} (${percentSaved}%)`));
       }
 
-      // Step 6: Call Gemini
-      console.log(chalk.gray('Step 6/8: Calling Gemini API...'));
+      // Step 7: Call Gemini
+      console.log(chalk.gray('Step 7/9: Calling Gemini API...'));
       console.log(chalk.yellow('   ⏳ Analyzing with AI... (10-40 seconds)'));
       
       let response;
@@ -131,8 +168,8 @@ export default async function scanCommand(options) {
         return;
       }
 
-      // Step 7: Parse YAML
-      console.log(chalk.gray('Step 7/8: Parsing AI response...'));
+      // Step 8: Parse YAML
+      console.log(chalk.gray('Step 8/9: Parsing AI response...'));
       memory = await parseGeminiResponse(response);
       
       if (!memory) {
@@ -140,24 +177,28 @@ export default async function scanCommand(options) {
         return;
       }
 
+      // Run history validation on the AI response
+      const validationReport = await validateHistoryClaims(response, historyRetriever);
+      memory._historyValidation = validationReport;
+
       console.log(chalk.green('   ✅ Valid response parsed'));
     } else {
       // No changes, reuse existing memory
-      console.log(chalk.gray('Step 5/8: No changes detected'));
+      console.log(chalk.gray('Step 6/9: No changes detected'));
       console.log(chalk.green('   ✅ Reusing existing memory'));
       memory = await readYaml(getRecallPath('memory.yaml'));
       
       // Skip API steps
-      console.log(chalk.gray('Step 6/8: Skipped (no API call needed)'));
-      console.log(chalk.gray('Step 7/8: Skipped (no parsing needed)'));
+      console.log(chalk.gray('Step 7/9: Skipped (no API call needed)'));
+      console.log(chalk.gray('Step 8/9: Skipped (no parsing needed)'));
     }
   }
 
   // Enrich memory with graph data
   memory = enrichMemoryWithGraph(memory, graph);
 
-  // Step 8: Save and display
-  console.log(chalk.gray('Step 8/8: Generating summary...\n'));
+  // Step 9: Save and display
+  console.log(chalk.gray('Step 9/9: Generating summary...\n'));
   
   printSummary(memory, {
     localOnly,
@@ -291,15 +332,15 @@ async function buildLocalMemory(files, graph, gitInfo) {
 /**
  * Build full prompt for first scan
  */
-function buildFullPrompt(files, gitInfo, graph) {
+function buildFullPrompt(files, gitInfo, graph, historyContext) {
   const graphSummary = buildGraphSummary(graph);
-  return buildGeminiPrompt(files, gitInfo, graphSummary);
+  return buildGeminiPrompt(files, gitInfo, graphSummary, historyContext);
 }
 
 /**
  * Build incremental prompt for changed files
  */
-function buildIncrementalPrompt(changeInfo, graph, gitInfo, previousMemory, files) {
+function buildIncrementalPrompt(changeInfo, graph, gitInfo, previousMemory, files, historyContext) {
   const sections = [];
 
   sections.push(`You are updating an existing project memory based on recent changes.
@@ -348,6 +389,14 @@ Previous memory context:`);
     sections.push(gitInfo.log);
   }
 
+  if (historyContext) {
+    sections.push('\n## Verified prior session history (from local history index — treat as ground truth, do not contradict)');
+    sections.push(historyContext);
+    sections.push('\n## Instructions');
+    sections.push('Only state a decision/fact as settled if it appears above or in the code itself.');
+    sections.push('If you are inferring rather than citing, prefix the line with "[inference]".');
+  }
+
   sections.push(`\nUpdate the memory YAML to reflect these changes. Keep existing information that's still valid.`);
 
   return sections.join('\n');
@@ -380,7 +429,8 @@ async function parseGeminiResponse(response) {
   yamlText = yamlText.replace(/(-\s+|:\s+)@([\w/.-]+)/g, "$1'@$2'");
 
   try {
-    return yaml.load(yamlText);
+    const docs = yaml.loadAll(yamlText);
+    return docs.length > 0 ? docs[0] : null;
   } catch (error) {
     // Save raw response for debugging, then try a more aggressive cleanup
     await writeFile(getRecallPath('scan_debug.txt'), response);
@@ -392,7 +442,8 @@ async function parseGeminiResponse(response) {
       const docEndMatch = yamlText.match(/^\.\.\.$/m);
       if (docEndMatch) {
         yamlText = yamlText.substring(0, docEndMatch.index).trim();
-        return yaml.load(yamlText);
+        const docs = yaml.loadAll(yamlText);
+        return docs.length > 0 ? docs[0] : null;
       }
     } catch { /* second attempt also failed */ }
     

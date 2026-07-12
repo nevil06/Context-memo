@@ -70,6 +70,45 @@ export class Orchestrator {
         this.log('validator', 'Validation failed', {
           errors: validation.errors.length
         });
+
+        // Check if any error matches a past failure in sessionHistory
+        let repeatingFailure = false;
+        let matchedEventId = '';
+        for (const file of plan.affectedFiles) {
+          const fileContext = context.files.find(f => f.path === file);
+          if (fileContext && fileContext.sessionHistory) {
+            for (const event of fileContext.sessionHistory) {
+              const snippetLower = event.snippet.toLowerCase();
+              const hasFailureKeywords =
+                snippetLower.includes('fail') ||
+                snippetLower.includes('error') ||
+                snippetLower.includes('bug') ||
+                snippetLower.includes('broken');
+              if (hasFailureKeywords) {
+                for (const err of validation.errors) {
+                  if (snippetLower.includes(err.message.toLowerCase())) {
+                    repeatingFailure = true;
+                    matchedEventId = event.eventId;
+                    break;
+                  }
+                }
+              }
+              if (repeatingFailure) break;
+            }
+          }
+          if (repeatingFailure) break;
+        }
+
+        if (repeatingFailure) {
+          this.log('orchestrator', `CRITICAL: Repeating known mistake from past history event: ${matchedEventId}`);
+          return {
+            success: false,
+            error: `Validation failed: Repeating known mistake from past history event ${matchedEventId}`,
+            details: validation.errors,
+            code,
+            halted: true
+          };
+        }
         
         return {
           success: false,

@@ -67,6 +67,8 @@ program
   .description('Configure recall settings')
   .option('--key <key>', 'Set Gemini API key')
   .option('--show', 'Show current configuration')
+  .option('--history-enabled <enabled>', 'Enable/disable local history search (true|false)')
+  .option('--history-limit <limit>', 'Set max snippets per file pulled from history search')
   .action(configCommand);
 
 program

@@ -10,3 +10,6 @@ coverage/
 # Don't commit API keys or local config
 .recall/config.json
 ~/.recall/config.json
+.recall/*_cache.json
+.recall/checksums.json
+test-install-dir/

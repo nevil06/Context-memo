@@ -1,3 +1,5 @@
+import { TrustMeter } from '../trust/trustMeter.js';
+
 /**
  * Repository Health Dashboard
  * Visualizes repository health metrics and issues
@@ -28,6 +30,7 @@ export class HealthDashboard {
       unstableModules: await this.findUnstableModules(),
       orphanedFiles: await this.findOrphanedFiles(),
       complexityHotspots: await this.identifyComplexityHotspots(),
+      historyGrounding: await this.getHistoryGroundingMetrics(),
       recommendations: []
     };
 
@@ -35,6 +38,18 @@ export class HealthDashboard {
     report.recommendations = this.generateRecommendations(report);
 
     return report;
+  }
+
+  /**
+   * Get history grounding metrics from TrustMeter
+   */
+  async getHistoryGroundingMetrics() {
+    try {
+      const trustMeter = new TrustMeter(this.context);
+      return await trustMeter.getHistoryCitationMetrics();
+    } catch {
+      return { checkedClaims: 0, citedClaims: 0, uncitedClaims: 0, citationRate: 100, flagged: [] };
+    }
   }
 
   /**

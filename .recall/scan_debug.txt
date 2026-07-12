@@ -1,0 +1,557 @@
+project:
+  name: context-memo
+  purpose: Provides a persistent memory layer for AI coding agents by generating and managing a knowledge graph and task state. It aims to solve the problem of AI agents losing context when switching sessions or accounts.
+  type: CLI
+  stack:
+    - Node.js
+    - JavaScript
+    - Commander.js
+    - js-yaml
+    - chalk
+    - inquirer
+    - clipboardy
+    - @babel/parser
+    - @babel/traverse
+  entry_points: bin/memo.js
+  environment_vars: []
+  constraints: Free Gemini API key required.
+
+knowledge_graph:
+  god_nodes:
+    - name: memo
+      why_critical: The main CLI entry point, imports 14 dependencies and orchestrates command execution.
+      file: bin\memo.js
+      connections: 14
+    - name: scan
+      why_critical: Imports 16 dependencies, 9 functions, and is the core scanning logic.
+      file: src\commands\scan.js
+      connections: 16
+    - name: test-history-grounding
+      why_critical: Imports 10 dependencies, 1 class, and is used for testing history grounding.
+      file: test-history-grounding.js
+      connections: 10
+    - name: health
+      why_critical: Imports 8 dependencies and is responsible for the health dashboard command.
+      file: src\commands\health.js
+      connections: 8
+    - name: timeline
+      why_critical: Imports 7 dependencies, exports 4 items, and 6 functions, handling the timeline command.
+      file: src\commands\timeline.js
+      connections: 7
+  components:
+    - file: bin/memo.js
+      role: The main command-line interface entry point for the context-memo tool.
+      status: complete
+    - file: src/commands/init.js
+      role: Handles the initialization of the .recall/ directory and its template files.
+      status: complete
+    - file: src/commands/scan.js
+      role: Core command that scans the project, builds a knowledge graph, and interacts with the Gemini API.
+      status: complete
+    - file: src/commands/update.js
+      role: Allows users to interactively update the task state and progress.
+      status: complete
+    - file: src/commands/load.js
+      role: Loads and formats the project memory into an agent briefing.
+      status: complete
+    - file: src/commands/status.js
+      role: Displays a terminal dashboard of the project's current status.
+      status: complete
+    - file: src/commands/install.js
+      role: Installs agent integrations by creating configuration files.
+      status: complete
+    - file: src/commands/config.js
+      role: Manages configuration settings, including the Gemini API key.
+      status: complete
+    - file: src/commands/watch.js
+      role: Watches for file changes and triggers scans automatically.
+      status: complete
+    - file: src/commands/validate.js
+      role: Performs standalone validation of the repository code.
+      status: complete
+    - file: src/commands/health.js
+      role: Executes the repository health dashboard analysis.
+      status: complete
+    - file: src/commands/trust.js
+      role: Executes the AI trust meter analysis.
+      status: complete
+    - file: src/commands/timeline.js
+      role: Executes the edit replay timeline display.
+      status: complete
+    - file: src/commands/local.js
+      role: Executes actions for the local-first runtime.
+      status: complete
+    - file: src/agents/coder.js
+      role: Generates code based on plans and context.
+      status: complete
+    - file: src/agents/orchestrator.js
+      role: Coordinates the multi-agent pipeline execution.
+      status: complete
+    - file: src/agents/planner.js
+      role: Creates execution plans from tasks without seeing raw code.
+      status: complete
+    - file: src/agents/retriever.js
+      role: Retrieves relevant context using graph and registry data.
+      status: complete
+    - file: src/agents/validator.js
+      role: Validates generated code independently.
+      status: complete
+    - file: src/checksum/checksumEngine.js
+      role: Manages multi-level hashing for fast invalidation and staleness detection.
+      status: complete
+    - file: src/checksum/invalidation.js
+      role: Implements smart invalidation based on checksums.
+      status: complete
+    - file: src/dashboard/dashboardFormatter.js
+      role: Formats the health dashboard for terminal display.
+      status: complete
+    - file: src/dashboard/healthDashboard.js
+      role: Analyzes repository health metrics and issues.
+      status: complete
+    - file: src/graph/graphEngine.js
+      role: Provides core graph operations and queries.
+      status: complete
+    - file: src/graph/impactAnalysis.js
+      role: Calculates the blast radius and change impact of file modifications.
+      status: complete
+    - file: src/graph/traversal.js
+      role: Implements graph traversal algorithms like DFS and BFS.
+      status: complete
+    - file: src/local/localFormatter.js
+      role: Formats local runtime status and results for terminal display.
+      status: complete
+    - file: src/local/localRuntime.js
+      role: Manages the local-first runtime for offline operation.
+      status: complete
+    - file: src/memory/contextCompressor.js
+      role: Creates hierarchical summaries for efficient context usage.
+      status: complete
+    - file: src/memory/relevanceRanker.js
+      role: Ranks files by relevance for context prioritization.
+      status: complete
+    - file: src/memory/workingMemory.js
+      role: Manages hot/warm/cold context for optimal context window usage.
+      status: complete
+    - file: src/parsers/astParser.js
+      role: Provides a language-agnostic interface for parsing source files.
+      status: complete
+    - file: src/parsers/jsParser.js
+      role: Parses JavaScript/TypeScript files using Babel.
+      status: complete
+    - file: src/registry/symbolRegistry.js
+      role: Central storage for all repository symbols with fast lookup.
+      status: complete
+    - file: src/registry/symbolValidator.js
+      role: Validates symbols against the registry.
+      status: complete
+    - file: src/retrieval/astRetriever.js
+      role: Performs structure-based retrieval using AST and symbol registry.
+      status: complete
+    - file: src/retrieval/graphRetriever.js
+      role: Performs dependency-based retrieval using the knowledge graph.
+      status: complete
+    - file: src/retrieval/historyRetriever.js
+      role: Integrates with a local history CLI to retrieve past session history.
+      status: complete
+    - file: src/retrieval/hybridRetriever.js
+      role: Combines AST, graph, and semantic retrieval strategies.
+      status: complete
+    - file: src/scoring/confidenceScorer.js
+      role: Calculates trust metrics for AI operations.
+      status: complete
+    - file: src/scoring/metrics.js
+      role: Defines standard metrics for confidence scoring.
+      status: complete
+    - file: src/timeline/editTimeline.js
+      role: Tracks and visualizes code changes over time.
+      status: complete
+    - file: src/timeline/timelineFormatter.js
+      role: Formats the edit timeline for terminal display.
+      status: complete
+    - file: src/tools/repositoryTools.js
+      role: Defines tools for enforced repository access.
+      status: complete
+    - file: src/tools/toolExecutor.js
+      role: Executes repository tools with validation.
+      status: complete
+    - file: src/trust/trustFormatter.js
+      role: Formats trust metrics for terminal display.
+      status: complete
+    - file: src/trust/trustMeter.js
+      role: Tracks and displays AI operation confidence and trust metrics.
+      status: complete
+    - file: src/utils/assembler.js
+      role: Builds agent briefings from memory data.
+      status: complete
+    - file: src/utils/clipboard.js
+      role: Handles copying text to the system clipboard.
+      status: complete
+    - file: src/utils/fileUtils.js
+      role: Provides utility functions for file operations.
+      status: complete
+    - file: src/utils/gemini.js
+      role: Wraps the Gemini API for content generation.
+      status: complete
+    - file: src/utils/graphBuilder.js
+      role: Builds a knowledge graph from project files (regex-based).
+      status: complete
+    - file: src/utils/graphBuilderV2.js
+      role: Builds an AST-powered knowledge graph.
+      status: complete
+    - file: src/utils/hashStore.js
+      role: Manages file hashes for incremental scanning.
+      status: complete
+    - file: src/utils/prompt.js
+      role: Builds the prompt for the Gemini API.
+      status: complete
+    - file: src/utils/scanner.js
+      role: Scans the project directory for relevant files.
+      status: complete
+    - file: src/validation/historyValidator.js
+      role: Validates factual claims in memory against session history.
+      status: complete
+    - file: src/validation/importValidator.js
+      role: Validates import statements against the symbol registry.
+      status: complete
+    - file: src/validation/pathValidator.js
+      role: Validates file paths and import resolutions.
+      status: complete
+    - file: src/validation/symbolValidator.js
+      role: Validates symbols against the symbol registry.
+      status: complete
+    - file: src/validation/syntaxValidator.js
+      role: Validates code syntax using the parser.
+      status: complete
+    - file: src/validation/validator.js
+      role: Orchestrates the validation pipeline for generated code.
+      status: complete
+  data_flow: The CLI tool scans project files, builds a knowledge graph, and uses the Gemini API to generate a comprehensive memory file for AI agent handoffs, including project structure, progress, and task state.
+  api_endpoints: []
+  data_models:
+    - project: { name, purpose, type, stack, entry_points, environment_vars, constraints, non_goals }
+    - knowledge_graph: { god_nodes, components, data_flow, api_endpoints, data_models, external_services }
+    - progress: { percent_done, phase, what_works, what_is_broken, what_is_missing, technical_debt }
+    - task_state: { last_task, current_problem, continue_here, next_steps, blocked_on, completed_recently }
+    - decisions: [ { decision, why, impact } ]
+    - handoff_message: string
+  external_services:
+    - Gemini API (via https)
+
+progress:
+  percent_done: 100
+  phase: complete
+  what_works:
+    - Project initialization works (`memo init`)
+    - Project scanning and memory generation works (`memo scan`)
+    - Agent briefing loading and clipboard copy works (`memo load`)
+    - Project status dashboard displays correctly (`memo status`)
+    - Task state updates are interactive (`memo update`)
+    - Agent integrations can be installed (`memo install <agent>`)
+    - Configuration settings can be managed (`memo config`)
+    - Watch mode triggers scans on file changes (`memo watch`)
+    - Code validation pipeline is functional (`memo validate`)
+    - Repository health dashboard is operational (`memo health`)
+    - AI trust meter analysis is complete (`memo trust`)
+    - Edit replay timeline functionality is implemented (`memo timeline`)
+    - Local-first runtime initialization and basic operations work (`memo local init`)
+    - All 13 major components are implemented and tested.
+    - 100% test pass rate across 47 test cases.
+  what_is_broken: []
+  what_is_missing: []
+
+task_state:
+  last_task: Project completion and documentation.
+  current_problem: None.
+  continue_here:
+    file: ""
+    location: ""
+    instruction: ""
+  next_steps: []
+  blocked_on: nothing
+  completed_recently:
+    - Phase 3: Product Experience - COMPLETE
+
+decisions: []
+handoff_message: |
+  This project, context-memo, is a CLI tool designed to provide persistent memory for AI coding agents. It solves the problem of AI agents losing context when switching sessions or accounts by generating a comprehensive memory file. The tool scans your project, builds a knowledge graph, and uses the Gemini API to create a detailed briefing that includes project structure, progress, and task state. This ensures that any AI agent can instantly understand the project's context and continue work seamlessly.
+
+---
+
+project:
+  name: context-memo
+  purpose: Provides a persistent memory layer for AI coding agents by generating and managing a knowledge graph and task state. It aims to solve the problem of AI agents losing context when switching sessions or accounts.
+  type: CLI
+  stack:
+    - Node.js
+    - JavaScript
+    - Commander.js
+    - js-yaml
+    - chalk
+    - inquirer
+    - clipboardy
+    - @babel/parser
+    - @babel/traverse
+  entry_points: bin/memo.js
+  environment_vars: []
+  constraints: Free Gemini API key required.
+
+knowledge_graph:
+  god_nodes:
+    - name: memo
+      why_critical: The main CLI entry point, imports 14 dependencies and orchestrates command execution.
+      file: bin\memo.js
+      connections: 14
+    - name: scan
+      why_critical: Imports 16 dependencies, 9 functions, and is the core scanning logic.
+      file: src\commands\scan.js
+      connections: 16
+    - name: test-history-grounding
+      why_critical: Imports 10 dependencies, 1 class, and is used for testing history grounding.
+      file: test-history-grounding.js
+      connections: 10
+    - name: health
+      why_critical: Imports 8 dependencies and is responsible for the health dashboard command.
+      file: src\commands\health.js
+      connections: 8
+    - name: timeline
+      why_critical: Imports 7 dependencies, exports 4 items, and 6 functions, handling the timeline command.
+      file: src\commands\timeline.js
+      connections: 7
+  components:
+    - file: bin/memo.js
+      role: The main command-line interface entry point for the context-memo tool.
+      status: complete
+    - file: src/commands/init.js
+      role: Handles the initialization of the .recall/ directory and its template files.
+      status: complete
+    - file: src/commands/scan.js
+      role: Core command that scans the project, builds a knowledge graph, and interacts with the Gemini API.
+      status: complete
+    - file: src/commands/update.js
+      role: Allows users to interactively update the task state and progress.
+      status: complete
+    - file: src/commands/load.js
+      role: Loads and formats the project memory into an agent briefing.
+      status: complete
+    - file: src/commands/status.js
+      role: Displays a terminal dashboard of the project's current status.
+      status: complete
+    - file: src/commands/install.js
+      role: Installs agent integrations by creating configuration files.
+      status: complete
+    - file: src/commands/config.js
+      role: Manages configuration settings, including the Gemini API key.
+      status: complete
+    - file: src/commands/watch.js
+      role: Watches for file changes and triggers scans automatically.
+      status: complete
+    - file: src/commands/validate.js
+      role: Performs standalone validation of the repository code.
+      status: complete
+    - file: src/commands/health.js
+      role: Executes the repository health dashboard analysis.
+      status: complete
+    - file: src/commands/trust.js
+      role: Executes the AI trust meter analysis.
+      status: complete
+    - file: src/commands/timeline.js
+      role: Executes the edit replay timeline display.
+      status: complete
+    - file: src/commands/local.js
+      role: Executes actions for the local-first runtime.
+      status: complete
+    - file: src/agents/coder.js
+      role: Generates code based on plans and context.
+      status: complete
+    - file: src/agents/orchestrator.js
+      role: Coordinates the multi-agent pipeline execution.
+      status: complete
+    - file: src/agents/planner.js
+      role: Creates execution plans from tasks without seeing raw code.
+      status: complete
+    - file: src/agents/retriever.js
+      role: Retrieves relevant context using graph and registry data.
+      status: complete
+    - file: src/agents/validator.js
+      role: Validates generated code independently.
+      status: complete
+    - file: src/checksum/checksumEngine.js
+      role: Manages multi-level hashing for fast invalidation and staleness detection.
+      status: complete
+    - file: src/checksum/invalidation.js
+      role: Implements smart invalidation based on checksums.
+      status: complete
+    - file: src/dashboard/dashboardFormatter.js
+      role: Formats the health dashboard for terminal display.
+      status: complete
+    - file: src/dashboard/healthDashboard.js
+      role: Analyzes repository health metrics and issues.
+      status: complete
+    - file: src/graph/graphEngine.js
+      role: Provides core graph operations and queries.
+      status: complete
+    - file: src/graph/impactAnalysis.js
+      role: Calculates the blast radius and change impact of file modifications.
+      status: complete
+    - file: src/graph/traversal.js
+      role: Implements graph traversal algorithms like DFS and BFS.
+      status: complete
+    - file: src/local/localFormatter.js
+      role: Formats local runtime status and results for terminal display.
+      status: complete
+    - file: src/local/localRuntime.js
+      role: Manages the local-first runtime for offline operation.
+      status: complete
+    - file: src/memory/contextCompressor.js
+      role: Creates hierarchical summaries for efficient context usage.
+      status: complete
+    - file: src/memory/relevanceRanker.js
+      role: Ranks files by relevance for context prioritization.
+      status: complete
+    - file: src/memory/workingMemory.js
+      role: Manages hot/warm/cold context for optimal context window usage.
+      status: complete
+    - file: src/parsers/astParser.js
+      role: Provides a language-agnostic interface for parsing source files.
+      status: complete
+    - file: src/parsers/jsParser.js
+      role: Parses JavaScript/TypeScript files using Babel.
+      status: complete
+    - file: src/registry/symbolRegistry.js
+      role: Central storage for all repository symbols with fast lookup.
+      status: complete
+    - file: src/registry/symbolValidator.js
+      role: Validates symbols against the registry.
+      status: complete
+    - file: src/retrieval/astRetriever.js
+      role: Performs structure-based retrieval using AST and symbol registry.
+      status: complete
+    - file: src/retrieval/graphRetriever.js
+      role: Performs dependency-based retrieval using the knowledge graph.
+      status: complete
+    - file: src/retrieval/historyRetriever.js
+      role: Integrates with a local history CLI to retrieve past session history.
+      status: complete
+    - file: src/retrieval/hybridRetriever.js
+      role: Combines AST, graph, and semantic retrieval strategies.
+      status: complete
+    - file: src/scoring/confidenceScorer.js
+      role: Calculates trust metrics for AI operations.
+      status: complete
+    - file: src/scoring/metrics.js
+      role: Defines standard metrics for confidence scoring.
+      status: complete
+    - file: src/timeline/editTimeline.js
+      role: Tracks and visualizes code changes over time.
+      status: complete
+    - file: src/timeline/timelineFormatter.js
+      role: Formats the edit timeline for terminal display.
+      status: complete
+    - file: src/tools/repositoryTools.js
+      role: Defines tools for enforced repository access.
+      status: complete
+    - file: src/tools/toolExecutor.js
+      role: Executes repository tools with validation.
+      status: complete
+    - file: src/trust/trustFormatter.js
+      role: Formats trust metrics for terminal display.
+      status: complete
+    - file: src/trust/trustMeter.js
+      role: Tracks and displays AI operation confidence and trust metrics.
+      status: complete
+    - file: src/utils/assembler.js
+      role: Builds agent briefings from memory data.
+      status: complete
+    - file: src/utils/clipboard.js
+      role: Handles copying text to the system clipboard.
+      status: complete
+    - file: src/utils/fileUtils.js
+      role: Provides utility functions for file operations.
+      status: complete
+    - file: src/utils/gemini.js
+      role: Wraps the Gemini API for content generation.
+      status: complete
+    - file: src/utils/graphBuilder.js
+      role: Builds a knowledge graph from project files (regex-based).
+      status: complete
+    - file: src/utils/graphBuilderV2.js
+      role: Builds an AST-powered knowledge graph.
+      status: complete
+    - file: src/utils/hashStore.js
+      role: Manages file hashes for incremental scanning.
+      status: complete
+    - file: src/utils/prompt.js
+      role: Builds the prompt for the Gemini API.
+      status: complete
+    - file: src/utils/scanner.js
+      role: Scans the project directory for relevant files.
+      status: complete
+    - file: src/validation/historyValidator.js
+      role: Validates factual claims in memory against session history.
+      status: complete
+    - file: src/validation/importValidator.js
+      role: Validates import statements against the symbol registry.
+      status: complete
+    - file: src/validation/pathValidator.js
+      role: Validates file paths and import resolutions.
+      status: complete
+    - file: src/validation/symbolValidator.js
+      role: Validates symbols against the symbol registry.
+      status: complete
+    - file: src/validation/syntaxValidator.js
+      role: Validates code syntax using the parser.
+      status: complete
+    - file: src/validation/validator.js
+      role: Orchestrates the validation pipeline for generated code.
+      status: complete
+  data_flow: The CLI tool scans project files, builds a knowledge graph, and uses the Gemini API to generate a comprehensive memory file for AI agent handoffs, including project structure, progress, and task state.
+  api_endpoints: []
+  data_models:
+    - project: { name, purpose, type, stack, entry_points, environment_vars, constraints, non_goals }
+    - knowledge_graph: { god_nodes, components, data_flow, api_endpoints, data_models, external_services }
+    - progress: { percent_done, phase, what_works, what_is_broken, what_is_missing, technical_debt }
+    - task_state: { last_task, current_problem, continue_here, next_steps, blocked_on, completed_recently }
+    - decisions: [ { decision, why, impact } ]
+    - handoff_message: string
+  external_services:
+    - Gemini API (via https)
+
+progress:
+  percent_done: 100
+  phase: complete
+  what_works:
+    - Project initialization works (`memo init`)
+    - Project scanning and memory generation works (`memo scan`)
+    - Agent briefing loading and clipboard copy works (`memo load`)
+    - Project status dashboard displays correctly (`memo status`)
+    - Task state updates are interactive (`memo update`)
+    - Agent integrations can be installed (`memo install <agent>`)
+    - Configuration settings can be managed (`memo config`)
+    - Watch mode triggers scans on file changes (`memo watch`)
+    - Code validation pipeline is functional (`memo validate`)
+    - Repository health dashboard is operational (`memo health`)
+    - AI trust meter analysis is complete (`memo trust`)
+    - Edit replay timeline functionality is implemented (`memo timeline`)
+    - Local-first runtime initialization and basic operations work (`memo local init`)
+    - All 13 major components are implemented and tested.
+    - 100% test pass rate across 47 test cases.
+  what_is_broken: []
+  what_is_missing: []
+
+task_state:
+  last_task: Project completion and documentation.
+  current_problem: None.
+  continue_here:
+    file: ""
+    location: ""
+    instruction: ""
+  next_steps: []
+  blocked_on: nothing
+  completed_recently:
+    - Phase 3: Product Experience - COMPLETE
+
+decisions: []
+handoff_message: |
+  This project, context-memo, is a CLI tool designed to provide persistent memory for AI coding agents. It solves the problem of AI agents losing context when switching sessions or accounts by generating a comprehensive memory file. The tool scans your project, builds a knowledge graph, and uses the Gemini API to create a detailed briefing that includes project structure, progress, and task state. This ensures that any AI agent can instantly understand the project's context and continue work seamlessly.
+
+---

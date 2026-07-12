@@ -29,6 +29,7 @@ When working with AI coding agents (Claude, Cursor, Windsurf, Copilot, etc.) and
 
 - 🔍 **Local Knowledge Graph** — Analyzes code structure without API calls
 - 🧠 **AI-Powered Reasoning** — Uses Gemini for deep insights
+- 🔗 **History Grounding** — Ground AI reasoning against your local session history (optional)
 - 📊 **Incremental Updates** — Only scans changed files (saves 60-90% tokens)
 - � **Privacy Mode** — Local-only scanning (--local flag)
 - 🎯 **Exact Continuation** — Tells next agent exactly where to continue
@@ -68,6 +69,22 @@ Paste the briefing into your AI agent and it instantly understands your entire p
 2. Click "Create API Key" (no credit card required)
 3. Copy your key
 4. Run: `memo config --key YOUR_KEY`
+
+## Optional: Install Local History CLI for Grounded Reasoning
+
+`context-memo` integrates with a local history command-line indexer to ground AI reasoning in your actual past session history. This allows `context-memo` to check if a proposed step was previously tried and failed, preventing unsupervised agent runs from looping on dead ends.
+
+Installing the history indexer is entirely optional, and `context-memo` will work identically without it if missing.
+
+To enable history grounding:
+1. Install the history indexer CLI via its official installation instructions.
+2. Run the history indexer in your projects to record session history.
+3. `context-memo` will automatically detect the indexer at runtime and configure `historyEnabled` to `true`.
+4. Configure limits or disable it at any time:
+   ```bash
+   memo config --history-enabled false
+   memo config --history-limit 5
+   ```
 
 ## Commands
 

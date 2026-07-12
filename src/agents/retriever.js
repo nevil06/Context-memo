@@ -1,3 +1,5 @@
+import { HistoryRetriever } from '../retrieval/historyRetriever.js';
+
 /**
  * Retriever Agent
  * Retrieves relevant context using graph and registry
@@ -9,6 +11,7 @@ export class RetrieverAgent {
     this.graph = context.graph;
     this.registry = context.registry;
     this.workingMemory = context.workingMemory;
+    this.historyRetriever = new HistoryRetriever({ log: () => {} });
   }
 
   /**
@@ -68,8 +71,11 @@ export class RetrieverAgent {
       return null;
     }
 
+    const sessionHistory = await this.historyRetriever.retrieveForFile(filePath);
+
     return {
       path: filePath,
+      sessionHistory,
       symbols: {
         functions: symbols.functions || [],
         classes: symbols.classes || [],

@@ -1,3 +1,7 @@
+import { validateHistoryClaims } from '../validation/historyValidator.js';
+import { HistoryRetriever } from '../retrieval/historyRetriever.js';
+import { getRecallPath, fileExists, readFile } from '../utils/fileUtils.js';
+
 /**
  * AI Trust Meter
  * Tracks and displays AI operation confidence and trust metrics
@@ -36,6 +40,39 @@ export class TrustMeter {
     report.recommendations = this.generateRecommendations(report);
 
     return report;
+  }
+
+  /**
+   * Get history citation metrics
+   */
+  async getHistoryCitationMetrics() {
+    if (this.context.historyValidation) {
+      return this.context.historyValidation;
+    }
+    if (this.context.memory && this.context.memory._historyValidation) {
+      return this.context.memory._historyValidation;
+    }
+
+    const memoryPath = getRecallPath('memory.yaml');
+    if (!await fileExists(memoryPath)) {
+      return { checkedClaims: 0, citedClaims: 0, uncitedClaims: 0, citationRate: 100, flagged: [] };
+    }
+
+    try {
+      const memoryText = await readFile(memoryPath, 'utf8');
+      const historyRetriever = new HistoryRetriever({ log: () => {} });
+      const validation = await validateHistoryClaims(memoryText, historyRetriever);
+      
+      const total = validation.checkedClaims + validation.uncitedClaims;
+      const citationRate = total > 0 ? (validation.citedClaims / total) * 100 : 100;
+      
+      return {
+        ...validation,
+        citationRate: Math.round(citationRate * 100) / 100
+      };
+    } catch {
+      return { checkedClaims: 0, citedClaims: 0, uncitedClaims: 0, citationRate: 100, flagged: [] };
+    }
   }
 
   /**
@@ -98,6 +135,19 @@ export class TrustMeter {
         rate: history.successRate,
         deduction,
         status: history.successRate >= 90 ? 'good' : history.successRate >= 75 ? 'fair' : 'poor'
+      });
+    }
+
+    // Factor 5: History citation rate
+    const historyMetrics = await this.getHistoryCitationMetrics();
+    if (historyMetrics.citationRate < 100) {
+      const deduction = (100 - historyMetrics.citationRate) * 0.2;
+      score -= deduction;
+      factors.push({
+        name: 'History Citation',
+        rate: historyMetrics.citationRate,
+        deduction,
+        status: historyMetrics.citationRate >= 90 ? 'good' : historyMetrics.citationRate >= 70 ? 'fair' : 'poor'
       });
     }
 
@@ -282,6 +332,19 @@ export class TrustMeter {
         count: cycles.length,
         risk,
         message: `${cycles.length} circular dependencies`
+      });
+    }
+
+    // Risk 5: Uncited claims
+    const historyMetrics = await this.getHistoryCitationMetrics();
+    if (historyMetrics.uncitedClaims > 0) {
+      const risk = Math.min(20, historyMetrics.uncitedClaims * 2);
+      riskScore += risk;
+      risks.push({
+        type: 'uncited_claims',
+        count: historyMetrics.uncitedClaims,
+        risk,
+        message: `${historyMetrics.uncitedClaims} uncited claims`
       });
     }
 
