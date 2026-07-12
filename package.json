@@ -1,6 +1,6 @@
 {
   "name": "context-memo",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "description": "Hybrid AI memory layer: Local knowledge graph + AI-powered reasoning for persistent context",
   "bin": {
     "memo": "./bin/memo.js"
